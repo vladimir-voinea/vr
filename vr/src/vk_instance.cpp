@@ -13,7 +13,7 @@ namespace vr
 
 	vk_instance::~vk_instance()
 	{
-
+		vkDestroyInstance(m_instance, nullptr);
 	}
 
 	bool vk_instance::init()
