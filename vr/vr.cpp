@@ -4,10 +4,20 @@
 #include "vr.h"
 #include <GLFW/glfw3.h>
 
-using namespace std;
-
 int main()
 {
-	cout << "Hello CMake." << endl;
+    glfwInit();
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Working window", nullptr, nullptr);
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+
 	return 0;
 }
