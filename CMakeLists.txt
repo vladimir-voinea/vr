@@ -2,8 +2,7 @@
 # and include sub-projects here.
 #
 cmake_minimum_required (VERSION 3.8)
-
-project ("vr")
+project(vr VERSION 0.1 DESCRIPTION "Vulkan graphics library")
 
 # GLFW3
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -17,5 +16,8 @@ add_subdirectory ("glm")
 # CMake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-# Include sub-projects.
+# vr directory
 add_subdirectory ("vr")
+
+# examples directory
+add_subdirectory ("examples")
