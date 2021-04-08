@@ -1,0 +1,9 @@
+[submodule "glfw3"]
+	path = dependencies/glfw
+	url = https://github.com/glfw/glfw.git
+	branch = 3.3.3
+
+[submodule "glm"]
+	path = dependencies/glm
+	url = https://github.com/g-truc/glm.git
+	branch = 0.9.9.8
