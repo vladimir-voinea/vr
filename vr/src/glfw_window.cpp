@@ -29,7 +29,7 @@ namespace vr {
 		deinitialize_glfw();
 	}
 
-	bool glfw_window::run()
+	bool glfw_window::run(i_window_loop* loop)
 	{
 		const auto created = create();
 		if (!created) {
@@ -39,6 +39,14 @@ namespace vr {
 		while (!close_requested())
 		{
 			glfwPollEvents();
+			if (loop)
+			{
+				const auto continue_looping = loop->loop();
+				if (!continue_looping)
+				{
+					return true;
+				}
+			}
 		}
 
 		return true;

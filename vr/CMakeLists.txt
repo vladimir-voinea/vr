@@ -6,7 +6,8 @@ set(LIB_NAME "vr")
 
 set(SOURCES "src/glfw_initialization.cpp"
 			"src/glfw_window.cpp" 
-			"src/glfw_window_settings.cpp")
+			"src/glfw_window_settings.cpp"
+			"src/i_window_loop.cpp")
 			
 add_library (${LIB_NAME} ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
