@@ -1,1 +1,1 @@
-add_subdirectory(basic_window)
+add_subdirectory(basic_glfw_window)

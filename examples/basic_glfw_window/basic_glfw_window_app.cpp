@@ -1,19 +1,19 @@
-#include "basic_window_app.hpp"
+#include "basic_glfw_window_app.hpp"
 
 #include <vr.hpp>
 
 #include <iostream>
 
-void basic_window_app::run()
+void basic_glfw_window_app::run()
 {
-	vr::window_settings settings;
+	vr::glfw_window_settings settings;
 	settings.width = 800;
 	settings.height = 600;
 	settings.name = "Basic window example";
 	settings.create_opengl_context = false;
 	settings.resizable = false;
 
-	vr::window window(settings);
+	vr::glfw_window window(settings);
 
 	const auto success = window.run();
 

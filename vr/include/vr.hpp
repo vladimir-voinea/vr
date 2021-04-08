@@ -3,6 +3,6 @@
 
 #pragma once
 
-#include "window.hpp"
+#include "glfw_window.hpp"
 
 // TODO: Reference additional headers your program requires here.

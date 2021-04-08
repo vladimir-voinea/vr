@@ -4,7 +4,7 @@
 
 namespace vr
 {
-	struct window_settings
+	struct glfw_window_settings
 	{
 		int width = 800;
 		int height = 600;
