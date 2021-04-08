@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "glfw_initialization.hpp"
 #include "glfw_window.hpp"
+#include "glfw_util.hpp"
 
 // TODO: Reference additional headers your program requires here.
