@@ -14,5 +14,8 @@ add_subdirectory ("glfw-3.3.3")
 # GLM
 add_subdirectory ("glm")
 
+# CMake modules
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 # Include sub-projects.
 add_subdirectory ("vr")
