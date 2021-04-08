@@ -7,6 +7,9 @@ project(vr VERSION 0.1 DESCRIPTION "Vulkan graphics library")
 # CMake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+# External dependencies
+add_subdirectory ("dependencies")
+
 # vr-glfw directory
 add_subdirectory ("vr-glfw")
 
