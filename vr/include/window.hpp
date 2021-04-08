@@ -1,5 +1,7 @@
 #pragma once
 
+#include "window_settings.hpp"
+
 #include <string>
 
 struct GLFWwindow;
@@ -7,7 +9,7 @@ struct GLFWwindow;
 namespace vr {
 	class window {
 	public:
-		window(int width, int height, std::string name);
+		window(window_settings settings);
 		~window();
 
 		window(const window&) = delete;
@@ -18,8 +20,6 @@ namespace vr {
 		bool close_requested();
 	private:
 		GLFWwindow* m_window = nullptr;
-		int m_width;
-		int m_height;
-		std::string m_name;
+		const window_settings m_settings;
 	};
 }

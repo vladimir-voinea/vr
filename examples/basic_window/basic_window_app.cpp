@@ -6,7 +6,14 @@
 
 void basic_window_app::run()
 {
-	vr::window window(800, 600, "Basic window example");
+	vr::window_settings settings;
+	settings.width = 800;
+	settings.height = 600;
+	settings.name = "Basic window example";
+	settings.create_opengl_context = false;
+	settings.resizable = false;
+
+	vr::window window(settings);
 
 	const auto success = window.run();
 

@@ -7,17 +7,20 @@
 #include <stdexcept>
 
 namespace vr {
-	window::window(int width, int height, std::string name)
-		: m_width(width)
-		, m_height(height)
-		, m_name(name)
+	window::window(window_settings settings)
+		: m_settings(settings)
 	{
 		if (!initialize_glfw_once()) {
 			throw std::runtime_error("GLFW initialization failed");
 		}
 
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		if (!m_settings.create_opengl_context)
+		{
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		}
+
+		const bool resizable = m_settings.resizable ? GLFW_TRUE : GLFW_FALSE;
+		glfwWindowHint(GLFW_RESIZABLE, resizable);
 	}
 
 	window::~window()
@@ -43,7 +46,7 @@ namespace vr {
 
 	bool window::create()
 	{
-		m_window = glfwCreateWindow(m_width, m_height, m_name.c_str(), nullptr, nullptr);
+		m_window = glfwCreateWindow(m_settings.width, m_settings.height, m_settings.name.c_str(), nullptr, nullptr);
 
 		return m_window != nullptr;
 	}
