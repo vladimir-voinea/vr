@@ -1,1 +1,2 @@
 add_subdirectory(basic_glfw_window)
+add_subdirectory(vulkan_support_check)
