@@ -1,6 +1,5 @@
 #include "glfw_initialization.hpp"
 
-#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 namespace

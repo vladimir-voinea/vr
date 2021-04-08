@@ -1,6 +1,6 @@
 #include "vulkan_support_check_app.hpp"
 
-#include <vr.hpp>
+#include <vr-glfw.hpp>
 
 #include <iostream>
 

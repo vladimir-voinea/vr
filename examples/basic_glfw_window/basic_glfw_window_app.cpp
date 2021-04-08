@@ -1,6 +1,6 @@
 #include "basic_glfw_window_app.hpp"
 
-#include <vr.hpp>
+#include <vr-glfw.hpp>
 
 #include <iostream>
 
