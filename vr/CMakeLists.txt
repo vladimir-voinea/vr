@@ -9,6 +9,7 @@ set(SOURCES "src/glfw_initialization.cpp"
 			"src/window_settings.cpp")
 			
 add_library (${LIB_NAME} ${SOURCES})
+target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
 target_link_libraries(${LIB_NAME} PUBLIC glfw glm Vulkan::Vulkan)
 
 target_include_directories(${LIB_NAME} PUBLIC include)
