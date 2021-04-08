@@ -11,6 +11,8 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory ("glfw-3.3.3")
 
+# GLM
+add_subdirectory ("glm")
 
 # Include sub-projects.
 add_subdirectory ("vr")
