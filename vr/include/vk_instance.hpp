@@ -14,6 +14,9 @@ namespace vr
 		vk_instance(vk_instance_settings settings);
 		~vk_instance();
 
+		vk_instance(const vk_instance&) = delete;
+		vk_instance& operator=(const vk_instance&) = delete;
+
 		bool init();
 		VkInstance get_instance_handle() const;
 

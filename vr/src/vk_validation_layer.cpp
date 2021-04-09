@@ -2,8 +2,6 @@
 
 #include <vk_extensions.hpp>
 
-#include <iostream>
-
 namespace vr
 {
 	vk_validation_layer::vk_validation_layer(const vk_instance& instance, vk_validation_layer_settings settings)

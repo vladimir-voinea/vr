@@ -15,31 +15,13 @@ VKAPI_ATTR VkBool32 VKAPI_CALL test_debug_callback(VkDebugUtilsMessageSeverityFl
 
 TEST(vk_validation_layer, can_init_with_validation_extension)
 {
-	{
-		vr::vk_instance_settings settings;
-		settings.extensions = { "VK_EXT_debug_utils" };
+	vr::vk_instance_settings settings;
+	settings.extensions = { "VK_EXT_debug_utils" };
+	settings.layers = { "VK_LAYER_KHRONOS_validation" };
 
-		vr::vk_instance instance(settings);
+	vr::vk_instance instance(settings);
 
-		EXPECT_TRUE(instance.init());
-	}
-	{
-		vr::vk_instance_settings settings;
-		settings.layers = { "VK_LAYER_KHRONOS_validation" };
-
-		vr::vk_instance instance(settings);
-
-		EXPECT_TRUE(instance.init());
-	}
-	{
-		vr::vk_instance_settings settings;
-		settings.extensions = { "VK_EXT_debug_utils" };
-		settings.layers = { "VK_LAYER_KHRONOS_validation" };
-
-		vr::vk_instance instance(settings);
-
-		EXPECT_TRUE(instance.init());
-	}
+	EXPECT_TRUE(instance.init());
 }
 
 TEST(vk_validation_layer, validation_layer_creation)

@@ -13,6 +13,9 @@ namespace vr
 		vk_validation_layer(const vk_instance& instance_handle, vk_validation_layer_settings settings);
 		~vk_validation_layer();
 
+		vk_validation_layer(const vk_validation_layer&) = delete;
+		vk_validation_layer& operator=(const vk_validation_layer&) = delete;
+
 		bool init();
 
 	private:

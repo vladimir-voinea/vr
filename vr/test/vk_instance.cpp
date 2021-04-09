@@ -5,19 +5,10 @@
 
 TEST(vk_instance, can_init_instance_with_empty_settings)
 {
-	{
-		vr::vk_instance_settings empty_settings;
-		vr::vk_instance instance(empty_settings);
+	vr::vk_instance_settings empty_settings;
+	vr::vk_instance instance(empty_settings);
 
-		EXPECT_TRUE(instance.init());
-	}
-
-	{
-		vr::vk_instance_settings empty_settings;
-		vr::vk_instance instance(empty_settings);
-
-		EXPECT_NO_FATAL_FAILURE(instance.init());
-	}
+	EXPECT_TRUE(instance.init());
 }
 
 TEST(vk_instance, cannot_init_with_inexistent_layer)
