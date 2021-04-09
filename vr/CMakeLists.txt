@@ -11,3 +11,6 @@ target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
 target_link_libraries(${LIB_NAME} PUBLIC glm Vulkan::Vulkan)
 
 target_include_directories(${LIB_NAME} PUBLIC include)
+
+enable_testing()
+add_subdirectory ("test")

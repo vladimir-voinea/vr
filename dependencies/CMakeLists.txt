@@ -3,4 +3,8 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory ("glfw")
+
 add_subdirectory ("glm")
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory ("gtest")
