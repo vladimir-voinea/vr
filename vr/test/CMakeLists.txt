@@ -4,7 +4,7 @@ include (GoogleTest)
 
 set(APP_NAME "vr_test")
 
-set(SOURCES "gtest_smoke_test.cpp" "vk_layers.cpp" "vk_extensions.cpp" "vk_instance.cpp")
+set(SOURCES "gtest_smoke_test.cpp" "vk_layers.cpp" "vk_extensions.cpp" "vk_instance.cpp" "validation_layer.cpp")
 
 add_executable(${APP_NAME} ${SOURCES})
 target_compile_features(${APP_NAME} PRIVATE cxx_std_20)
