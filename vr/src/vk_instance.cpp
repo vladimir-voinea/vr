@@ -55,7 +55,7 @@ namespace vr
 		create_info.pApplicationInfo = &app_info;
 		create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		create_info.ppEnabledExtensionNames = extensions.data();
-		create_info.enabledLayerCount = layers.size();
+		create_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
 		create_info.ppEnabledLayerNames = layers.data();
 	}
 }
