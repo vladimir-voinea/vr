@@ -18,7 +18,8 @@ namespace vr
 
 	private:
 		void populate_app_info(VkApplicationInfo& app_info) const;
-		void populate_create_info(VkInstanceCreateInfo& create_info, VkApplicationInfo& app_info) const;
+		void populate_create_info(VkInstanceCreateInfo& create_info, VkApplicationInfo& app_info, 
+			const std::vector<const char*>& extensions, const std::vector<const char*>& layers) const;
 
 	private:
 		VkInstance m_instance;
