@@ -1,10 +1,15 @@
 #pragma once
 
+#include "vk_debug_default_callback.hpp"
+
+#include <vulkan/vulkan.h>
+
 #include <vector>
 #include <string>
 
 namespace vr
 {
+
 	struct version
 	{
 		uint16_t major = 0;
@@ -19,5 +24,6 @@ namespace vr
 		std::vector<std::string> extensions;
 		std::vector<std::string> layers;
 		version vk_api_version;
+		debug_utils_messenger_callback debug_callback = nullptr;
 	};
 }

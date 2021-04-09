@@ -12,3 +12,13 @@ TEST(validation_layer, can_init_with_validation_layer)
 
 	EXPECT_TRUE(instance.init());
 }
+
+TEST(validation_layer, can_init_with_debug_utils_extension_no_layers)
+{
+	vr::vk_instance_settings settings;
+	settings.extensions = { "VK_EXT_debug_utils" };
+
+	vr::vk_instance instance(settings);
+
+	EXPECT_TRUE(instance.init());
+}
