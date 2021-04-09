@@ -24,6 +24,5 @@ namespace vr
 		std::vector<std::string> extensions;
 		std::vector<std::string> layers;
 		version vk_api_version;
-		debug_utils_messenger_callback debug_callback = nullptr;
 	};
 }
