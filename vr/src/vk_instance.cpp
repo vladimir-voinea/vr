@@ -45,14 +45,17 @@ namespace vr
 	void vk_instance::populate_create_info(VkInstanceCreateInfo& create_info, VkApplicationInfo& app_info) const
 	{
 		std::vector<const char*> extensions;
+		std::vector<const char*> layers;
 
 		auto pointer = [](const auto& string) { return string.c_str(); };
 		std::transform(m_settings.extensions.begin(), m_settings.extensions.end(), std::back_inserter(extensions), pointer);
+		std::transform(m_settings.layers.begin(), m_settings.layers.end(), std::back_inserter(layers), pointer);
 
 		create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		create_info.pApplicationInfo = &app_info;
 		create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		create_info.ppEnabledExtensionNames = extensions.data();
-		create_info.enabledLayerCount = 0;
+		create_info.enabledLayerCount = layers.size();
+		create_info.ppEnabledLayerNames = layers.data();
 	}
 }

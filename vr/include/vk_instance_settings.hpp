@@ -17,6 +17,7 @@ namespace vr
 		std::string application_name;
 		version application_version;
 		std::vector<std::string> extensions;
+		std::vector<std::string> layers;
 		version vk_api_version;
 	};
 }
