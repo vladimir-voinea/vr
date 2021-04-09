@@ -23,6 +23,6 @@ namespace vr
 		version application_version;
 		std::vector<std::string> extensions;
 		std::vector<std::string> layers;
-		version vk_api_version;
+		version vk_api_version = { 1, 0, 0 };
 	};
 }
