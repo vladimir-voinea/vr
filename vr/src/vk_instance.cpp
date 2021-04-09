@@ -33,10 +33,10 @@ namespace vr
 	{
 		app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		app_info.pApplicationName = m_settings.application_name.c_str();
-		app_info.applicationVersion = VK_MAKE_VERSION(0, 0, 1);
+		app_info.applicationVersion = VK_MAKE_VERSION(m_settings.application_version.major, m_settings.application_version.minor, m_settings.application_version.patch);
 		app_info.pEngineName = nullptr;
 		app_info.engineVersion = VK_MAKE_VERSION(0, 0, 0);
-		app_info.apiVersion = VK_MAKE_VERSION(1, 0, 0);
+		app_info.apiVersion = VK_MAKE_VERSION(m_settings.vk_api_version.major, m_settings.vk_api_version.minor, m_settings.vk_api_version.patch);
 	}
 
 	void vk_instance::populate_create_info(VkInstanceCreateInfo& create_info, VkApplicationInfo& app_info) const
