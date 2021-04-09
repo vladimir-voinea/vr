@@ -2,6 +2,9 @@
 
 #include <vulkan/vulkan.h>
 
+#include <algorithm>
+#include <iterator>
+
 namespace vr
 {
 	vk_instance::vk_instance(vk_instance_settings settings)
@@ -42,10 +45,9 @@ namespace vr
 	void vk_instance::populate_create_info(VkInstanceCreateInfo& create_info, VkApplicationInfo& app_info) const
 	{
 		std::vector<const char*> extensions;
-		for (const auto& extension : m_settings.extensions)
-		{
-			extensions.push_back(extension.c_str());
-		}
+
+		auto pointer = [](const auto& string) { return string.c_str(); };
+		std::transform(m_settings.extensions.begin(), m_settings.extensions.end(), std::back_inserter(extensions), pointer);
 
 		create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		create_info.pApplicationInfo = &app_info;
