@@ -9,12 +9,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL test_debug_callback(VkDebugUtilsMessageSeverityFl
 	VkDebugUtilsMessageTypeFlagsEXT message_type, const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
 	void* user_data)
 {
-	if (user_data)
-	{
-		auto callback_ptr = reinterpret_cast<std::function<void(void)>*>(user_data);
-		(*callback_ptr)();
-	}
-
+	std::cout << callback_data->pMessage << '\n';
 	return VkBool32(VK_FALSE);
 }
 
@@ -55,12 +50,9 @@ TEST(vk_validation_layer, validation_layer_creation)
 	vr::vk_instance instance(instance_settings);
 	instance.init();
 
-	std::function<void(void)> callback = []() {};
-
-
 	vr::vk_validation_layer_settings validation_settings;
 	validation_settings.debug_callback = test_debug_callback;
-	validation_settings.user_data = &callback;
+	validation_settings.user_data = nullptr;
 
 	vr::vk_validation_layer validation_layer(instance, validation_settings);
 	EXPECT_TRUE(validation_layer.init());
