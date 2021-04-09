@@ -15,6 +15,7 @@ namespace vr
 		~vk_instance();
 
 		bool init();
+		VkInstance get_instance_handle() const;
 
 	private:
 		void populate_app_info(VkApplicationInfo& app_info) const;

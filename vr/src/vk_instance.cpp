@@ -58,4 +58,9 @@ namespace vr
 		create_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
 		create_info.ppEnabledLayerNames = layers.data();
 	}
+
+	VkInstance vk_instance::get_instance_handle() const
+	{
+		return m_instance;
+	}
 }

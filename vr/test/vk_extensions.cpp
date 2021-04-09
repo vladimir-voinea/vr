@@ -24,3 +24,12 @@ TEST(vk_extensions, get_supported_extensions_for_empty_layer_no_fail)
 	EXPECT_NO_THROW(vr::get_supported_extensions_for_layer(""));
 	EXPECT_NO_FATAL_FAILURE(vr::get_supported_extensions_for_layer(""));
 }
+
+TEST(vk_extensions, cannot_get_invalid_extension_function)
+{
+	vr::vk_instance_settings settings;
+	vr::vk_instance instance(settings);
+	instance.init();
+
+	EXPECT_EQ(nullptr, vr::get_extension_function<PFN_vkCreateDebugUtilsMessengerEXT>(instance, "invalid_extension"));
+}
