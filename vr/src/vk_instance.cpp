@@ -8,7 +8,7 @@
 namespace vr
 {
 	vk_instance::vk_instance(vk_instance_settings settings)
-		: m_instance()
+		: m_instance(VK_NULL_HANDLE)
 		, m_settings(settings)
 	{
 
