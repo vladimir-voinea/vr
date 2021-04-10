@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace vr
+namespace vr::vk
 {
 	class vk_validation_layer
 	{

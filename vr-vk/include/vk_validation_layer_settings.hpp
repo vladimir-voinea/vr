@@ -2,7 +2,7 @@
 
 #include "vk_debug_default_callback.hpp"
 
-namespace vr
+namespace vr::vk
 {
 	struct vk_validation_layer_settings
 	{

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace vr
+namespace vr::vk
 {
 	VKAPI_ATTR VkBool32 VKAPI_CALL default_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
 		VkDebugUtilsMessageTypeFlagsEXT message_type, const VkDebugUtilsMessengerCallbackDataEXT* callback_data,

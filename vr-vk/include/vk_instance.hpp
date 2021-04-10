@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace vr
+namespace vr::vk
 {
 	class vk_instance
 	{

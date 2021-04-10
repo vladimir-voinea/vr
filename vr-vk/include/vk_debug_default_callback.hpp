@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace vr
+namespace vr::vk
 {
 	using debug_utils_messenger_callback = PFN_vkDebugUtilsMessengerCallbackEXT;
 

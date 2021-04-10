@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iterator>
 
-namespace vr
+namespace vr::vk
 {
 	vk_instance::vk_instance(vk_instance_settings settings)
 		: m_instance(VK_NULL_HANDLE)

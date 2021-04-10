@@ -27,7 +27,7 @@ namespace
 	}
 }
 
-namespace vr
+namespace vr::vk
 {
 	std::vector<VkExtensionProperties> get_supported_extensions()
 	{

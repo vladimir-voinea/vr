@@ -7,9 +7,8 @@
 #include <vector>
 #include <string>
 
-namespace vr
+namespace vr::vk
 {
-
 	struct version
 	{
 		uint16_t major = 0;

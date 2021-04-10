@@ -1,6 +1,6 @@
 #include "vk_layers.hpp"
 
-namespace vr
+namespace vr::vk
 {
 	std::vector<VkLayerProperties> get_supported_layers()
 	{

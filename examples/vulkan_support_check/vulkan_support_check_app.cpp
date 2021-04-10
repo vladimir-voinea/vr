@@ -45,7 +45,7 @@ void vulkan_support_check_app::run()
 
 			std::cout << "\nAvailable extensions:\n";
 
-			const auto available_extensions = vr::get_supported_extensions();
+			const auto available_extensions = vr::vk::get_supported_extensions();
 			for (const auto& extension : available_extensions)
 			{
 				std::cout << extension.extensionName << '\n';

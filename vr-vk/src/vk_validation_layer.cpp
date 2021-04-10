@@ -2,7 +2,7 @@
 
 #include <vk_extensions.hpp>
 
-namespace vr
+namespace vr::vk
 {
 	vk_validation_layer::vk_validation_layer(const vk_instance& instance, vk_validation_layer_settings settings)
 		: m_instance(instance)

@@ -15,28 +15,28 @@ VKAPI_ATTR VkBool32 VKAPI_CALL test_debug_callback(VkDebugUtilsMessageSeverityFl
 
 TEST(vk_validation_layer, can_init_with_validation_extension)
 {
-	vr::vk_instance_settings settings;
+	vr::vk::vk_instance_settings settings;
 	settings.extensions = { "VK_EXT_debug_utils" };
 	settings.layers = { "VK_LAYER_KHRONOS_validation" };
 
-	vr::vk_instance instance(settings);
+	vr::vk::vk_instance instance(settings);
 
 	EXPECT_TRUE(instance.init());
 }
 
 TEST(vk_validation_layer, validation_layer_creation)
 {
-	vr::vk_instance_settings instance_settings;
+	vr::vk::vk_instance_settings instance_settings;
 	instance_settings.extensions = { "VK_EXT_debug_utils" };
 	instance_settings.layers = { "VK_LAYER_KHRONOS_validation" };
-	vr::vk_instance instance(instance_settings);
+	vr::vk::vk_instance instance(instance_settings);
 	instance.init();
 
-	vr::vk_validation_layer_settings validation_settings;
+	vr::vk::vk_validation_layer_settings validation_settings;
 	validation_settings.debug_callback = test_debug_callback;
 	validation_settings.user_data = nullptr;
 
-	vr::vk_validation_layer validation_layer(instance, validation_settings);
+	vr::vk::vk_validation_layer validation_layer(instance, validation_settings);
 	EXPECT_TRUE(validation_layer.init());
 }
 
@@ -44,16 +44,16 @@ TEST(vk_validation_layer, validation_layer_creation)
 TEST(vk_validation_layer, DISABLED_validation_layer_creation_with_null_debug_callback_fails)
 {
 
-	vr::vk_instance_settings instance_settings;
+	vr::vk::vk_instance_settings instance_settings;
 	instance_settings.extensions = { "VK_EXT_debug_utils" };
 	instance_settings.layers = { "VK_LAYER_KHRONOS_validation" };
-	vr::vk_instance instance(instance_settings);
+	vr::vk::vk_instance instance(instance_settings);
 	instance.init();
 
-	vr::vk_validation_layer_settings validation_settings;
+	vr::vk::vk_validation_layer_settings validation_settings;
 	validation_settings.debug_callback = nullptr;
 	validation_settings.user_data = nullptr;
 
-	vr::vk_validation_layer validation_layer(instance, validation_settings);
+	vr::vk::vk_validation_layer validation_layer(instance, validation_settings);
 	EXPECT_FALSE(validation_layer.init());
 }
