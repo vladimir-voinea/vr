@@ -1,14 +1,23 @@
 #pragma once
 
-#include "shader_source.hpp"
+#include "opengl.h"
 
-namespace vr::gl 
+#include <string>
+
+namespace vr::gl
 {
 	class shader
 	{
 	public:
-		shader();
-		shader(shader_source vertex_shader, shader_source fragment_shader);
+		enum class type
+		{
+			vertex,
+			fragment
+		};
+
+	public:
+		shader() = default;
+		shader(type shader_type, const std::string& source);
 		~shader();
 
 		shader(const shader&) = delete;
@@ -17,15 +26,12 @@ namespace vr::gl
 		shader(shader&&) noexcept;
 		shader& operator=(shader&&) noexcept;
 
+		GLuint get_id();
+
 		bool compile();
 		std::string get_compilation_info();
 
 	private:
-		bool compile_shaders();
-
-	private:
-		GLuint m_program_id = 0;
-		shader_source m_vertex_shader;
-		shader_source m_fragment_shader;
+		GLuint m_id = 0;
 	};
 }

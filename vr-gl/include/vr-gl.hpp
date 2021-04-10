@@ -1,3 +1,4 @@
 #pragma once
 
-#include "shader_source.hpp"
+#include "shader.hpp"
+#include "shader_program.hpp"

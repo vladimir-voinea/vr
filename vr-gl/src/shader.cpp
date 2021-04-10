@@ -3,23 +3,51 @@
 #include "opengl.h"
 
 #include <stdexcept>
+#include <algorithm>
+
+namespace
+{
+	auto convert_shader_type(vr::gl::shader::type type)
+	{
+		auto result = 0;
+
+		switch (type)
+		{
+		case vr::gl::shader::type::vertex:
+		{
+			result = GL_VERTEX_SHADER;
+			break;
+		}
+		case vr::gl::shader::type::fragment:
+		{
+			result = GL_FRAGMENT_SHADER;
+			break;
+		}
+		}
+
+		return result;
+	}
+}
 
 namespace vr::gl
 {
-	shader::shader(shader_source vertex_shader, shader_source fragment_shader)
-		: m_vertex_shader(std::move(vertex_shader))
-		, m_fragment_shader(std::move(fragment_shader))
+	shader::shader(shader::type shader_type, const std::string& source)
 	{
-		m_program_id = glCreateProgram();
-		if (!m_program_id)
+		const auto gl_shader_type = convert_shader_type(shader_type);
+		m_id = glCreateShader(gl_shader_type);
+
+		if (!m_id)
 		{
-			throw std::runtime_error("Cannot create shader program");
+			throw std::runtime_error("Cannot create shader");
 		}
+
+		const char* shader_source_code = source.c_str();
+		glShaderSource(m_id, 1, &shader_source_code, nullptr);
 	}
 
 	shader::~shader()
 	{
-		glDeleteProgram(m_program_id);
+		glDeleteShader(m_id);
 	}
 
 	shader::shader(shader&& other) noexcept
@@ -31,28 +59,25 @@ namespace vr::gl
 	{
 		if (this != &other)
 		{
-			std::swap(m_program_id, other.m_program_id);
-			std::swap(m_vertex_shader, other.m_vertex_shader);
-			std::swap(m_fragment_shader, other.m_fragment_shader);
+			std::swap(m_id, other.m_id);
 		}
 
 		return *this;
 	}
 
+	GLuint shader::get_id()
+	{
+		return m_id;
+	}
+
 	bool shader::compile()
 	{
-		if (compile_shaders())
-		{
-			glAttachShader(m_program_id, m_vertex_shader.get_id());
-			glAttachShader(m_program_id, m_fragment_shader.get_id());
-		}
+		glCompileShader(m_id);
 
-		glLinkProgram(m_program_id);
+		GLint compilation_status = GL_FALSE;
+		glGetShaderiv(m_id, GL_COMPILE_STATUS, &compilation_status);
 
-		GLint result = GL_FALSE;
-		glGetProgramiv(m_program_id, GL_LINK_STATUS, &result);
-
-		return result == GL_TRUE;
+		return compilation_status == GL_TRUE;
 	}
 
 	std::string shader::get_compilation_info()
@@ -60,18 +85,13 @@ namespace vr::gl
 		std::string compilation_info;
 
 		int info_length = 0;
-		glGetProgramiv(m_program_id, GL_INFO_LOG_LENGTH, &info_length);
+		glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &info_length);
 		if (info_length > 0)
 		{
 			compilation_info.resize(info_length, '-');
-			glGetProgramInfoLog(m_program_id, info_length, nullptr, compilation_info.data());
+			glGetShaderInfoLog(m_id, info_length, nullptr, compilation_info.data());
 		}
 
 		return compilation_info;
-	}
-
-	bool shader::compile_shaders()
-	{
-		return m_vertex_shader.compile() && m_fragment_shader.compile();
 	}
 }
