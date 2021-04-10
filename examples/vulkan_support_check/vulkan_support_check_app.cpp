@@ -1,7 +1,7 @@
 #include "vulkan_support_check_app.hpp"
 
 #include <vr-glfw.hpp>
-#include <vr.hpp>
+#include <vr-vk.hpp>
 
 #include <algorithm>
 #include <unordered_set>
