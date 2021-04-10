@@ -1,5 +1,7 @@
 #include "glfw_opengl_es_triangle_app.hpp"
 
+#include <GL/glew.h>
+
 #include <vr-glfw.hpp>
 #include <vr-gl.hpp>
 
