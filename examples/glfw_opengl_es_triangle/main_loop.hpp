@@ -3,6 +3,10 @@
 #include <i_window_loop.hpp>
 #include <glfw_window.hpp>
 
+#include <shader.hpp>
+#include <shader_program.hpp>
+#include "shaders.hpp"
+
 class main_loop : public vr::i_window_loop
 {
 public:
@@ -12,4 +16,5 @@ public:
 
 private:
 	vr::glfw_window& m_window;
+	shaders m_shaders;
 };

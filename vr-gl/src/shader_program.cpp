@@ -15,12 +15,27 @@ namespace vr::gl
 		{
 			throw std::runtime_error("Cannot create shader program");
 		}
+
+		if (!link())
+		{
+			const std::string message = "Cannot link shader program: " + get_linkage_info();
+
+			throw std::runtime_error(message);
+		}
 	}
 
 	shader_program::~shader_program()
 	{
-		glDetachShader(m_program_id, m_vertex_shader->get_id());
-		glDetachShader(m_program_id, m_fragment_shader->get_id());
+		if (m_vertex_shader)
+		{
+			glDetachShader(m_program_id, m_vertex_shader->get_id());
+		}
+		
+		if (m_fragment_shader)
+		{
+			glDetachShader(m_program_id, m_fragment_shader->get_id());
+		}
+
 		glDeleteProgram(m_program_id);
 	}
 

@@ -17,6 +17,8 @@ namespace vr::gl
 		shader_program(shader_program&&) noexcept;
 		shader_program& operator=(shader_program&&) noexcept;
 
+	private:
+
 		bool link();
 		std::string get_linkage_info();
 
