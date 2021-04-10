@@ -65,7 +65,7 @@ namespace vr::gl
 		return *this;
 	}
 
-	GLuint shader::get_id()
+	GLuint shader::get_id() const
 	{
 		return m_id;
 	}

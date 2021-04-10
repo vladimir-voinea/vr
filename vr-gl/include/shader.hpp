@@ -26,7 +26,7 @@ namespace vr::gl
 		shader(shader&&) noexcept;
 		shader& operator=(shader&&) noexcept;
 
-		GLuint get_id();
+		GLuint get_id() const;
 
 		bool compile();
 		std::string get_compilation_info();

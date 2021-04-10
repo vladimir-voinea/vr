@@ -6,9 +6,9 @@
 
 namespace vr::gl
 {
-	shader_program::shader_program(shader vertex_shader, shader fragment_shader)
-		: m_vertex_shader(std::move(vertex_shader))
-		, m_fragment_shader(std::move(fragment_shader))
+	shader_program::shader_program(const shader& vertex_shader, const shader& fragment_shader)
+		: m_vertex_shader(&vertex_shader)
+		, m_fragment_shader(&fragment_shader)
 	{
 		m_program_id = glCreateProgram();
 		if (!m_program_id)
@@ -39,13 +39,10 @@ namespace vr::gl
 		return *this;
 	}
 
-	bool shader_program::compile()
+	bool shader_program::link()
 	{
-		if (compile_shaders())
-		{
-			glAttachShader(m_program_id, m_vertex_shader.get_id());
-			glAttachShader(m_program_id, m_fragment_shader.get_id());
-		}
+		glAttachShader(m_program_id, m_vertex_shader->get_id());
+		glAttachShader(m_program_id, m_fragment_shader->get_id());
 
 		glLinkProgram(m_program_id);
 
@@ -55,7 +52,7 @@ namespace vr::gl
 		return result == GL_TRUE;
 	}
 
-	std::string shader_program::get_compilation_info()
+	std::string shader_program::get_linkage_info()
 	{
 		std::string compilation_info;
 
@@ -68,10 +65,5 @@ namespace vr::gl
 		}
 
 		return compilation_info;
-	}
-
-	bool shader_program::compile_shaders()
-	{
-		return m_vertex_shader.compile() && m_fragment_shader.compile();
 	}
 }
