@@ -6,5 +6,7 @@ add_subdirectory ("glfw")
 
 add_subdirectory ("glm")
 
+add_subdirectory ("glew")
+
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory ("gtest")
