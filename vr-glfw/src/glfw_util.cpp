@@ -31,4 +31,21 @@ namespace vr
 
 		return result;
 	}
+
+	void poll_events()
+	{
+		glfwPollEvents();
+	}
+
+	void wait_events(std::optional<double> timeout)
+	{
+		if (!timeout)
+		{
+			glfwWaitEvents();
+		}
+		else
+		{
+			glfwWaitEventsTimeout(timeout);
+		}
+	}
 }
