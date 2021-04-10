@@ -93,13 +93,16 @@ namespace vr {
 
 		const auto created = create();
 
+		if (created) 
+		{
+			glfwMakeContextCurrent(m_window);
+		}
+
 		return created;
 	}
 
 	bool glfw_window::run(i_window_loop* loop)
 	{
-		glfwMakeContextCurrent(m_window);
-
 		if (!m_window)
 		{
 			return false;
