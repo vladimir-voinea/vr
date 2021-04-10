@@ -38,5 +38,6 @@ namespace vr
 		std::string name = "Unnamed window";
 		std::optional<opengl_context> opengl_context = {};
 		bool resizable = false;
+		std::optional<uint8_t> msaa_samples;
 	};
 }

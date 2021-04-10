@@ -22,6 +22,7 @@ void glfw_opengl_es_triangle_app::run()
 		settings.name = "GLFW OpenGL ES 2.0 Triangle";
 		settings.opengl_context = opengl_context_settings;
 		settings.resizable = true;
+		settings.msaa_samples = 4;
 
 		vr::glfw_window window(settings);
 		if (window.init())
@@ -29,7 +30,7 @@ void glfw_opengl_es_triangle_app::run()
 			std::cout << "Window created successfully\n";
 
 			main_loop loop(window);
-			const auto success = window.run(loop);
+			loop.run();
 		}
 		else
 		{

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "glfw_window_settings.hpp"
-#include "i_window_loop.hpp"
 
 #include <string>
 
@@ -18,15 +17,8 @@ namespace vr {
 
 		bool init();
 
-		/**
-		 * @brief Runs the window
-		 *
-		 * @param[in]  loop optional callback class for the window loop. can be null, in which case no callback will be invoked
-		 */
-		bool run(i_window_loop& loop);
 		bool close_requested();
 		void swap_buffers();
-
 		void set_sticky_keys(bool status);
 	private:
 		bool create();

@@ -9,14 +9,10 @@ main_loop::main_loop(vr::glfw_window& window)
 {
 }
 
-bool main_loop::loop()
+void main_loop::run()
 {
-	vr::poll_events();
-
-	if (m_window.close_requested())
+	while (!m_window.close_requested())
 	{
-		return false;
+		vr::poll_events();
 	}
-
-	return true;
 }

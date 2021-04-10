@@ -1,13 +1,12 @@
 #pragma once
 
-#include <i_window_loop.hpp>
 #include <glfw_window.hpp>
 
 #include <shader.hpp>
 #include <shader_program.hpp>
 #include "shaders.hpp"
 
-class main_loop : public vr::i_window_loop
+class main_loop
 {
 public:
 	main_loop(vr::glfw_window& window);
@@ -15,7 +14,7 @@ public:
 
 	void init();
 
-	bool loop() override;
+	void run();
 
 private:
 	vr::glfw_window& m_window;

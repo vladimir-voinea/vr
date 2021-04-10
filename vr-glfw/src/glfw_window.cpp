@@ -88,8 +88,8 @@ namespace vr {
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		}
 
-		const bool resizable = m_settings.resizable ? GLFW_TRUE : GLFW_FALSE;
-		glfwWindowHint(GLFW_RESIZABLE, resizable);
+		glfwWindowHint(GLFW_RESIZABLE, m_settings.resizable ? GLFW_TRUE : GLFW_FALSE);
+		glfwWindowHint(GLFW_SAMPLES, m_settings.msaa_samples ? *m_settings.msaa_samples : GLFW_DONT_CARE);
 
 		const auto created = create();
 
@@ -99,20 +99,6 @@ namespace vr {
 		}
 
 		return created;
-	}
-
-	bool glfw_window::run(i_window_loop& loop)
-	{
-		if (!m_window)
-		{
-			return false;
-		}
-
-		while (loop.loop())
-		{
-		}
-
-		return true;
 	}
 
 	bool glfw_window::create()

@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 
 set(LIB_NAME "vr-glfw")
 
-set(SOURCES "src/glfw_initialization.cpp" "src/glfw_window.cpp" "src/glfw_window_settings.cpp" "src/glfw_util.cpp" "src/i_window_loop.cpp" )
+set(SOURCES "src/glfw_initialization.cpp" "src/glfw_window.cpp" "src/glfw_window_settings.cpp" "src/glfw_util.cpp"  )
 			
 add_library (${LIB_NAME} ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)

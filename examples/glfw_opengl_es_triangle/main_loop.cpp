@@ -70,28 +70,23 @@ void main_loop::init()
 	glBufferData(GL_ARRAY_BUFFER, data_size, vertex_buffer_data, GL_STATIC_DRAW);
 }
 
-bool main_loop::loop()
+void main_loop::run()
 {
-	vr::poll_events();
-
-	if (m_window.close_requested())
+	while (!m_window.close_requested())
 	{
-		return false;
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(m_shaders.program.get_id());
+
+		glEnableVertexAttribArray(0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(0));
+
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		glDisableVertexAttribArray(0);
+
+		m_window.swap_buffers();
+		vr::poll_events();
 	}
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(m_shaders.program.get_id());
-
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(0));
-
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-
-	glDisableVertexAttribArray(0);
-
-	m_window.swap_buffers();
-
-	return true;
 }
