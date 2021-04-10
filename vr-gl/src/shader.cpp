@@ -43,6 +43,12 @@ namespace vr::gl
 
 		const char* shader_source_code = source.c_str();
 		glShaderSource(m_id, 1, &shader_source_code, nullptr);
+
+		if (!compile())
+		{
+			const std::string message = "Cannot compile shader: " + get_compilation_info();
+			throw std::runtime_error(message);
+		}
 	}
 
 	shader::~shader()

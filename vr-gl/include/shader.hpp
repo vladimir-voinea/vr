@@ -28,6 +28,7 @@ namespace vr::gl
 
 		GLuint get_id() const;
 
+	private:
 		bool compile();
 		std::string get_compilation_info();
 
