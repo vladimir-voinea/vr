@@ -7,6 +7,7 @@ namespace vr::gl
 	class shader_program
 	{
 	public:
+		shader_program() = default;
 		shader_program(const shader& vertex_shader, const shader& fragment_shader);
 		~shader_program();
 
@@ -21,7 +22,7 @@ namespace vr::gl
 
 	private:
 		GLuint m_program_id = 0;
-		const shader* m_vertex_shader;
-		const shader* m_fragment_shader;
+		const shader* m_vertex_shader = nullptr;
+		const shader* m_fragment_shader = nullptr;
 	};
 }

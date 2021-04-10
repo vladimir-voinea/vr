@@ -19,6 +19,8 @@ namespace vr::gl
 
 	shader_program::~shader_program()
 	{
+		glDetachShader(m_program_id, m_vertex_shader->get_id());
+		glDetachShader(m_program_id, m_fragment_shader->get_id());
 		glDeleteProgram(m_program_id);
 	}
 
