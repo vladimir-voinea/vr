@@ -16,6 +16,7 @@ namespace vr::gl
 		};
 
 	public:
+		shader_source() = default;
 		shader_source(type shader_type, const std::string& source);
 		~shader_source();
 
@@ -27,7 +28,7 @@ namespace vr::gl
 
 		GLuint get_id();
 
-		bool was_compiled();
+		bool compile();
 		std::string get_compilation_info();
 
 	private:

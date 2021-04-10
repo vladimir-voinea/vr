@@ -43,7 +43,6 @@ namespace vr::gl
 
 		const char* shader_source_code = source.c_str();
 		glShaderSource(m_id, 1, &shader_source_code, nullptr);
-		glCompileShader(m_id);
 	}
 
 	shader_source::~shader_source()
@@ -53,15 +52,15 @@ namespace vr::gl
 
 	shader_source::shader_source(shader_source&& other) noexcept
 	{
-		if (this != &other)
-		{
-			std::swap(m_id, other.m_id);
-		}
+		*this = std::move(other);
 	}
 
 	shader_source& shader_source::operator=(shader_source&& other) noexcept
 	{
-		std::swap(m_id, other.m_id);
+		if (this != &other)
+		{
+			std::swap(m_id, other.m_id);
+		}
 
 		return *this;
 	}
@@ -71,8 +70,10 @@ namespace vr::gl
 		return m_id;
 	}
 
-	bool shader_source::was_compiled()
+	bool shader_source::compile()
 	{
+		glCompileShader(m_id);
+
 		GLint compilation_status = GL_FALSE;
 		glGetShaderiv(m_id, GL_COMPILE_STATUS, &compilation_status);
 
