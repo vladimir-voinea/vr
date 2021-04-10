@@ -1,5 +1,6 @@
 #include "main_loop.hpp"
 
+
 #define GLEW_STATIC
 #include <gl/glew.h>
 
@@ -15,9 +16,12 @@ void initialize_glew()
 	}
 }
 
-main_loop::main_loop()
+main_loop::main_loop(vr::glfw_window& window)
+	: m_window(window)
 {
 	initialize_glew();
+
+	m_window.set_sticky_keys(true);
 }
 
 bool main_loop::loop()

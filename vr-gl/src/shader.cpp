@@ -4,26 +4,26 @@
 
 namespace
 {
-	//auto convert_shader_type(vr::gl::shader::type type)
-	//{
-	//	auto result = 0;
+	auto convert_shader_type(vr::gl::shader::type type)
+	{
+		auto result = 0;
 
-	//	switch (type)
-	//	{
-	//	case vr::gl::shader::type::vertex:
-	//	{
-	//		result = GL_VERTEX_SHADER;
-	//		break;
-	//	}
-	//	case vr::gl::shader::type::fragment:
-	//	{
-	//		result = GL_FRAGMENT_SHADER;
-	//		break;
-	//	}
-	//	}
+		switch (type)
+		{
+		case vr::gl::shader::type::vertex:
+		{
+			result = GL_VERTEX_SHADER;
+			break;
+		}
+		case vr::gl::shader::type::fragment:
+		{
+			result = GL_FRAGMENT_SHADER;
+			break;
+		}
+		}
 
-	//	return result;
-	//}
+		return result;
+	}
 }
 
 namespace vr::gl

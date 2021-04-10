@@ -135,4 +135,9 @@ namespace vr {
 	{
 		return glfwWindowShouldClose(m_window);
 	}
+
+	void glfw_window::set_sticky_keys(bool status)
+	{
+		glfwSetInputMode(m_window, GLFW_STICKY_KEYS, status ? GL_TRUE : GL_FALSE);
+	}
 }

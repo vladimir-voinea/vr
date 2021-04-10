@@ -24,9 +24,9 @@ namespace vr {
 		 * @param[in]  loop optional callback class for the window loop. can be null, in which case no callback will be invoked
 		 */
 		bool run(i_window_loop* loop = nullptr);
-
-
 		bool close_requested();
+
+		void set_sticky_keys(bool status);
 	private:
 		bool create();
 
