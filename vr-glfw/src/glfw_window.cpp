@@ -98,6 +98,8 @@ namespace vr {
 
 	bool glfw_window::run(i_window_loop* loop)
 	{
+		glfwMakeContextCurrent(m_window);
+
 		if (!m_window)
 		{
 			return false;
