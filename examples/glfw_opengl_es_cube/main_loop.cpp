@@ -66,6 +66,8 @@ void main_loop::init()
 
 	m_shaders = load_shaders();
 	m_mvp_uniform = glGetUniformLocation(m_shaders.program.get_id(), "mvp");
+	m_position_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "position");
+	m_vertex_color_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "vertex_color");
 	calculate_mvp();
 
 	glGenBuffers(1, &m_vertex_buffer);
@@ -106,12 +108,10 @@ void main_loop::run()
 
 		glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &m_mvp[0][0]);
 
-		m_position_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "position");
 		glEnableVertexAttribArray(m_position_attribute_location);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		m_vertex_color_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "vertex_color");
 		glEnableVertexAttribArray(m_vertex_color_attribute_location);
 		glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
