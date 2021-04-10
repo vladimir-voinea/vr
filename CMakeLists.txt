@@ -13,8 +13,8 @@ add_subdirectory ("dependencies")
 # vr-glfw directory
 add_subdirectory ("vr-glfw")
 
-# vr directory
-add_subdirectory ("vr")
+# vr-vk directory
+add_subdirectory ("vr-vk")
 
 # examples directory
 add_subdirectory ("examples")

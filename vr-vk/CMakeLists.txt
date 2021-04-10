@@ -2,7 +2,7 @@
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
 
-set(LIB_NAME "vr")
+set(LIB_NAME "vr-vk")
 
 set(SOURCES "src/vk_instance.cpp" "src/vk_extensions.cpp" "src/vk_layers.cpp" "src/vk_debug_default_callback.cpp" "include/vk_validation_layer.hpp" "src/vk_validation_layer.cpp")
 			
