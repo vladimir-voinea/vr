@@ -21,7 +21,7 @@ void glfw_opengl_es_cube_app::run()
 		settings.height = 600;
 		settings.name = "GLFW OpenGL ES 2.0 Cube";
 		settings.opengl_context = opengl_context_settings;
-		settings.resizable = true;
+		settings.resizable = false;
 		settings.msaa_samples = 4;
 
 		vr::glfw_window window(settings);

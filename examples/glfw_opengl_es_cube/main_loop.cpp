@@ -81,12 +81,12 @@ void main_loop::init()
 
 void main_loop::calculate_mvp()
 {
-	constexpr float field_of_view = 75.0f;
+	constexpr float field_of_view = glm::radians(45.0f);
 	constexpr float aspect_ratio = 4.0f / 3.0f;
 	constexpr float near = 0.1f;
 	constexpr float far = 100.0f;
 
-	const glm::mat4 projection = glm::perspective(glm::radians(field_of_view), aspect_ratio, near, far);
+	const glm::mat4 projection = glm::perspective(field_of_view, aspect_ratio, near, far);
 
 	const glm::mat4 view = glm::lookAt(glm::vec3(-4, 3, -3),
 		glm::vec3(0, 0, 0),
@@ -106,18 +106,20 @@ void main_loop::run()
 
 		glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &m_mvp[0][0]);
 
-		glEnableVertexAttribArray(0);
+		m_position_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "position");
+		glEnableVertexAttribArray(m_position_attribute_location);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		glEnableVertexAttribArray(1);
+		m_vertex_color_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "vertex_color");
+		glEnableVertexAttribArray(m_vertex_color_attribute_location);
 		glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(m_vertex_color_attribute_location);
+		glDisableVertexAttribArray(m_position_attribute_location);
 
 		m_window.swap_buffers();
 		vr::poll_events();

@@ -26,9 +26,12 @@ private:
 	shaders m_shaders;
 
 	GLuint m_mvp_uniform;
-	glm::mat2 m_mvp;
+	glm::mat4 m_mvp;
 
 	GLuint m_vertex_array;
 	GLuint m_vertex_buffer;
 	GLuint m_color_buffer;
+
+	GLuint m_position_attribute_location;
+	GLuint m_vertex_color_attribute_location;
 };
