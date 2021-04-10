@@ -11,10 +11,16 @@ class main_loop : public vr::i_window_loop
 {
 public:
 	main_loop(vr::glfw_window& window);
+	~main_loop();
+
+	void init();
 
 	bool loop() override;
 
 private:
 	vr::glfw_window& m_window;
 	shaders m_shaders;
+
+	GLuint vertex_array;
+	GLuint vertex_buffer;
 };

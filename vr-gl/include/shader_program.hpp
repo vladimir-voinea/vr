@@ -17,6 +17,8 @@ namespace vr::gl
 		shader_program(shader_program&&) noexcept;
 		shader_program& operator=(shader_program&&) noexcept;
 
+		GLuint get_id() const;
+
 	private:
 
 		bool link();

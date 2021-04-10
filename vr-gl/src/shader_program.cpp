@@ -56,6 +56,11 @@ namespace vr::gl
 		return *this;
 	}
 
+	GLuint shader_program::get_id() const
+	{
+		return m_program_id;
+	}
+
 	bool shader_program::link()
 	{
 		glAttachShader(m_program_id, m_vertex_shader->get_id());

@@ -131,4 +131,9 @@ namespace vr {
 	{
 		glfwSetInputMode(m_window, GLFW_STICKY_KEYS, status ? GL_TRUE : GL_FALSE);
 	}
+
+	void glfw_window::swap_buffers()
+	{
+		glfwSwapBuffers(m_window);
+	}
 }

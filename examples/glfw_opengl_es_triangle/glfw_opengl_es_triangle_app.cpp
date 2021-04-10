@@ -21,6 +21,7 @@ void glfw_opengl_es_triangle_app::run()
 		settings.height = 600;
 		settings.name = "GLFW OpenGL ES 2.0 Triangle";
 		settings.opengl_context = opengl_context_settings;
+		settings.resizable = true;
 
 		vr::glfw_window window(settings);
 		if (window.init())

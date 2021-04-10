@@ -25,6 +25,7 @@ namespace vr {
 		 */
 		bool run(i_window_loop& loop);
 		bool close_requested();
+		void swap_buffers();
 
 		void set_sticky_keys(bool status);
 	private:
