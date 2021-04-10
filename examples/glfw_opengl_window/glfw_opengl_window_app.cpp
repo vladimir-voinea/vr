@@ -15,7 +15,7 @@ void glfw_opengl_window_app::run()
 	vr::glfw_window_settings settings;
 	settings.width = 800;
 	settings.height = 600;
-	settings.name = "Basic window example";
+	settings.name = "OpenGL window example";
 	settings.opengl_context = opengl_context_settings;
 
 	vr::glfw_window window(settings);
