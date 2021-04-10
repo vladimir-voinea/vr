@@ -1,12 +1,37 @@
 #include "shader.hpp"
 
-//#include <gl/GL.h>
+#include "opengl.h"
+
+namespace
+{
+	//auto convert_shader_type(vr::gl::shader::type type)
+	//{
+	//	auto result = 0;
+
+	//	switch (type)
+	//	{
+	//	case vr::gl::shader::type::vertex:
+	//	{
+	//		result = GL_VERTEX_SHADER;
+	//		break;
+	//	}
+	//	case vr::gl::shader::type::fragment:
+	//	{
+	//		result = GL_FRAGMENT_SHADER;
+	//		break;
+	//	}
+	//	}
+
+	//	return result;
+	//}
+}
 
 namespace vr::gl
 {
-	shader::shader(const std::string& source)
+	shader::shader(shader::type shader_type, const std::string& source)
 	{
-		//m_shader = glCreateShader()
+		GLuint jet = 0;
+		//m_shader = glCreateShader();
 	}
 
 	shader::~shader()

@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <gl/gl.h>
+#include "opengl.h"
 
 #include <string>
 
@@ -9,9 +9,17 @@ namespace vr::gl
 	class shader
 	{
 	public:
-		shader(const std::string& source);
+		enum class type
+		{
+			vertex,
+			fragment
+		};
+
+	public:
+		shader(type shader_type, const std::string& source);
 		~shader();
 
 	private:
+		//GLuint m_shader;
 	};
 }
