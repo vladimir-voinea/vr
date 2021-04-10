@@ -45,7 +45,7 @@ namespace vr
 		}
 		else
 		{
-			glfwWaitEventsTimeout(timeout);
+			glfwWaitEventsTimeout(*timeout);
 		}
 	}
 }
