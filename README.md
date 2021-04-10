@@ -1,2 +1,2 @@
 # vr
-Vulkan graphics
+VR graphics
