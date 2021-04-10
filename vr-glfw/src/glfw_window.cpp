@@ -101,24 +101,15 @@ namespace vr {
 		return created;
 	}
 
-	bool glfw_window::run(i_window_loop* loop)
+	bool glfw_window::run(i_window_loop& loop)
 	{
 		if (!m_window)
 		{
 			return false;
 		}
 
-		while (!close_requested())
+		while (loop.loop())
 		{
-			glfwPollEvents();
-			if (loop)
-			{
-				const auto continue_looping = loop->loop();
-				if (!continue_looping)
-				{
-					return true;
-				}
-			}
 		}
 
 		return true;

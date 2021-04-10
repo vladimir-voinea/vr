@@ -28,7 +28,7 @@ void glfw_opengl_es_triangle_app::run()
 			std::cout << "Window created successfully\n";
 
 			main_loop loop(window);
-			const auto success = window.run(&loop);
+			const auto success = window.run(loop);
 		}
 		else
 		{

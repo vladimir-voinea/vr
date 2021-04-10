@@ -1,5 +1,7 @@
 #include "glfw_opengl_window_app.hpp"
 
+#include "main_loop.hpp"
+
 #include <vr-glfw.hpp>
 
 #include <iostream>
@@ -21,8 +23,10 @@ void glfw_opengl_window_app::run()
 	vr::glfw_window window(settings);
 	if (window.init())
 	{
+		main_loop loop(window);
+
 		std::cout << "Window created successfully";
-		const auto success = window.run();
+		const auto success = window.run(loop);
 	}
 	else
 	{
