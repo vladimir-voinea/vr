@@ -4,7 +4,7 @@ find_package(OpenGL REQUIRED)
 
 set(LIB_NAME "vr-gl")
 
-set(SOURCES "src/shader.cpp")
+set(SOURCES "src/shader_source.cpp" "src/shader.cpp")
 			
 add_library (${LIB_NAME} ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
