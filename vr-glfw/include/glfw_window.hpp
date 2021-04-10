@@ -16,6 +16,8 @@ namespace vr {
 		glfw_window(const glfw_window&) = delete;
 		glfw_window& operator=(const glfw_window&) = delete;
 
+		bool init();
+
 		/**
 		 * @brief Runs the window
 		 *
@@ -23,9 +25,11 @@ namespace vr {
 		 */
 		bool run(i_window_loop* loop = nullptr);
 
-		bool create();
 
 		bool close_requested();
+	private:
+		bool create();
+
 	private:
 		GLFWwindow* m_window = nullptr;
 		const glfw_window_settings m_settings;

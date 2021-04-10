@@ -1,2 +1,3 @@
-add_subdirectory(basic_glfw_window)
-add_subdirectory(vulkan_support_check)
+add_subdirectory (basic_glfw_window)
+add_subdirectory (vulkan_support_check)
+add_subdirectory (glfw_opengl_window)

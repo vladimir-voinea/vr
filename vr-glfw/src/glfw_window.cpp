@@ -3,23 +3,62 @@
 
 #include <GLFW/glfw3.h>
 
+#include <iostream>
 #include <stdexcept>
+
+namespace
+{
+	auto convert_opengl_api(vr::opengl_context_api api) {
+		auto result = GLFW_NO_API;
+
+		switch (api)
+		{
+		case vr::opengl_context_api::opengl_es:
+		{
+			result = GLFW_OPENGL_ES_API;
+			break;
+		}
+		case vr::opengl_context_api::opengl:
+		{
+			result = GLFW_OPENGL_API;
+			break;
+		}
+		}
+
+		return result;
+	}
+
+	auto convert_opengl_profile(vr::opengl_profile profile) {
+		auto result = GLFW_OPENGL_CORE_PROFILE;
+
+		switch (profile)
+		{
+		case vr::opengl_profile::core:
+		{
+			result = GLFW_OPENGL_CORE_PROFILE;
+			break;
+		}
+		case vr::opengl_profile::any:
+		{
+			result = GLFW_OPENGL_ANY_PROFILE;
+			break;
+		}
+		}
+
+		return result;
+	}
+
+	void glfw_error_callback(int, const char* err)
+	{
+		std::cerr << "GLFW error: " << err << '\n';
+	}
+}
 
 namespace vr {
 	glfw_window::glfw_window(glfw_window_settings settings)
 		: m_settings(settings)
 	{
-		if (!initialize_glfw_once()) {
-			throw std::runtime_error("GLFW initialization failed");
-		}
 
-		if (!m_settings.create_opengl_context)
-		{
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		}
-
-		const bool resizable = m_settings.resizable ? GLFW_TRUE : GLFW_FALSE;
-		glfwWindowHint(GLFW_RESIZABLE, resizable);
 	}
 
 	glfw_window::~glfw_window()
@@ -28,10 +67,39 @@ namespace vr {
 		deinitialize_glfw();
 	}
 
+	bool glfw_window::init()
+	{
+		if (!initialize_glfw_once()) {
+			throw std::runtime_error("GLFW initialization failed");
+		}
+
+		glfwSetErrorCallback(glfw_error_callback);
+
+		if (m_settings.opengl_context)
+		{
+			glfwWindowHint(GLFW_CLIENT_API, convert_opengl_api(m_settings.opengl_context->api));
+			glfwWindowHint(GLFW_OPENGL_PROFILE, convert_opengl_profile(m_settings.opengl_context->profile));
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_settings.opengl_context->context_version.major);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_settings.opengl_context->context_version.minor);
+			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, m_settings.opengl_context->foward_compatible ? GL_TRUE : GL_FALSE);
+		}
+		else
+		{
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		}
+
+		const bool resizable = m_settings.resizable ? GLFW_TRUE : GLFW_FALSE;
+		glfwWindowHint(GLFW_RESIZABLE, resizable);
+
+		const auto created = create();
+
+		return created;
+	}
+
 	bool glfw_window::run(i_window_loop* loop)
 	{
-		const auto created = create();
-		if (!created) {
+		if (!m_window)
+		{
 			return false;
 		}
 

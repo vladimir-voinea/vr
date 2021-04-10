@@ -10,16 +10,12 @@ void basic_glfw_window_app::run()
 	settings.width = 800;
 	settings.height = 600;
 	settings.name = "Basic window example";
-	settings.create_opengl_context = false;
-	settings.resizable = false;
 
 	vr::glfw_window window(settings);
-
-	const auto success = window.run();
-
-	if (success)
+	if (window.init())
 	{
 		std::cout << "Window created successfully";
+		const auto success = window.run();
 	}
 	else
 	{
