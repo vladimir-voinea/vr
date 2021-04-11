@@ -1,4 +1,5 @@
 #include "main_loop.hpp"
+#include <perspective_camera.hpp>
 #include "cube_data.hpp"
 #include "shader_loader.hpp"
 
@@ -40,6 +41,10 @@ main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
 	, m_kb(window)
 	, m_mouse(window)
+	, m_camera(std::make_unique<vr::gl::perspective_camera>(vr::gl::perspective_camera::settings{
+	45.f, static_cast<float>(window.get_size().width) / static_cast<float>(window.get_size().height),
+	0.1f,100.f }))
+	, m_controls(m_window, *m_camera, m_mouse, m_kb)
 {
 	init();
 }
@@ -68,6 +73,8 @@ void main_loop::init()
 	glBindVertexArray(m_vertex_array);
 
 	initialize_controls();
+	initialize_position();
+
 	m_shaders = load_shaders();
 	m_mvp_uniform = glGetUniformLocation(m_shaders.program.get_id(), "mvp");
 	m_position_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "position");
@@ -82,6 +89,8 @@ void main_loop::init()
 	glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
 	constexpr auto color_data_size = sizeof(color_data);
 	glBufferData(GL_ARRAY_BUFFER, color_data_size, color_data, GL_STATIC_DRAW);
+
+	m_last_timestamp = vr::glfw::get_time();
 }
 
 void main_loop::initialize_controls()
@@ -89,13 +98,12 @@ void main_loop::initialize_controls()
 	m_kb.set_sticky_keys(true);
 	m_mouse.set_sticky_buttons(true);
 	m_mouse.set_mode(vr::glfw::mouse::mode::disabled);
+}
 
-	m_position = glm::vec3(-4, 3, -3);
-	m_vertical_angle = 0.0f;
-	m_horizontal_angle = glm::pi<float>();
-	m_speed = 3.0f;
-	m_mouse_speed = 0.1f;
-	m_last_timestamp = vr::glfw::get_time(); 
+void main_loop::initialize_position()
+{
+	m_camera->set_position({ -8.96424, 2.70909, 4.2585 });
+	m_camera->set_direction({ 0.827756, -0.307191, -0.469526 });
 }
 
 void main_loop::process_input()
@@ -103,88 +111,9 @@ void main_loop::process_input()
 	const auto current_time = vr::glfw::get_time();
 	const float delta_time = static_cast<float>(current_time - m_last_timestamp);
 
-	const auto mouse = m_mouse.get_position();
-	//std::cout << "Mouse position x / y: " << mouse_x << ' ' << mouse_y << '\n';
+	m_controls.process_events(delta_time);
 
-	double window_width, window_height;
-	{
-		const auto window_size = m_window.get_size();
-		window_width = static_cast<double>(window_size.width);
-		window_height = static_cast<double>(window_size.height);
-	}
-
-	const auto window_middle_x = window_width / 2;
-	const auto window_middle_y = window_height / 2;
-
-	m_mouse.set_position({ window_middle_x, window_middle_y });
-
-	const auto mouse_x_diff = static_cast<float>(window_middle_x - mouse.x);
-	const auto mouse_y_diff = static_cast<float>(window_middle_y - mouse.y);
-
-	//std::cout << "Mouse diff (horizontal/vertical): " << mouse_horizontal_diff << ' ' << mouse_vertical_diff << '\n';
-
-	m_horizontal_angle += m_mouse_speed * static_cast<float>(delta_time) * mouse_x_diff;
-	m_vertical_angle += m_mouse_speed * static_cast<float>(delta_time) * mouse_y_diff;
-
-	//std::cout << "Vertical angle: " << m_vertical_angle << " horizontal angle: " << m_horizontal_angle << '\n';
-
-	const glm::vec3 direction(
-		std::cos(m_vertical_angle) * std::sin(m_horizontal_angle),
-		std::sin(m_vertical_angle),
-		std::cos(m_vertical_angle) * std::cos(m_horizontal_angle));
-
-	//std::cout << "Direction: " << direction.x << ' ' << direction.y << ' ' << direction.z << '\n';
-
-	const auto pi = glm::pi<float>();
-	const auto pi_2 = pi / 2.0f;
-
-	const glm::vec3 right(std::sin(m_horizontal_angle - pi_2),
-		0,
-		std::cos(m_horizontal_angle - pi_2));
-
-	const glm::vec3 up = glm::cross(right, direction);
-
-	using k = vr::glfw::keyboard::key;
-	using s = vr::glfw::keyboard::state;
-
-	if (m_kb.get_key_state(k::w) == s::press)
-	{
-		m_position += direction * delta_time * m_speed;
-	}
-
-	if (m_kb.get_key_state(k::s) == s::press)
-	{
-		m_position -= direction * delta_time * m_speed;
-	}
-
-	if (m_kb.get_key_state(k::d) == s::press)
-	{
-		m_position += right * delta_time * m_speed;
-	}
-
-	if (m_kb.get_key_state(k::a) == s::press)
-	{
-		m_position -= right * delta_time * m_speed;
-	}
-
-	if (m_kb.get_key_state(k::space) == s::press)
-	{
-		m_position += up * delta_time * m_speed;
-	}
-
-	if (m_kb.get_key_state(k::left_ctrl) == s::press)
-	{
-		m_position -= up * delta_time * m_speed;
-	}
-
-	//std::cout << "Position: " << m_position.x << ' ' << m_position.y << ' ' << m_position.z << '\n';
-
-	const auto aspect_ratio = static_cast<float>(window_middle_x / window_middle_y);
-	m_projection = glm::perspective(glm::radians(45.f), aspect_ratio, 0.1f, 100.0f);
-	m_view = glm::lookAt(m_position, m_position + direction, up);
-	m_mvp = m_projection * m_view * glm::mat4(1.0f);
-
-	if (m_kb.get_key_state(k::escape) == s::press)
+	if (m_kb.get_key_state(vr::glfw::keyboard::key::escape) == vr::glfw::keyboard::state::press)
 	{
 		m_window.request_close();
 	}
@@ -192,12 +121,29 @@ void main_loop::process_input()
 	m_last_timestamp = current_time;
 }
 
+void main_loop::print_state()
+{
+	std::cout << "Position: " 
+		<< m_camera->get_position().x << ", "
+		<< m_camera->get_position().y << ", " 
+		<< m_camera->get_position().z << '\n';
+
+	std::cout << "Direction: " << 
+		m_camera->get_direction().x << ", " 
+		<< m_camera->get_direction().y << ", " 
+		<< m_camera->get_direction().z << '\n';
+}
+
 void main_loop::render_scene()
 {
+	const auto projection_matrix = m_camera->get_projection_matrix();
+	const auto view_matrix = m_controls.get_view_matrix();
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(m_shaders.program.get_id());
 
-	glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &m_mvp[0][0]);
+	const auto mvp = projection_matrix * view_matrix * glm::mat4(1.0f);
+	glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
 
 	glEnableVertexAttribArray(m_position_attribute_location);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
@@ -222,6 +168,7 @@ void main_loop::run()
 		if (m_window.has_focus())
 		{
 			process_input();
+			print_state();
 			render_scene();
 		}
 
