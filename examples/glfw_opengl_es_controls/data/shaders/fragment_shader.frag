@@ -1,4 +1,3 @@
-R"(
 #version 330 core
 
 in vec3 fragment_color;
@@ -8,4 +7,3 @@ void main()
 {
 	color = fragment_color;
 }
-)"

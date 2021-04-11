@@ -1,25 +1,31 @@
 #include "shader_loader.hpp"
 
+#include <fstream>
 #include <string>
+#include <streambuf>
 
-std::string get_vertex_shader_source()
+std::string read_file(const std::string& path)
 {
-	std::string result = 
+	std::ifstream f(path);
+	if (!f.good())
+	{
+		const std::string message = "File not found: " + path;
+		throw std::runtime_error(message);
+	}
 
-	#include "shaders/vertex_shader.vert"
-		;
+	std::string result((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 
 	return result;
 }
 
+std::string get_vertex_shader_source()
+{
+	return read_file("data/shaders/vertex_shader.vert");
+}
+
 std::string get_fragment_shader_source()
 {
-	std::string result =
-
-	#include "shaders/fragment_shader.frag"
-		;
-
-	return result;
+	return read_file("data/shaders/fragment_shader.frag");
 }
 
 shaders load_shaders()
