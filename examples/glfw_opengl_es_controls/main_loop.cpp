@@ -7,7 +7,6 @@
 #include <gl/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include <GLFW/glfw3.h>
 
 #include <stdexcept>
@@ -96,12 +95,12 @@ void main_loop::initialize_controls()
 	m_horizontal_angle = glm::pi<float>();
 	m_speed = 3.0f;
 	m_mouse_speed = 0.1f;
-	m_last_timestamp = glfwGetTime();
+	m_last_timestamp = vr::glfw::get_time(); 
 }
 
 void main_loop::process_input()
 {
-	const auto current_time = glfwGetTime();
+	const auto current_time = vr::glfw::get_time();
 	const float delta_time = static_cast<float>(current_time - m_last_timestamp);
 
 	const auto mouse = m_mouse.get_position();

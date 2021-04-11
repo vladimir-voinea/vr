@@ -32,6 +32,11 @@ namespace vr::glfw
 		return result;
 	}
 
+	double get_time()
+	{
+		return glfwGetTime();
+	}
+
 	void poll_events()
 	{
 		glfwPollEvents();
