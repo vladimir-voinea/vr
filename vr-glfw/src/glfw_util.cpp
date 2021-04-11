@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 
-namespace vr
+namespace vr::glfw
 {
 	bool is_vulkan_supported()
 	{

@@ -3,7 +3,7 @@
 #include <string>
 #include <optional>
 
-namespace vr
+namespace vr::glfw
 {
 	struct version
 	{
@@ -31,7 +31,7 @@ namespace vr
 		bool foward_compatible;
 	};
 
-	struct glfw_window_settings
+	struct window_settings
 	{
 		int width = 800;
 		int height = 600;

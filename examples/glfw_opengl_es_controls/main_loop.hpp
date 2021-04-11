@@ -11,7 +11,7 @@
 class main_loop
 {
 public:
-	main_loop(vr::glfw_window& window);
+	main_loop(vr::glfw::window& window);
 	~main_loop();
 
 	void init();
@@ -23,7 +23,7 @@ private:
 	void calculate_matrices_from_inputs();
 
 private:
-	vr::glfw_window& m_window;
+	vr::glfw::window& m_window;
 	shaders m_shaders;
 
 	GLuint m_mvp_uniform;

@@ -10,13 +10,13 @@ void glfw_opengl_es_triangle_app::run()
 {
 	try
 	{
-		vr::opengl_context opengl_context_settings;
-		opengl_context_settings.api = vr::opengl_context_api::opengl_es;
-		opengl_context_settings.context_version = vr::version{ 2, 0 };
-		opengl_context_settings.profile = vr::opengl_profile::core;
+		vr::glfw::opengl_context opengl_context_settings;
+		opengl_context_settings.api = vr::glfw::opengl_context_api::opengl_es;
+		opengl_context_settings.context_version = vr::glfw::version{ 2, 0 };
+		opengl_context_settings.profile = vr::glfw::opengl_profile::core;
 		opengl_context_settings.foward_compatible = true;
 
-		vr::glfw_window_settings settings;
+		vr::glfw::window_settings settings;
 		settings.width = 800;
 		settings.height = 600;
 		settings.name = "GLFW OpenGL ES 2.0 Triangle";
@@ -24,7 +24,7 @@ void glfw_opengl_es_triangle_app::run()
 		settings.resizable = true;
 		settings.msaa_samples = 4;
 
-		vr::glfw_window window(settings);
+		vr::glfw::window window(settings);
 		if (window.init())
 		{
 			std::cout << "Window created successfully\n";

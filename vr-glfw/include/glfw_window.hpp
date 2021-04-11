@@ -6,17 +6,16 @@
 
 struct GLFWwindow;
 
-namespace vr {
-	class glfw_window {
+namespace vr::glfw {
+	class window {
 	public:
-		glfw_window(glfw_window_settings settings);
-		~glfw_window();
+		window(window_settings settings);
+		~window();
 
-		glfw_window(const glfw_window&) = delete;
-		glfw_window& operator=(const glfw_window&) = delete;
+		window(const window&) = delete;
+		window& operator=(const window&) = delete;
 
 		bool init();
-
 		GLFWwindow* get_handle();
 
 		bool close_requested();
@@ -34,7 +33,7 @@ namespace vr {
 	
 	private:
 		GLFWwindow* m_window = nullptr;
-		const glfw_window_settings m_settings;
+		const window_settings m_settings;
 
 		bool m_has_focus;
 	};

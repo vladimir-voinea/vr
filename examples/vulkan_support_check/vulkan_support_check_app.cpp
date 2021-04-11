@@ -27,9 +27,9 @@ bool check_required_extensions_support(const std::vector<std::string>& required_
 void vulkan_support_check_app::run()
 {
 	try {
-		vr::initialize_glfw_once();
+		vr::glfw::initialize_glfw_once();
 
-		const auto have_vulkan_support = vr::is_vulkan_supported();
+		const auto have_vulkan_support = vr::glfw::is_vulkan_supported();
 
 		if (have_vulkan_support)
 		{
@@ -37,7 +37,7 @@ void vulkan_support_check_app::run()
 			std::cout << "Vulkan is supported\n";
 			std::cout << "Required Vulkan extensions for GLFW:\n";
 
-			const auto required_vulkan_extensions = vr::get_vulkan_required_extensions();
+			const auto required_vulkan_extensions = vr::glfw::get_vulkan_required_extensions();
 			for (const auto& extension : required_vulkan_extensions)
 			{
 				std::cout << extension << '\n';

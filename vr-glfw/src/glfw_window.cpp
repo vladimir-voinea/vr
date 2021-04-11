@@ -8,17 +8,17 @@
 
 namespace
 {
-	auto convert_opengl_api(vr::opengl_context_api api) {
+	auto convert_opengl_api(vr::glfw::opengl_context_api api) {
 		auto result = GLFW_NO_API;
 
 		switch (api)
 		{
-		case vr::opengl_context_api::opengl_es:
+		case vr::glfw::opengl_context_api::opengl_es:
 		{
 			result = GLFW_OPENGL_ES_API;
 			break;
 		}
-		case vr::opengl_context_api::opengl:
+		case vr::glfw::opengl_context_api::opengl:
 		{
 			result = GLFW_OPENGL_API;
 			break;
@@ -28,17 +28,17 @@ namespace
 		return result;
 	}
 
-	auto convert_opengl_profile(vr::opengl_profile profile) {
+	auto convert_opengl_profile(vr::glfw::opengl_profile profile) {
 		auto result = GLFW_OPENGL_CORE_PROFILE;
 
 		switch (profile)
 		{
-		case vr::opengl_profile::core:
+		case vr::glfw::opengl_profile::core:
 		{
 			result = GLFW_OPENGL_CORE_PROFILE;
 			break;
 		}
-		case vr::opengl_profile::any:
+		case vr::glfw::opengl_profile::any:
 		{
 			result = GLFW_OPENGL_ANY_PROFILE;
 			break;
@@ -54,27 +54,27 @@ namespace
 	}
 }
 
-namespace vr
+namespace vr::glfw
 {
-	glfw_window::glfw_window(glfw_window_settings settings)
+	window::window(window_settings settings)
 		: m_settings(settings)
 	{
 
 	}
 
-	glfw_window::~glfw_window()
+	window::~window()
 	{
 		glfwDestroyWindow(m_window);
 		deinitialize_glfw();
 	}
 
-	bool glfw_window::init()
+	bool window::init()
 	{
 		if (!initialize_glfw_once()) {
 			throw std::runtime_error("GLFW initialization failed");
 		}
 
-		glfwSetErrorCallback(glfw_error_callback);
+		glfwSetErrorCallback(::glfw_error_callback);
 
 		if (m_settings.opengl_context)
 		{
@@ -106,44 +106,44 @@ namespace vr
 		return created;
 	}
 
-	bool glfw_window::create()
+	bool window::create()
 	{
 		m_window = glfwCreateWindow(m_settings.width, m_settings.height, m_settings.name.c_str(), nullptr, nullptr);
 
 		return m_window != nullptr;
 	}
 
-	GLFWwindow* glfw_window::get_handle()
+	GLFWwindow* window::get_handle()
 	{
 		return m_window;
 	}
 
-	void glfw_window::window_focus_callback(bool status)
+	void window::window_focus_callback(bool status)
 	{
 		m_has_focus = status;
 	}
 
-	bool glfw_window::close_requested()
+	bool window::close_requested()
 	{
 		return glfwWindowShouldClose(m_window);
 	}
 
-	bool glfw_window::has_focus()
+	bool window::has_focus()
 	{
 		return m_has_focus;
 	}
 
-	void glfw_window::set_sticky_keys(bool status)
+	void window::set_sticky_keys(bool status)
 	{
 		glfwSetInputMode(m_window, GLFW_STICKY_KEYS, status ? GL_TRUE : GL_FALSE);
 	}
 
-	void glfw_window::set_mouse_visibility(bool status)
+	void window::set_mouse_visibility(bool status)
 	{
 		glfwSetInputMode(m_window, GLFW_CURSOR, status ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
 
-	void glfw_window::swap_buffers()
+	void window::swap_buffers()
 	{
 		glfwSwapBuffers(m_window);
 	}
@@ -151,7 +151,7 @@ namespace vr
 	void glfw_window_focus_callback(GLFWwindow* window, int focused)
 	{
 		void* window_user_ptr = glfwGetWindowUserPointer(window);
-		auto window_instance = static_cast<vr::glfw_window*>(window_user_ptr);
+		auto window_instance = static_cast<vr::glfw::window*>(window_user_ptr);
 		if (window_instance != nullptr)
 		{
 			const bool status = focused;

@@ -7,7 +7,7 @@ namespace
 	bool glfw_is_initialized = false;
 }
 
-namespace vr {
+namespace vr::glfw {
 	bool initialize_glfw_once()
 	{
 		if (!glfw_is_initialized) {

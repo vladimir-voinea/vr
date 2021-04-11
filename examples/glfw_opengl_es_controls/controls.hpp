@@ -5,8 +5,8 @@
 class controls
 {
 public:
-	controls(vr::glfw_window& window);
+	controls(vr::glfw::window& window);
 
 private:
-	vr::glfw_window& m_window;
+	vr::glfw::window& m_window;
 };

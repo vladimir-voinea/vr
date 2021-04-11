@@ -31,7 +31,7 @@ void initialize_glew()
 	}
 }
 
-main_loop::main_loop(vr::glfw_window& window)
+main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
 {
 	init();
@@ -87,6 +87,6 @@ void main_loop::run()
 		glDisableVertexAttribArray(0);
 
 		m_window.swap_buffers();
-		vr::poll_events();
+		vr::glfw::poll_events();
 	}
 }

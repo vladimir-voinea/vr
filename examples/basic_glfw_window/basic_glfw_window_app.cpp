@@ -8,12 +8,12 @@
 
 void basic_glfw_window_app::run()
 {
-	vr::glfw_window_settings settings;
+	vr::glfw::window_settings settings;
 	settings.width = 800;
 	settings.height = 600;
 	settings.name = "Basic window example";
 
-	vr::glfw_window window(settings);
+	vr::glfw::window window(settings);
 	if (window.init())
 	{
 		std::cout << "Window created successfully";
