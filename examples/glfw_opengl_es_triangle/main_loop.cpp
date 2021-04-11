@@ -33,6 +33,7 @@ void initialize_glew()
 
 main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
+	, m_kb(window)
 {
 	init();
 }
@@ -46,7 +47,7 @@ main_loop::~main_loop()
 void main_loop::init()
 {
 	initialize_glew();
-	m_window.set_sticky_keys(true);
+	m_kb.set_sticky_keys(true);
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, nullptr);

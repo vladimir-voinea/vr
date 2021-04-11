@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glfw_window.hpp>
+#include <glfw_keyboard.hpp>
 
 #include <shader.hpp>
 #include <shader_program.hpp>
@@ -18,6 +19,7 @@ public:
 
 private:
 	vr::glfw::window& m_window;
+	vr::glfw::keyboard m_kb;
 	shaders m_shaders;
 
 	GLuint vertex_array;
