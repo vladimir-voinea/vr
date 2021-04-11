@@ -123,6 +123,11 @@ namespace vr {
 		glfwSetInputMode(m_window, GLFW_STICKY_KEYS, status ? GL_TRUE : GL_FALSE);
 	}
 
+	void glfw_window::set_mouse_visibility(bool status)
+	{
+		glfwSetInputMode(m_window, GLFW_CURSOR, status ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+	}
+
 	void glfw_window::swap_buffers()
 	{
 		glfwSwapBuffers(m_window);

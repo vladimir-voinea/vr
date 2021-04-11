@@ -17,8 +17,8 @@ void glfw_opengl_es_controls_app::run()
 		opengl_context_settings.foward_compatible = true;
 
 		vr::glfw_window_settings settings;
-		settings.width = 800;
-		settings.height = 600;
+		settings.width = 1024;
+		settings.height = 768;
 		settings.name = "GLFW OpenGL ES 2.0 Cube";
 		settings.opengl_context = opengl_context_settings;
 		settings.resizable = false;

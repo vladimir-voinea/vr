@@ -87,7 +87,7 @@ void main_loop::calculate_matrices_from_inputs()
 		std::sin(m_vertical_angle),
 		std::cos(m_vertical_angle) * std::cos(m_horizontal_angle));
 
-	std::cout << "Direction: " << direction.x << ' ' << direction.y << ' ' << direction.z << '\n';
+	//std::cout << "Direction: " << direction.x << ' ' << direction.y << ' ' << direction.z << '\n';
 
 	const auto pi = glm::pi<float>();
 	const auto pi_2 = pi / 2.0f;
@@ -118,7 +118,17 @@ void main_loop::calculate_matrices_from_inputs()
 		m_position -= right * delta_time * m_speed;
 	}
 
-	//std::cout << "Position: " << m_position.x << ' ' << m_position.y << ' ' << m_position.z << '\n';
+	if (glfwGetKey(m_window.get_handle(), GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		m_position += up * delta_time * m_speed;
+	}
+
+	if (glfwGetKey(m_window.get_handle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	{
+		m_position -= up * delta_time * m_speed;
+	}
+
+	std::cout << "Position: " << m_position.x << ' ' << m_position.y << ' ' << m_position.z << '\n';
 
 	const auto aspect_ratio = static_cast<float>(window_middle_x / window_middle_y);
 	m_projection = glm::perspective(glm::radians(45.f), aspect_ratio, 0.1f, 100.0f);
@@ -142,6 +152,7 @@ void main_loop::init()
 {
 	initialize_glew();
 	m_window.set_sticky_keys(true);
+	m_window.set_mouse_visibility(false);
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, nullptr);
@@ -160,7 +171,6 @@ void main_loop::init()
 	m_mvp_uniform = glGetUniformLocation(m_shaders.program.get_id(), "mvp");
 	m_position_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "position");
 	m_vertex_color_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "vertex_color");
-	//calculate_initial_mvp();
 
 	glGenBuffers(1, &m_vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
