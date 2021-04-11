@@ -128,7 +128,7 @@ void main_loop::calculate_matrices_from_inputs()
 		m_position -= up * delta_time * m_speed;
 	}
 
-	std::cout << "Position: " << m_position.x << ' ' << m_position.y << ' ' << m_position.z << '\n';
+	//std::cout << "Position: " << m_position.x << ' ' << m_position.y << ' ' << m_position.z << '\n';
 
 	const auto aspect_ratio = static_cast<float>(window_middle_x / window_middle_y);
 	m_projection = glm::perspective(glm::radians(45.f), aspect_ratio, 0.1f, 100.0f);
@@ -187,26 +187,30 @@ void main_loop::run()
 {
 	while (!m_window.close_requested())
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(m_shaders.program.get_id());
+		if (m_window.has_focus())
+		{
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glUseProgram(m_shaders.program.get_id());
 
-		calculate_matrices_from_inputs();
-		glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &m_mvp[0][0]);
+			calculate_matrices_from_inputs();
+			glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &m_mvp[0][0]);
 
-		glEnableVertexAttribArray(m_position_attribute_location);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+			glEnableVertexAttribArray(m_position_attribute_location);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		glEnableVertexAttribArray(m_vertex_color_attribute_location);
-		glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+			glEnableVertexAttribArray(m_vertex_color_attribute_location);
+			glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+			glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
-		glDisableVertexAttribArray(m_vertex_color_attribute_location);
-		glDisableVertexAttribArray(m_position_attribute_location);
+			glDisableVertexAttribArray(m_vertex_color_attribute_location);
+			glDisableVertexAttribArray(m_position_attribute_location);
 
-		m_window.swap_buffers();
+			m_window.swap_buffers();
+		}
+
 		vr::poll_events();
 	}
 }

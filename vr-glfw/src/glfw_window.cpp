@@ -54,7 +54,8 @@ namespace
 	}
 }
 
-namespace vr {
+namespace vr
+{
 	glfw_window::glfw_window(glfw_window_settings settings)
 		: m_settings(settings)
 	{
@@ -93,9 +94,13 @@ namespace vr {
 
 		const auto created = create();
 
-		if (created) 
+		if (created)
 		{
 			glfwMakeContextCurrent(m_window);
+			m_has_focus = true;
+
+			glfwSetWindowUserPointer(m_window, this);
+			glfwSetWindowFocusCallback(m_window, glfw_window_focus_callback);
 		}
 
 		return created;
@@ -113,9 +118,19 @@ namespace vr {
 		return m_window;
 	}
 
+	void glfw_window::window_focus_callback(bool status)
+	{
+		m_has_focus = status;
+	}
+
 	bool glfw_window::close_requested()
 	{
 		return glfwWindowShouldClose(m_window);
+	}
+
+	bool glfw_window::has_focus()
+	{
+		return m_has_focus;
 	}
 
 	void glfw_window::set_sticky_keys(bool status)
@@ -131,5 +146,21 @@ namespace vr {
 	void glfw_window::swap_buffers()
 	{
 		glfwSwapBuffers(m_window);
+	}
+
+	void glfw_window_focus_callback(GLFWwindow* window, int focused)
+	{
+		void* window_user_ptr = glfwGetWindowUserPointer(window);
+		auto window_instance = static_cast<vr::glfw_window*>(window_user_ptr);
+		if (window_instance != nullptr)
+		{
+			const bool status = focused;
+			std::cout << "Focus: " << std::boolalpha << status << '\n';;
+			window_instance->window_focus_callback(status);
+		}
+		else
+		{
+			std::cerr << "User pointer is null" << '\n';
+		}
 	}
 }
