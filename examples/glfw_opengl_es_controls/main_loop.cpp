@@ -55,25 +55,23 @@ void main_loop::calculate_matrices_from_inputs()
 	const auto current_time = glfwGetTime();
 	const float delta_time = static_cast<float>(current_time - m_last_timestamp);
 
-	double mouse_x, mouse_y;
-	glfwGetCursorPos(m_window.get_handle(), &mouse_x, &mouse_y);
+	const auto mouse = m_window.get_mouse_position();
 	//std::cout << "Mouse position x / y: " << mouse_x << ' ' << mouse_y << '\n';
 
 	double window_width, window_height;
 	{
-		int window_width_i, window_height_i;
-		glfwGetWindowSize(m_window.get_handle(), &window_width_i, &window_height_i);
-		window_width = static_cast<double>(window_width_i);
-		window_height = static_cast<double>(window_height_i);
+		const auto window_size = m_window.get_size();
+		window_width = static_cast<double>(window_size.width);
+		window_height = static_cast<double>(window_size.height);
 	}
 
 	const auto window_middle_x = window_width / 2;
 	const auto window_middle_y = window_height / 2;
 
-	glfwSetCursorPos(m_window.get_handle(), window_middle_x, window_middle_y);
+	m_window.set_mouse_position({ window_middle_x, window_middle_y });
 
-	const auto mouse_x_diff = static_cast<float>(window_middle_x - mouse_x);
-	const auto mouse_y_diff = static_cast<float>(window_middle_y - mouse_y);
+	const auto mouse_x_diff = static_cast<float>(window_middle_x - mouse.x);
+	const auto mouse_y_diff = static_cast<float>(window_middle_y - mouse.y);
 
 	//std::cout << "Mouse diff (horizontal/vertical): " << mouse_horizontal_diff << ' ' << mouse_vertical_diff << '\n';
 
