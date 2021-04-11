@@ -173,24 +173,6 @@ void main_loop::init()
 	glBufferData(GL_ARRAY_BUFFER, color_data_size, color_data, GL_STATIC_DRAW);
 }
 
-void main_loop::calculate_initial_mvp()
-{
-	constexpr float field_of_view = glm::radians(45.0f);
-	constexpr float aspect_ratio = 4.0f / 3.0f;
-	constexpr float near = 0.1f;
-	constexpr float far = 100.0f;
-
-	const glm::mat4 projection = glm::perspective(field_of_view, aspect_ratio, near, far);
-
-	const glm::mat4 view = glm::lookAt(m_position,
-		glm::vec3(0, 0, 0),
-		glm::vec3(0, 1, 0));
-
-	const glm::mat4 model = glm::mat4(1.0f);
-
-	m_mvp = projection * view * model;
-}
-
 void main_loop::run()
 {
 	while (!m_window.close_requested())

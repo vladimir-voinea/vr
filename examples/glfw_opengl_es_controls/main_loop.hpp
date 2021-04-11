@@ -19,7 +19,6 @@ public:
 	void run();
 
 private:
-	void calculate_initial_mvp();
 	void initialize_controls();
 	void calculate_matrices_from_inputs();
 
