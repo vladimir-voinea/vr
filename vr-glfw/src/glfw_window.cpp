@@ -123,6 +123,11 @@ namespace vr::glfw
 		m_has_focus = status;
 	}
 
+	void window::request_close()
+	{
+		glfwSetWindowShouldClose(m_window, GLFW_TRUE);
+	}
+
 	bool window::close_requested()
 	{
 		return glfwWindowShouldClose(m_window);
@@ -139,16 +144,6 @@ namespace vr::glfw
 		glfwGetWindowSize(m_window, &size.width, &size.height);
 
 		return size;
-	}
-
-	void window::set_sticky_keys(bool status)
-	{
-		glfwSetInputMode(m_window, GLFW_STICKY_KEYS, status ? GL_TRUE : GL_FALSE);
-	}
-
-	void window::set_mouse_visibility(bool status)
-	{
-		glfwSetInputMode(m_window, GLFW_CURSOR, status ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
 
 	void window::swap_buffers()

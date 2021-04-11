@@ -77,6 +77,11 @@ namespace vr::glfw
 	{
 	}
 
+	void keyboard::set_sticky_keys(bool value)
+	{
+		glfwSetInputMode(m_window.get_handle(), GLFW_STICKY_KEYS, value ? GL_TRUE : GL_FALSE);
+	}
+
 	keyboard::state keyboard::get_key_state(const keyboard::key& key)
 	{
 		const auto glfw_key = enum_to_glfw_key(key);

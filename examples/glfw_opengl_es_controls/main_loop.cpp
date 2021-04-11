@@ -55,8 +55,6 @@ main_loop::~main_loop()
 void main_loop::init()
 {
 	initialize_glew();
-	m_window.set_sticky_keys(true);
-	m_window.set_mouse_visibility(false);
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, nullptr);
@@ -89,6 +87,10 @@ void main_loop::init()
 
 void main_loop::initialize_controls()
 {
+	m_kb.set_sticky_keys(true);
+	m_mouse.set_sticky_buttons(true);
+	m_mouse.set_mode(vr::glfw::mouse::mode::disabled);
+
 	m_position = glm::vec3(-4, 3, -3);
 	m_vertical_angle = 0.0f;
 	m_horizontal_angle = glm::pi<float>();
@@ -182,6 +184,11 @@ void main_loop::process_input()
 	m_projection = glm::perspective(glm::radians(45.f), aspect_ratio, 0.1f, 100.0f);
 	m_view = glm::lookAt(m_position, m_position + direction, up);
 	m_mvp = m_projection * m_view * glm::mat4(1.0f);
+
+	if (m_kb.get_key_state(k::escape) == s::press)
+	{
+		m_window.request_close();
+	}
 
 	m_last_timestamp = current_time;
 }

@@ -24,13 +24,13 @@ namespace vr::glfw {
 		bool init();
 		GLFWwindow* get_handle();
 
+		void request_close();
 		bool close_requested();
+
 		bool has_focus();
 		window_size get_size();
 
 		void swap_buffers();
-		void set_sticky_keys(bool status);
-		void set_mouse_visibility(bool stattus);
 	private:
 		bool create();
 

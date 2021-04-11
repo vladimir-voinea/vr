@@ -50,6 +50,7 @@ namespace vr::glfw
 	public:
 		keyboard(window& window);
 
+		void set_sticky_keys(bool value);
 		state get_key_state(const key& key);
 
 	private:
