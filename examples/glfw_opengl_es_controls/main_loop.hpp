@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glfw_window.hpp>
+#include <glfw_keyboard.hpp>
+#include <glfw_mouse.hpp>
 
 #include <shader.hpp>
 #include <shader_program.hpp>
@@ -16,14 +18,19 @@ public:
 
 	void init();
 
+	void render_scene();
+
 	void run();
 
 private:
 	void initialize_controls();
-	void calculate_matrices_from_inputs();
+	void process_input();
 
 private:
 	vr::glfw::window& m_window;
+	vr::glfw::keyboard m_kb;
+	vr::glfw::mouse m_mouse;
+
 	shaders m_shaders;
 
 	GLuint m_mvp_uniform;

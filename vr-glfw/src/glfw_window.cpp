@@ -141,19 +141,6 @@ namespace vr::glfw
 		return size;
 	}
 
-	mouse_position window::get_mouse_position()
-	{
-		mouse_position position;
-		glfwGetCursorPos(m_window, &position.x, &position.y);
-
-		return position;
-	}
-
-	void window::set_mouse_position(const mouse_position& position)
-	{
-		glfwSetCursorPos(m_window, position.x, position.y);
-	}
-
 	void window::set_sticky_keys(bool status)
 	{
 		glfwSetInputMode(m_window, GLFW_STICKY_KEYS, status ? GL_TRUE : GL_FALSE);

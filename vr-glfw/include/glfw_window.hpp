@@ -13,12 +13,6 @@ namespace vr::glfw {
 		int height;
 	};
 
-	struct mouse_position
-	{
-		double x;
-		double y;
-	};
-
 	class window {
 	public:
 		window(window_settings settings);
@@ -33,9 +27,6 @@ namespace vr::glfw {
 		bool close_requested();
 		bool has_focus();
 		window_size get_size();
-
-		mouse_position get_mouse_position();
-		void set_mouse_position(const mouse_position& position);
 
 		void swap_buffers();
 		void set_sticky_keys(bool status);
