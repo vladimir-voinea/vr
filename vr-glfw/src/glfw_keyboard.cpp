@@ -90,7 +90,7 @@ namespace vr::glfw
 		{
 			return keyboard::state::press;
 		}
-		else if (state == GLFW_RELEASE)
+		if (state == GLFW_RELEASE)
 		{
 			return keyboard::state::release;
 		}

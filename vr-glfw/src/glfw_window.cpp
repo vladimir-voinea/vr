@@ -58,6 +58,7 @@ namespace vr::glfw
 {
 	window::window(window_settings settings)
 		: m_settings(settings)
+		, m_has_focus(false)
 	{
 
 	}
