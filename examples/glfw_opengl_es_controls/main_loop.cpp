@@ -8,6 +8,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <GLFW/glfw3.h>
+
 #include <stdexcept>
 #include <iostream>
 
@@ -48,6 +50,76 @@ main_loop::~main_loop()
 	glDeleteVertexArrays(1, &m_vertex_array);
 }
 
+void main_loop::calculate_matrices_from_inputs()
+{
+	const auto current_time = glfwGetTime();
+	const float delta_time = static_cast<float>(current_time - m_last_timestamp);
+
+	double mouse_x, mouse_y;
+	glfwGetCursorPos(m_window.get_handle(), &mouse_x, &mouse_y);
+
+	int window_width, window_height;
+	glfwGetWindowSize(m_window.get_handle(), &window_width, &window_height);
+	const auto window_middle_horizontal = static_cast<double>(window_width) / 2.0f;
+	const auto window_middle_vertical = static_cast<double>(window_height) / 2.0f;
+
+	glfwSetCursorPos(m_window.get_handle(), window_middle_vertical, window_middle_horizontal);
+
+	m_horizontal_angle += static_cast<float>(m_mouse_speed * (window_middle_horizontal - mouse_x));
+	m_vertical_angle += static_cast<float>(m_mouse_speed * (window_middle_vertical - mouse_y));
+
+	std::cout << "Vertical angle: " << m_vertical_angle << " horizontal angle: " << m_horizontal_angle << '\n';
+
+	const glm::vec3 direction(std::cos(m_vertical_angle) * std::sin(m_horizontal_angle),
+		std::sin(m_vertical_angle),
+		std::cos(m_vertical_angle) * std::cos(m_horizontal_angle));
+
+	const glm::vec3 right(std::sin(m_horizontal_angle - glm::pi<float>() / 2.0f),
+		0,
+		std::cos(m_horizontal_angle - glm::pi<float>() / 2.0f));
+
+	const glm::vec3 up = glm::cross(right, direction);
+
+	if (glfwGetKey(m_window.get_handle(), GLFW_KEY_W) == GLFW_PRESS)
+	{
+		m_position += direction * delta_time * m_speed;
+	}
+
+	if (glfwGetKey(m_window.get_handle(), GLFW_KEY_S) == GLFW_PRESS)
+	{
+		m_position -= direction * delta_time * m_speed;
+	}
+
+	if (glfwGetKey(m_window.get_handle(), GLFW_KEY_D) == GLFW_PRESS)
+	{
+		m_position += right * delta_time * m_speed;
+	}
+
+	if (glfwGetKey(m_window.get_handle(), GLFW_KEY_A) == GLFW_PRESS)
+	{
+		m_position -= right * delta_time * m_speed;
+	}
+
+	std::cout << "Position: " << m_position.x << ' ' << m_position.y << ' ' << m_position.z << '\n';
+
+	const auto aspect_ratio = static_cast<float>(window_middle_horizontal / window_middle_vertical);
+	m_projection = glm::perspective(glm::radians(45.f), aspect_ratio, 0.1f, 100.0f);
+	m_view = glm::lookAt(m_position, m_position + direction, up);
+	m_mvp = m_projection * m_view * glm::mat4(1.0f);
+
+	m_last_timestamp = current_time;
+}
+
+void main_loop::initialize_controls()
+{
+	m_position = glm::vec3(-4, 3, -3);
+	m_vertical_angle = 0.0f;
+	m_horizontal_angle = glm::pi<float>();
+	m_speed = 3.0f;
+	m_mouse_speed = 0.005f;
+	m_last_timestamp = glfwGetTime();
+}
+
 void main_loop::init()
 {
 	initialize_glew();
@@ -64,11 +136,12 @@ void main_loop::init()
 	glGenVertexArrays(1, &m_vertex_array);
 	glBindVertexArray(m_vertex_array);
 
+	initialize_controls();
 	m_shaders = load_shaders();
 	m_mvp_uniform = glGetUniformLocation(m_shaders.program.get_id(), "mvp");
 	m_position_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "position");
 	m_vertex_color_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "vertex_color");
-	calculate_mvp();
+	calculate_initial_mvp();
 
 	glGenBuffers(1, &m_vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
@@ -81,7 +154,7 @@ void main_loop::init()
 	glBufferData(GL_ARRAY_BUFFER, color_data_size, color_data, GL_STATIC_DRAW);
 }
 
-void main_loop::calculate_mvp()
+void main_loop::calculate_initial_mvp()
 {
 	constexpr float field_of_view = glm::radians(45.0f);
 	constexpr float aspect_ratio = 4.0f / 3.0f;
@@ -90,7 +163,7 @@ void main_loop::calculate_mvp()
 
 	const glm::mat4 projection = glm::perspective(field_of_view, aspect_ratio, near, far);
 
-	const glm::mat4 view = glm::lookAt(glm::vec3(-4, 3, -3),
+	const glm::mat4 view = glm::lookAt(m_position,
 		glm::vec3(0, 0, 0),
 		glm::vec3(0, 1, 0));
 
@@ -106,6 +179,7 @@ void main_loop::run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(m_shaders.program.get_id());
 
+		calculate_matrices_from_inputs();
 		glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &m_mvp[0][0]);
 
 		glEnableVertexAttribArray(m_position_attribute_location);

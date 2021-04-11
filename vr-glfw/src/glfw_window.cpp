@@ -108,6 +108,11 @@ namespace vr {
 		return m_window != nullptr;
 	}
 
+	GLFWwindow* glfw_window::get_handle()
+	{
+		return m_window;
+	}
+
 	bool glfw_window::close_requested()
 	{
 		return glfwWindowShouldClose(m_window);

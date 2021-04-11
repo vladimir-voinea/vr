@@ -17,6 +17,8 @@ namespace vr {
 
 		bool init();
 
+		GLFWwindow* get_handle();
+
 		bool close_requested();
 		void swap_buffers();
 		void set_sticky_keys(bool status);
