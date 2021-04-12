@@ -5,7 +5,7 @@
 #include <glfw_mouse.hpp>
 
 #include <assimp/Importer.hpp>
-#include "model_data.hpp"
+#include "geometry_data_base.hpp"
 
 #include <shader.hpp>
 #include <shader_program.hpp>
@@ -28,7 +28,8 @@ public:
 	void run();
 
 private:
-	model_data import_model();
+	using suzanne_geometry = geometry_data_base<glm::vec3, glm::vec2, glm::vec3, uint16_t>;
+	suzanne_geometry import_model();
 	void initialize_controls();
 	void initialize_position();
 
