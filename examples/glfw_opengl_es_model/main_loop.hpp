@@ -51,8 +51,6 @@ private:
 	GLuint m_cube_vertex_array;
 	GLuint m_cube_vertex_buffer;
 	GLuint m_cube_color_buffer;
-	//GLuint m_cube_position_attribute_location;
-	//GLuint m_cube_vertex_color_attribute_location;
 
 	shaders m_suzanne_shaders;
 	GLuint m_suzanne_mvp_uniform;
@@ -65,9 +63,6 @@ private:
 	GLuint m_suzanne_normal_buffer;
 	GLuint m_suzanne_index_buffer;
 	uint64_t m_suzanne_indices;
-	//GLuint m_suzanne_position_attribute_location;
-	//GLuint m_suzanne_uv_attribute_location;
-	//GLuint m_suzanne_normal_attribute_location;
 
 	GLuint m_suzanne_texture;
 	GLuint m_suzanne_texture_shader_sampler;

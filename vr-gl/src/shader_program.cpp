@@ -1,6 +1,6 @@
 #include "shader_program.hpp"
 
-#include "opengl.h"
+#include "vr-opengl.h"
 
 #include <stdexcept>
 
