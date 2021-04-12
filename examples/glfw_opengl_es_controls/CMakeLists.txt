@@ -7,7 +7,7 @@ set(SOURCES "main.cpp" "glfw_opengl_es_controls_app.cpp" "main_loop.cpp" "shader
 add_executable(${APP_NAME} ${SOURCES})
 target_compile_features(${APP_NAME} PRIVATE cxx_std_20)
 
-target_link_libraries(${APP_NAME} vr-glfw vr-gl glm)
+target_link_libraries(${APP_NAME} vr vr-glfw vr-gl glm)
 
 set(DATA_FOLDER_IN "${CMAKE_CURRENT_SOURCE_DIR}/data")
 set(DATA_FOLDER_OUT "${CMAKE_CURRENT_BINARY_DIR}/data")

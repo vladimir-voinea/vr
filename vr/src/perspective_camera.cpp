@@ -2,7 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace vr::gl
+namespace vr
 {
 	perspective_camera::perspective_camera(const perspective_camera::settings& settings)
 		: camera()

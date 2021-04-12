@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-user_controls::user_controls(vr::glfw::window& window, vr::gl::camera& camera,
+user_controls::user_controls(vr::glfw::window& window, vr::camera& camera,
 	vr::glfw::mouse& mouse, vr::glfw::keyboard& keyboard)
 	: m_window(window)
 	, m_camera(camera)

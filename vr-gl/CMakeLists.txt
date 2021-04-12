@@ -4,7 +4,7 @@ find_package(OpenGL REQUIRED)
 
 set(LIB_NAME "vr-gl")
 
-set(SOURCES "src/shader.cpp" "src/shader_program.cpp" "src/perspective_camera.cpp" "src/camera.cpp")
+set(SOURCES "src/shader.cpp" "src/shader_program.cpp")
 			
 add_library (${LIB_NAME} ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)

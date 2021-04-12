@@ -3,7 +3,7 @@
 #include "camera.hpp"
 #include <glm/glm.hpp>
 
-namespace vr::gl
+namespace vr
 {
 	class perspective_camera : public camera
 	{

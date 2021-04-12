@@ -42,7 +42,7 @@ private:
 	vr::glfw::keyboard m_kb;
 	vr::glfw::mouse m_mouse;
 
-	std::unique_ptr<vr::gl::camera> m_camera;
+	std::unique_ptr<vr::camera> m_camera;
 	user_controls m_controls;
 	
 	double m_last_timestamp;

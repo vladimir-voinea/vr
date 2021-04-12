@@ -2,9 +2,9 @@ cmake_minimum_required (VERSION 3.8)
 
 include (GoogleTest)
 
-set(APP_NAME "vr-vk-test")
+set(APP_NAME "vr-test")
 
-set(SOURCES "gtest_smoke_test.cpp" "vk_layers.cpp" "vk_extensions.cpp" "vk_instance.cpp" "vk_validation_layer.cpp")
+set(SOURCES "gtest_smoke_test.cpp")
 
 add_executable(${APP_NAME} ${SOURCES})
 target_compile_features(${APP_NAME} PRIVATE cxx_std_20)

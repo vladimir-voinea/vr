@@ -11,6 +11,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 add_subdirectory ("dependencies")
 
 # vr-glfw directory
+add_subdirectory ("vr")
+
+# vr-glfw directory
 add_subdirectory ("vr-glfw")
 
 # vr-gl directory

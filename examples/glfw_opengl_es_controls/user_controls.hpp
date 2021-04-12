@@ -12,7 +12,7 @@ class user_controls
 	};
 
 public:
-	user_controls(vr::glfw::window& window, vr::gl::camera& camera, vr::glfw::mouse& mouse, vr::glfw::keyboard& keyboard);
+	user_controls(vr::glfw::window& window, vr::camera& camera, vr::glfw::mouse& mouse, vr::glfw::keyboard& keyboard);
 
 	void process_events(float time_difference);
 
@@ -29,7 +29,7 @@ private:
 
 private:
 	vr::glfw::window& m_window;
-	vr::gl::camera& m_camera;
+	vr::camera& m_camera;
 	vr::glfw::mouse& m_mouse;
 	vr::glfw::keyboard m_kb;
 

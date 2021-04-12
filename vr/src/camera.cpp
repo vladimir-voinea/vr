@@ -1,6 +1,6 @@
 #include "camera.hpp"
 
-namespace vr::gl
+namespace vr
 {
 	glm::vec3 camera::get_position() const
 	{

@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-namespace vr::gl
+namespace vr
 {
 	class camera
 	{

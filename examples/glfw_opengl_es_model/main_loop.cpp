@@ -33,7 +33,7 @@ main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
 	, m_kb(window)
 	, m_mouse(window)
-	, m_camera(std::make_unique<vr::gl::perspective_camera>(vr::gl::perspective_camera::settings{
+	, m_camera(std::make_unique<vr::perspective_camera>(vr::perspective_camera::settings{
 	45.f, static_cast<float>(window.get_size().width) / static_cast<float>(window.get_size().height),
 	0.1f,100.f }))
 	, m_controls(m_window, *m_camera, m_mouse, m_kb)
