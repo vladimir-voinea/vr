@@ -11,6 +11,7 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 #include <stdexcept>
 #include <iostream>
@@ -27,6 +28,101 @@ MessageCallback(GLenum source,
 	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
 		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
 		type, severity, message);
+}
+
+#define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
+#define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
+#define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
+
+GLuint loadDDS(const char* imagepath) {
+
+	unsigned char header[124];
+
+	FILE* fp;
+
+	/* try to open the file */
+	fp = fopen(imagepath, "rb");
+	if (fp == NULL) {
+		printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", imagepath); getchar();
+		return 0;
+	}
+
+	/* verify the type of file */
+	char filecode[4];
+	fread(filecode, 1, 4, fp);
+	if (strncmp(filecode, "DDS ", 4) != 0) {
+		fclose(fp);
+		return 0;
+	}
+
+	/* get the surface desc */
+	fread(&header, 124, 1, fp);
+
+	unsigned int height = *(unsigned int*)&(header[8]);
+	unsigned int width = *(unsigned int*)&(header[12]);
+	unsigned int linearSize = *(unsigned int*)&(header[16]);
+	unsigned int mipMapCount = *(unsigned int*)&(header[24]);
+	unsigned int fourCC = *(unsigned int*)&(header[80]);
+
+
+	unsigned char* buffer;
+	unsigned int bufsize;
+	/* how big is it going to be including all mipmaps? */
+	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
+	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
+	fread(buffer, 1, bufsize, fp);
+	/* close the file pointer */
+	fclose(fp);
+
+	unsigned int components = (fourCC == FOURCC_DXT1) ? 3 : 4;
+	unsigned int format;
+	switch (fourCC)
+	{
+	case FOURCC_DXT1:
+		format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		break;
+	case FOURCC_DXT3:
+		format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		break;
+	case FOURCC_DXT5:
+		format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		break;
+	default:
+		free(buffer);
+		return 0;
+	}
+
+	// Create one OpenGL texture
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+
+	// "Bind" the newly created texture : all future texture functions will modify this texture
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
+	unsigned int offset = 0;
+
+	/* load the mipmaps */
+	for (unsigned int level = 0; level < mipMapCount && (width || height); ++level)
+	{
+		unsigned int size = ((width + 3) / 4) * ((height + 3) / 4) * blockSize;
+		glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height,
+			0, size, buffer + offset);
+
+		offset += size;
+		width /= 2;
+		height /= 2;
+
+		// Deal with Non-Power-Of-Two textures. This code is not included in the webpage to reduce clutter.
+		if (width < 1) width = 1;
+		if (height < 1) height = 1;
+
+	}
+
+	free(buffer);
+
+	return textureID;
 }
 
 void initialize_glew()
@@ -53,15 +149,22 @@ main_loop::main_loop(vr::glfw::window& window)
 
 main_loop::~main_loop()
 {
-	glDeleteBuffers(1, &m_color_buffer);
-	glDeleteBuffers(1, &m_vertex_buffer);
-	glDeleteVertexArrays(1, &m_vertex_array);
+	glDeleteBuffers(1, &m_suzanne_vertex_buffer);
+	glDeleteBuffers(1, &m_suzanne_uv_buffer);
+	glDeleteBuffers(1, &m_suzanne_normal_buffer);
+	glDeleteTextures(1, &m_suzanne_texture);
+	glDeleteVertexArrays(1, &m_suzanne_vertex_array);
+
+	glDeleteBuffers(1, &m_cube_color_buffer);
+	glDeleteBuffers(1, &m_cube_vertex_buffer);
+	glDeleteVertexArrays(1, &m_cube_vertex_array);
 }
 
 void main_loop::init()
 {
 	initialize_glew();
-	import_model();
+	initialize_controls();
+	initialize_position();
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, nullptr);
@@ -72,41 +175,102 @@ void main_loop::init()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	glGenVertexArrays(1, &m_vertex_array);
-	glBindVertexArray(m_vertex_array);
 
-	initialize_controls();
-	initialize_position();
+	{
+		// load cube
+		m_cube_shaders = load_shaders("cube", "cube");
+		m_cube_mvp_uniform = glGetUniformLocation(m_cube_shaders.program.get_id(), "mvp");
 
-	m_shaders = load_shaders();
-	m_mvp_uniform = glGetUniformLocation(m_shaders.program.get_id(), "mvp");
-	m_position_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "position");
-	m_vertex_color_attribute_location = glGetAttribLocation(m_shaders.program.get_id(), "vertex_color");
+		glGenVertexArrays(1, &m_cube_vertex_array);
+		glBindVertexArray(m_cube_vertex_array);
 
-	glGenBuffers(1, &m_vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
-	constexpr auto vertex_data_size = sizeof(vertex_data);
-	glBufferData(GL_ARRAY_BUFFER, vertex_data_size, vertex_data, GL_STATIC_DRAW);
+		glGenBuffers(1, &m_cube_vertex_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_cube_vertex_buffer);
+		constexpr auto vertex_data_size = sizeof(vertex_data);
+		glBufferData(GL_ARRAY_BUFFER, vertex_data_size, vertex_data, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &m_color_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
-	constexpr auto color_data_size = sizeof(color_data);
-	glBufferData(GL_ARRAY_BUFFER, color_data_size, color_data, GL_STATIC_DRAW);
+		glGenBuffers(1, &m_cube_color_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_cube_color_buffer);
+		constexpr auto color_data_size = sizeof(color_data);
+		glBufferData(GL_ARRAY_BUFFER, color_data_size, color_data, GL_STATIC_DRAW);
+	}
+
+	{
+		// load suzanne
+		const auto model = import_model();
+
+		m_suzanne_texture = loadDDS("data/models/uvmap.DDS");
+		m_suzanne_shaders = load_shaders("suzanne", "suzanne");
+		m_suzanne_mvp_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "mvp");
+		m_suzanne_view_matrix_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "v");
+		m_suzanne_model_matrix_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "m");
+		m_suzanne_light_position_world_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "light_position_world");
+		m_suzanne_texture_shader_sampler = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "texture_sampler");
+	
+		glGenVertexArrays(1, &m_suzanne_vertex_array);
+		glBindVertexArray(m_suzanne_vertex_array);
+
+		glGenBuffers(1, &m_suzanne_vertex_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_vertex_buffer);
+		const auto size = model.vertices.size() * sizeof(decltype(model.vertices)::value_type);
+		glBufferData(GL_ARRAY_BUFFER, size, model.vertices.data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &m_suzanne_uv_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_uv_buffer);
+		glBufferData(GL_ARRAY_BUFFER, model.uvs.size() * sizeof(decltype(model.uvs)::value_type), model.uvs.data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &m_suzanne_normal_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_normal_buffer);
+		glBufferData(GL_ARRAY_BUFFER, model.normals.size() * sizeof(decltype(model.normals)::value_type), model.normals.data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &m_suzanne_index_buffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_suzanne_index_buffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.indices.size() * sizeof(decltype(model.indices)::value_type), model.indices.data(), GL_STATIC_DRAW);
+
+		m_suzanne_indices = model.indices.size();
+	}
 
 	m_last_timestamp = vr::glfw::get_time();
 }
 
-void main_loop::import_model()
+model main_loop::import_model()
 {
 	constexpr auto path = "data/models/suzanne.obj";
+	
+	Assimp::Importer importer;
+	const aiScene* suzanne = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure);
 
-	m_suzanne = m_asset_importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure);
-
-	if (!m_suzanne)
+	if (!suzanne)
 	{
-		const std::string message = "Could not import model: " + std::string(m_asset_importer.GetErrorString());
+		const std::string message = "Could not import model: " + std::string(importer.GetErrorString());
 		throw std::runtime_error(message);
 	}
+
+	const aiMesh* mesh = suzanne->mMeshes[0];
+
+	model result;
+	
+	for (auto i = 0u; i < mesh->mNumVertices; ++i)
+	{
+		const auto& position = mesh->mVertices[i];
+		result.vertices.emplace_back(position.x, position.y, position.z);
+
+		const auto& uv = mesh->mTextureCoords[0][i];
+		result.uvs.emplace_back(uv.x, uv.y);
+
+		const auto& normal = mesh->mNormals[i];
+		result.normals.emplace_back(normal.x, normal.y, normal.z);
+	}
+
+	for (auto i = 0u; i < mesh->mNumFaces; ++i)
+	{
+		const auto& face = mesh->mFaces[i];
+		result.indices.push_back(face.mIndices[0]);
+		result.indices.push_back(face.mIndices[1]);
+		result.indices.push_back(face.mIndices[2]);
+	}
+
+	return result;
 }
 
 void main_loop::initialize_controls()
@@ -156,23 +320,74 @@ void main_loop::render_scene()
 	const auto view_matrix = m_controls.get_view_matrix();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(m_shaders.program.get_id());
 
-	const auto mvp = projection_matrix * view_matrix * glm::mat4(1.0f);
-	glUniformMatrix4fv(m_mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
+	{
+		// cube
+		const auto model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(3, 0, 2));
 
-	glEnableVertexAttribArray(m_position_attribute_location);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glBindVertexArray(m_cube_vertex_array);
+		glUseProgram(m_cube_shaders.program.get_id());
 
-	glEnableVertexAttribArray(m_vertex_color_attribute_location);
-	glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		const auto mvp = projection_matrix * view_matrix * model_matrix;
+		glUniformMatrix4fv(m_cube_mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
 
-	glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+		const auto cube_position_attribute_location = glGetAttribLocation(m_cube_shaders.program.get_id(), "position");
+		glEnableVertexAttribArray(cube_position_attribute_location);
+		glBindBuffer(GL_ARRAY_BUFFER, m_cube_vertex_buffer);
+		glVertexAttribPointer(cube_position_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-	glDisableVertexAttribArray(m_vertex_color_attribute_location);
-	glDisableVertexAttribArray(m_position_attribute_location);
+		const auto cube_vertex_color_attribute_location = glGetAttribLocation(m_cube_shaders.program.get_id(), "vertex_color");
+		glEnableVertexAttribArray(cube_vertex_color_attribute_location);
+		glBindBuffer(GL_ARRAY_BUFFER, m_cube_color_buffer);
+		glVertexAttribPointer(cube_vertex_color_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+
+		glDisableVertexAttribArray(cube_position_attribute_location);
+		glDisableVertexAttribArray(cube_vertex_color_attribute_location);
+	}
+
+	{
+		//suzanne
+		const auto model_matrix = glm::mat4(1.0f);
+		const auto light_position = glm::vec3(4, 4, 4);
+
+		glBindVertexArray(m_suzanne_vertex_array);
+		glUseProgram(m_suzanne_shaders.program.get_id());
+
+		const auto mvp = projection_matrix * view_matrix * model_matrix;
+		glUniformMatrix4fv(m_suzanne_mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
+		glUniformMatrix4fv(m_suzanne_model_matrix_uniform, 1, GL_FALSE, &model_matrix[0][0]);
+		glUniformMatrix4fv(m_suzanne_view_matrix_uniform, 1, GL_FALSE, &view_matrix[0][0]);
+		glUniform3f(m_suzanne_light_position_world_uniform, light_position.x, light_position.y, light_position.z);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_suzanne_texture);
+		glUniform1i(m_suzanne_texture_shader_sampler, 0);
+
+		const auto suzanne_vertex_position_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_position_model");
+		glEnableVertexAttribArray(suzanne_vertex_position_attribute_location);
+		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_vertex_buffer);
+		glVertexAttribPointer(suzanne_vertex_position_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+		const auto suzanne_uv_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_uv");
+		glEnableVertexAttribArray(suzanne_uv_attribute_location);
+		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_uv_buffer);
+		glVertexAttribPointer(suzanne_uv_attribute_location, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+		const auto suzanne_normal_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_normal_model");
+		glEnableVertexAttribArray(suzanne_normal_attribute_location);
+		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_normal_buffer);
+		glVertexAttribPointer(suzanne_normal_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_suzanne_index_buffer);
+
+		glDrawElements(GL_TRIANGLES, m_suzanne_indices, GL_UNSIGNED_SHORT, nullptr);
+
+		glDisableVertexAttribArray(suzanne_normal_attribute_location);
+		glDisableVertexAttribArray(suzanne_uv_attribute_location);
+		glDisableVertexAttribArray(suzanne_vertex_position_attribute_location);
+	}
 
 	m_window.swap_buffers();
 }

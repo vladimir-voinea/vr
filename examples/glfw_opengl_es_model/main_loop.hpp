@@ -5,6 +5,7 @@
 #include <glfw_mouse.hpp>
 
 #include <assimp/Importer.hpp>
+#include "model.hpp"
 
 #include <shader.hpp>
 #include <shader_program.hpp>
@@ -27,7 +28,7 @@ public:
 	void run();
 
 private:
-	void import_model();
+	model import_model();
 	void initialize_controls();
 	void initialize_position();
 
@@ -40,27 +41,34 @@ private:
 	vr::glfw::keyboard m_kb;
 	vr::glfw::mouse m_mouse;
 
-	Assimp::Importer m_asset_importer;
-	const aiScene* m_suzanne = nullptr;
-
 	std::unique_ptr<vr::gl::camera> m_camera;
 	user_controls m_controls;
-	shaders m_shaders;
 	
 	double m_last_timestamp;
 
-	GLuint m_mvp_uniform;
+	shaders m_cube_shaders;
+	GLuint m_cube_mvp_uniform;
+	GLuint m_cube_vertex_array;
+	GLuint m_cube_vertex_buffer;
+	GLuint m_cube_color_buffer;
+	//GLuint m_cube_position_attribute_location;
+	//GLuint m_cube_vertex_color_attribute_location;
 
-	GLuint m_vertex_array;
-	GLuint m_vertex_buffer;
-	GLuint m_color_buffer;
-
-	GLuint m_position_attribute_location;
-	GLuint m_vertex_color_attribute_location;
-
+	shaders m_suzanne_shaders;
+	GLuint m_suzanne_mvp_uniform;
+	GLuint m_suzanne_view_matrix_uniform;
+	GLuint m_suzanne_model_matrix_uniform;
+	GLuint m_suzanne_light_position_world_uniform;
 	GLuint m_suzanne_vertex_array;
 	GLuint m_suzanne_vertex_buffer;
 	GLuint m_suzanne_uv_buffer;
 	GLuint m_suzanne_normal_buffer;
+	GLuint m_suzanne_index_buffer;
+	uint64_t m_suzanne_indices;
+	//GLuint m_suzanne_position_attribute_location;
+	//GLuint m_suzanne_uv_attribute_location;
+	//GLuint m_suzanne_normal_attribute_location;
 
+	GLuint m_suzanne_texture;
+	GLuint m_suzanne_texture_shader_sampler;
 };

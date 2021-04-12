@@ -46,7 +46,8 @@ namespace vr::gl
 
 		if (!compile())
 		{
-			const std::string message = "Cannot compile shader: " + get_compilation_info();
+			const std::string shader_type_str = shader_type == shader::type::vertex ? "vertex" : "fragment";
+			const std::string message = "Cannot compile " + shader_type_str + " shader: " + get_compilation_info();
 			throw std::runtime_error(message);
 		}
 	}
