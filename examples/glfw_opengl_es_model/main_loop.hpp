@@ -5,7 +5,7 @@
 #include <glfw_mouse.hpp>
 
 #include <assimp/Importer.hpp>
-#include "model.hpp"
+#include "model_data.hpp"
 
 #include <shader.hpp>
 #include <shader_program.hpp>
@@ -28,7 +28,7 @@ public:
 	void run();
 
 private:
-	model import_model();
+	model_data import_model();
 	void initialize_controls();
 	void initialize_position();
 

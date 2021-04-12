@@ -168,7 +168,7 @@ void main_loop::init()
 	m_last_timestamp = vr::glfw::get_time();
 }
 
-model main_loop::import_model()
+model_data main_loop::import_model()
 {
 	constexpr auto path = "data/models/suzanne.obj";
 	
@@ -183,7 +183,7 @@ model main_loop::import_model()
 
 	const aiMesh* mesh = suzanne->mMeshes[0];
 
-	model result;
+	model_data result;
 	
 	for (auto i = 0u; i < mesh->mNumVertices; ++i)
 	{
