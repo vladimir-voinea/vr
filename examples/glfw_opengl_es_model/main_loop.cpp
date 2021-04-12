@@ -9,6 +9,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
 #include <stdexcept>
 #include <iostream>
 
@@ -58,6 +61,7 @@ main_loop::~main_loop()
 void main_loop::init()
 {
 	initialize_glew();
+	import_model();
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, nullptr);
@@ -90,6 +94,19 @@ void main_loop::init()
 	glBufferData(GL_ARRAY_BUFFER, color_data_size, color_data, GL_STATIC_DRAW);
 
 	m_last_timestamp = vr::glfw::get_time();
+}
+
+void main_loop::import_model()
+{
+	constexpr auto path = "data/models/suzanne.obj";
+
+	m_suzanne = m_asset_importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure);
+
+	if (!m_suzanne)
+	{
+		const std::string message = "Could not import model: " + std::string(m_asset_importer.GetErrorString());
+		throw std::runtime_error(message);
+	}
 }
 
 void main_loop::initialize_controls()

@@ -4,6 +4,8 @@
 #include <glfw_keyboard.hpp>
 #include <glfw_mouse.hpp>
 
+#include <assimp/Importer.hpp>
+
 #include <shader.hpp>
 #include <shader_program.hpp>
 #include "shaders.hpp"
@@ -25,6 +27,7 @@ public:
 	void run();
 
 private:
+	void import_model();
 	void initialize_controls();
 	void initialize_position();
 
@@ -36,6 +39,9 @@ private:
 	vr::glfw::window& m_window;
 	vr::glfw::keyboard m_kb;
 	vr::glfw::mouse m_mouse;
+
+	Assimp::Importer m_asset_importer;
+	const aiScene* m_suzanne = nullptr;
 
 	std::unique_ptr<vr::gl::camera> m_camera;
 	user_controls m_controls;
@@ -51,5 +57,10 @@ private:
 
 	GLuint m_position_attribute_location;
 	GLuint m_vertex_color_attribute_location;
+
+	GLuint m_suzanne_vertex_array;
+	GLuint m_suzanne_vertex_buffer;
+	GLuint m_suzanne_uv_buffer;
+	GLuint m_suzanne_normal_buffer;
 
 };
