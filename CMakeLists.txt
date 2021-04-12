@@ -21,3 +21,5 @@ add_subdirectory ("vr-vk")
 
 # examples directory
 add_subdirectory ("examples")
+
+message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")
