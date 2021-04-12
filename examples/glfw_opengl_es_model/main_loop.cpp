@@ -160,6 +160,47 @@ main_loop::~main_loop()
 	glDeleteVertexArrays(1, &m_cube_vertex_array);
 }
 
+void main_loop::initialize_controls()
+{
+	m_kb.set_sticky_keys(true);
+	m_mouse.set_sticky_buttons(true);
+	m_mouse.set_mode(vr::glfw::mouse::mode::disabled);
+}
+
+void main_loop::initialize_position()
+{
+	m_camera->set_position({ -8.96424, 2.70909, 4.2585 });
+	m_camera->set_direction({ 0.827756, -0.307191, -0.469526 });
+}
+
+void main_loop::process_input()
+{
+	const auto current_time = vr::glfw::get_time();
+	const float delta_time = static_cast<float>(current_time - m_last_timestamp);
+
+	m_controls.process_events(delta_time);
+
+	if (m_kb.get_key_state(vr::glfw::keyboard::key::escape) == vr::glfw::keyboard::state::press)
+	{
+		m_window.request_close();
+	}
+
+	m_last_timestamp = current_time;
+}
+
+void main_loop::print_state()
+{
+	std::cout << "Position: "
+		<< m_camera->get_position().x << ", "
+		<< m_camera->get_position().y << ", "
+		<< m_camera->get_position().z << '\n';
+
+	std::cout << "Direction: " <<
+		m_camera->get_direction().x << ", "
+		<< m_camera->get_direction().y << ", "
+		<< m_camera->get_direction().z << '\n';
+}
+
 void main_loop::init()
 {
 	initialize_glew();
@@ -271,47 +312,6 @@ model main_loop::import_model()
 	}
 
 	return result;
-}
-
-void main_loop::initialize_controls()
-{
-	m_kb.set_sticky_keys(true);
-	m_mouse.set_sticky_buttons(true);
-	m_mouse.set_mode(vr::glfw::mouse::mode::disabled);
-}
-
-void main_loop::initialize_position()
-{
-	m_camera->set_position({ -8.96424, 2.70909, 4.2585 });
-	m_camera->set_direction({ 0.827756, -0.307191, -0.469526 });
-}
-
-void main_loop::process_input()
-{
-	const auto current_time = vr::glfw::get_time();
-	const float delta_time = static_cast<float>(current_time - m_last_timestamp);
-
-	m_controls.process_events(delta_time);
-
-	if (m_kb.get_key_state(vr::glfw::keyboard::key::escape) == vr::glfw::keyboard::state::press)
-	{
-		m_window.request_close();
-	}
-
-	m_last_timestamp = current_time;
-}
-
-void main_loop::print_state()
-{
-	std::cout << "Position: " 
-		<< m_camera->get_position().x << ", "
-		<< m_camera->get_position().y << ", " 
-		<< m_camera->get_position().z << '\n';
-
-	std::cout << "Direction: " << 
-		m_camera->get_direction().x << ", " 
-		<< m_camera->get_direction().y << ", " 
-		<< m_camera->get_direction().z << '\n';
 }
 
 void main_loop::render_scene()
