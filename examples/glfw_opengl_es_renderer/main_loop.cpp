@@ -44,8 +44,6 @@ main_loop::main_loop(vr::glfw::window& window)
 main_loop::~main_loop()
 {
 	glDeleteBuffers(1, &m_suzanne_vertex_buffer);
-	//glDeleteBuffers(1, &m_suzanne_uv_buffer);
-	//glDeleteBuffers(1, &m_suzanne_normal_buffer);
 	glDeleteTextures(1, &m_suzanne_texture);
 	glDeleteVertexArrays(1, &m_suzanne_vertex_array);
 
@@ -150,14 +148,6 @@ void main_loop::init()
 		const auto size = model.get_geometry().vertices.size() * sizeof(vr::mesh::geometry_type::vertex_type);
 		glBufferData(GL_ARRAY_BUFFER, size, model.get_geometry().vertices.data(), GL_STATIC_DRAW);
 
-		//glGenBuffers(1, &m_suzanne_normal_buffer);
-		//glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_normal_buffer);
-		//glBufferData(GL_ARRAY_BUFFER, model.normals.size() * sizeof(decltype(model.normals)::value_type), model.normals.data(), GL_STATIC_DRAW);
-
-		//glGenBuffers(1, &m_suzanne_uv_buffer);
-		//glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_uv_buffer);
-		//glBufferData(GL_ARRAY_BUFFER, model.uvs.size() * sizeof(decltype(model.uvs)::value_type), model.uvs.data(), GL_STATIC_DRAW);
-
 		glGenBuffers(1, &m_suzanne_index_buffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_suzanne_index_buffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.get_geometry().indices.size() * sizeof(vr::mesh::geometry_type::index_type), model.get_geometry().indices.data(), GL_STATIC_DRAW);
@@ -173,7 +163,9 @@ vr::mesh main_loop::import_model(const std::string& name)
 	const auto path = "data/models/" + name + ".obj";
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure);
+	const aiScene* scene = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure |
+													aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
+													aiPostProcessSteps::aiProcess_Triangulate);
 	if (!scene)
 	{
 		const std::string message = "Could not import model: " + std::string(importer.GetErrorString());
