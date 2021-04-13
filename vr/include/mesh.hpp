@@ -1,19 +1,24 @@
 #pragma once
 
+#include "geometry.hpp"
+
 #include <glm/glm.hpp>
 
 #include <vector>
 
-template<typename geometry_type>
-class mesh_base
+namespace vr
 {
-public:
-	mesh();
-	mesh(geometry_type data_type)
-		: m_data(std::move(data_type))
-		, m_shader(shader)
-	{}
+	class mesh
+	{
+	public:
+		typedef geometry geometry_type;
+	public:
+		mesh();
+		mesh(geometry_type geometry);
 
-private:
-	geometry_type m_data;
+		const geometry_type& get_geometry() const;
+
+	private:
+		geometry_type m_geometry;
+	};
 }
