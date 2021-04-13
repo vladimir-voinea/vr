@@ -29,7 +29,7 @@ public:
 
 private:
 	using suzanne_geometry = geometry_data_base<glm::vec3, glm::vec2, glm::vec3, uint16_t>;
-	suzanne_geometry import_model();
+	suzanne_geometry import_model(const std::string& name);
 	void initialize_controls();
 	void initialize_position();
 

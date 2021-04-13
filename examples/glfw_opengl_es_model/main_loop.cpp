@@ -132,7 +132,7 @@ void main_loop::init()
 
 	{
 		// load suzanne
-		const auto model = import_model();
+		const auto model = import_model("suzanne");
 
 		m_suzanne_texture = load_dds("data/models/uvmap.DDS");
 		m_suzanne_shaders = load_shaders("suzanne", "suzanne");
@@ -168,9 +168,9 @@ void main_loop::init()
 	m_last_timestamp = vr::glfw::get_time();
 }
 
-main_loop::suzanne_geometry main_loop::import_model()
+main_loop::suzanne_geometry main_loop::import_model(const std::string& name)
 {
-	constexpr auto path = "data/models/suzanne.obj";
+	const auto path = "data/models/" + name + ".obj";
 	
 	Assimp::Importer importer;
 	const aiScene* suzanne = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure);
