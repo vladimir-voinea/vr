@@ -2,7 +2,7 @@
 
 set(LIB_NAME "vr")
 
-set(SOURCES "src/camera.cpp" "src/perspective_camera.cpp")
+set(SOURCES "src/camera.cpp" "src/perspective_camera.cpp" "include/vertex.hpp")
 			
 add_library (${LIB_NAME} ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
