@@ -185,16 +185,24 @@ main_loop::suzanne_geometry main_loop::import_model()
 
 	suzanne_geometry result;
 	
-	for (auto i = 0u; i < mesh->mNumVertices; ++i)
+	const auto mesh_vertices_count = mesh->mNumVertices;
+
+	for (auto i = 0u; i < mesh_vertices_count; ++i)
 	{
 		const auto& position = mesh->mVertices[i];
 		result.vertices.emplace_back(position.x, position.y, position.z);
 
-		const auto& uv = mesh->mTextureCoords[0][i];
-		result.uvs.emplace_back(uv.x, uv.y);
+		if (mesh->mTextureCoords)
+		{
+			const auto& uv = mesh->mTextureCoords[0][i];
+			result.uvs.emplace_back(uv.x, uv.y);
+		}
 
-		const auto& normal = mesh->mNormals[i];
-		result.normals.emplace_back(normal.x, normal.y, normal.z);
+		if (mesh->mNormals)
+		{
+			const auto& normal = mesh->mNormals[i];
+			result.normals.emplace_back(normal.x, normal.y, normal.z);
+		}
 	}
 
 	for (auto i = 0u; i < mesh->mNumFaces; ++i)
