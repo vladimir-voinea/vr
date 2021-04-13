@@ -1,6 +1,6 @@
 #pragma once
 
-namespace vr::gl
+namespace vr
 {
 	class scene
 	{
