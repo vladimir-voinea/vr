@@ -6,6 +6,7 @@
 
 #include <assimp/Importer.hpp>
 #include "geometry_data_base.hpp"
+#include <mesh.hpp>
 
 #include <shader.hpp>
 #include <shader_program.hpp>
@@ -28,8 +29,7 @@ public:
 	void run();
 
 private:
-	using suzanne_geometry = geometry_data_base<glm::vec3, glm::vec2, glm::vec3, uint16_t>;
-	suzanne_geometry import_model(const std::string& name);
+	vr::mesh import_model(const std::string& name);
 	void initialize_controls();
 	void initialize_position();
 
@@ -60,8 +60,6 @@ private:
 	GLuint m_suzanne_light_position_world_uniform;
 	GLuint m_suzanne_vertex_array;
 	GLuint m_suzanne_vertex_buffer;
-	GLuint m_suzanne_uv_buffer;
-	GLuint m_suzanne_normal_buffer;
 	GLuint m_suzanne_index_buffer;
 	uint64_t m_suzanne_indices;
 

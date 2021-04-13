@@ -44,8 +44,8 @@ main_loop::main_loop(vr::glfw::window& window)
 main_loop::~main_loop()
 {
 	glDeleteBuffers(1, &m_suzanne_vertex_buffer);
-	glDeleteBuffers(1, &m_suzanne_uv_buffer);
-	glDeleteBuffers(1, &m_suzanne_normal_buffer);
+	//glDeleteBuffers(1, &m_suzanne_uv_buffer);
+	//glDeleteBuffers(1, &m_suzanne_normal_buffer);
 	glDeleteTextures(1, &m_suzanne_texture);
 	glDeleteVertexArrays(1, &m_suzanne_vertex_array);
 
@@ -141,79 +141,76 @@ void main_loop::init()
 		m_suzanne_model_matrix_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "m");
 		m_suzanne_light_position_world_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "light_position_world");
 		m_suzanne_texture_shader_sampler = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "texture_sampler");
-	
+
 		glGenVertexArrays(1, &m_suzanne_vertex_array);
 		glBindVertexArray(m_suzanne_vertex_array);
 
 		glGenBuffers(1, &m_suzanne_vertex_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_vertex_buffer);
-		const auto size = model.vertices.size() * sizeof(decltype(model.vertices)::value_type);
-		glBufferData(GL_ARRAY_BUFFER, size, model.vertices.data(), GL_STATIC_DRAW);
+		const auto size = model.get_geometry().vertices.size() * sizeof(vr::mesh::geometry_type::vertex_type);
+		glBufferData(GL_ARRAY_BUFFER, size, model.get_geometry().vertices.data(), GL_STATIC_DRAW);
 
-		glGenBuffers(1, &m_suzanne_uv_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_uv_buffer);
-		glBufferData(GL_ARRAY_BUFFER, model.uvs.size() * sizeof(decltype(model.uvs)::value_type), model.uvs.data(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &m_suzanne_normal_buffer);
+		//glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_normal_buffer);
+		//glBufferData(GL_ARRAY_BUFFER, model.normals.size() * sizeof(decltype(model.normals)::value_type), model.normals.data(), GL_STATIC_DRAW);
 
-		glGenBuffers(1, &m_suzanne_normal_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_normal_buffer);
-		glBufferData(GL_ARRAY_BUFFER, model.normals.size() * sizeof(decltype(model.normals)::value_type), model.normals.data(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &m_suzanne_uv_buffer);
+		//glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_uv_buffer);
+		//glBufferData(GL_ARRAY_BUFFER, model.uvs.size() * sizeof(decltype(model.uvs)::value_type), model.uvs.data(), GL_STATIC_DRAW);
 
 		glGenBuffers(1, &m_suzanne_index_buffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_suzanne_index_buffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.indices.size() * sizeof(decltype(model.indices)::value_type), model.indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.get_geometry().indices.size() * sizeof(vr::mesh::geometry_type::index_type), model.get_geometry().indices.data(), GL_STATIC_DRAW);
 
-		m_suzanne_indices = model.indices.size();
+		m_suzanne_indices = model.get_geometry().indices.size();
 	}
 
 	m_last_timestamp = vr::glfw::get_time();
 }
 
-main_loop::suzanne_geometry main_loop::import_model(const std::string& name)
+vr::mesh main_loop::import_model(const std::string& name)
 {
 	const auto path = "data/models/" + name + ".obj";
-	
-	Assimp::Importer importer;
-	const aiScene* suzanne = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure);
 
-	if (!suzanne)
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure);
+	if (!scene)
 	{
 		const std::string message = "Could not import model: " + std::string(importer.GetErrorString());
 		throw std::runtime_error(message);
 	}
 
-	const aiMesh* mesh = suzanne->mMeshes[0];
+	const aiMesh* mesh = scene->mMeshes[0];
 
-	suzanne_geometry result;
-	
-	const auto mesh_vertices_count = mesh->mNumVertices;
-
-	for (auto i = 0u; i < mesh_vertices_count; ++i)
+	vr::geometry geometry;
+	for (auto i = 0u; i < mesh->mNumVertices; ++i)
 	{
-		const auto& position = mesh->mVertices[i];
-		result.vertices.emplace_back(position.x, position.y, position.z);
+		vr::vertex vertex;
+		vertex.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 
-		if (mesh->mTextureCoords)
+		if (mesh->HasTextureCoords(0))
 		{
-			const auto& uv = mesh->mTextureCoords[0][i];
-			result.uvs.emplace_back(uv.x, uv.y);
+			vertex.texcoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 		}
 
-		if (mesh->mNormals)
+		if (mesh->HasNormals())
 		{
-			const auto& normal = mesh->mNormals[i];
-			result.normals.emplace_back(normal.x, normal.y, normal.z);
+			vertex.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 		}
+
+		geometry.vertices.push_back(vertex);
 	}
 
 	for (auto i = 0u; i < mesh->mNumFaces; ++i)
 	{
-		const auto& face = mesh->mFaces[i];
-		result.indices.push_back(face.mIndices[0]);
-		result.indices.push_back(face.mIndices[1]);
-		result.indices.push_back(face.mIndices[2]);
+		geometry.indices.push_back(mesh->mFaces[i].mIndices[0]);
+		geometry.indices.push_back(mesh->mFaces[i].mIndices[1]);
+		geometry.indices.push_back(mesh->mFaces[i].mIndices[2]);
 	}
 
-	return result;
+	m_suzanne_indices = geometry.indices.size();
+
+	return vr::mesh{ std::move(geometry) };
 }
 
 void main_loop::render_scene()
@@ -268,27 +265,30 @@ void main_loop::render_scene()
 		glBindTexture(GL_TEXTURE_2D, m_suzanne_texture);
 		glUniform1i(m_suzanne_texture_shader_sampler, 0);
 
+		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_vertex_buffer);
+		constexpr auto vertex_size = sizeof(vr::mesh::geometry_type::vertex_type);
+
 		const auto suzanne_vertex_position_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_position_model");
 		glEnableVertexAttribArray(suzanne_vertex_position_attribute_location);
-		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_vertex_buffer);
-		glVertexAttribPointer(suzanne_vertex_position_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		const auto position_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::position);
+		glVertexAttribPointer(suzanne_vertex_position_attribute_location, 3, GL_FLOAT, GL_FALSE, vertex_size, reinterpret_cast<const void*>(position_offset));
 
 		const auto suzanne_uv_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_uv");
 		glEnableVertexAttribArray(suzanne_uv_attribute_location);
-		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_uv_buffer);
-		glVertexAttribPointer(suzanne_uv_attribute_location, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+		const auto uv_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::texcoords);
+		glVertexAttribPointer(suzanne_uv_attribute_location, 2, GL_FLOAT, GL_FALSE, vertex_size, reinterpret_cast<const void*>(uv_offset));
 
 		const auto suzanne_normal_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_normal_model");
 		glEnableVertexAttribArray(suzanne_normal_attribute_location);
-		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_normal_buffer);
-		glVertexAttribPointer(suzanne_normal_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		const auto normal_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::normal);
+		glVertexAttribPointer(suzanne_normal_attribute_location, 3, GL_FLOAT, GL_FALSE, vertex_size, reinterpret_cast<const void*>(normal_offset));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_suzanne_index_buffer);
 
 		glDrawElements(GL_TRIANGLES, m_suzanne_indices, GL_UNSIGNED_SHORT, nullptr);
 
-		glDisableVertexAttribArray(suzanne_normal_attribute_location);
 		glDisableVertexAttribArray(suzanne_uv_attribute_location);
+		glDisableVertexAttribArray(suzanne_normal_attribute_location);
 		glDisableVertexAttribArray(suzanne_vertex_position_attribute_location);
 	}
 
