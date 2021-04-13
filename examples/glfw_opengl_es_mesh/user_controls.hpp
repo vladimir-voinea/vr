@@ -16,9 +16,6 @@ public:
 
 	void process_events(float time_difference);
 
-	// until we move this somewhere else
-	glm::mat4 get_view_matrix() const;
-
 private:
 	glm::vec3 get_right_vector() const;
 
@@ -38,6 +35,4 @@ private:
 
 	float m_horizontal_angle;
 	float m_vertical_angle;
-
-	glm::mat4 m_view_matrix;
 };

@@ -6,7 +6,7 @@
 
 #include <assimp/Importer.hpp>
 #include "geometry_data_base.hpp"
-#include <mesh.hpp>
+#include "mesh.hpp"
 
 #include <shader.hpp>
 #include <shader_program.hpp>
@@ -29,7 +29,7 @@ public:
 	void run();
 
 private:
-	vr::mesh import_model(const std::string& name);
+	mesh import_model(const std::string& name);
 	void initialize_controls();
 	void initialize_position();
 

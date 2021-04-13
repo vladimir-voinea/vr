@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 
 set(APP_NAME "glfw_opengl_es_mesh_app")
 
-set(SOURCES "main.cpp" "glfw_opengl_es_mesh_app.cpp" "main_loop.cpp" "opengl_debug_callback.cpp" "shader_loader.cpp" "user_controls.cpp" "user_controls.hpp" "texture_loader.cpp")
+set(SOURCES "main.cpp" "glfw_opengl_es_mesh_app.cpp" "main_loop.cpp" "opengl_debug_callback.cpp" "shader_loader.cpp" "user_controls.cpp" "user_controls.hpp" "texture_loader.cpp" "mesh.cpp")
 
 add_executable(${APP_NAME} ${SOURCES})
 target_compile_features(${APP_NAME} PRIVATE cxx_std_20)
