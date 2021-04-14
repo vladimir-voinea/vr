@@ -30,7 +30,7 @@ namespace vr
 			m_settings.far);
 	}
 
-	glm::mat4 perspective_camera::get_projection_matrix() const
+	const glm::mat4& perspective_camera::get_projection_matrix() const
 	{
 		return m_projection;
 	}

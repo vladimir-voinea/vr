@@ -1,6 +1,8 @@
 #pragma once
 
 #include "geometry.hpp"
+#include "shader_material.hpp"
+#include "texture.hpp"
 
 #include <glm/glm.hpp>
 
@@ -14,11 +16,15 @@ namespace vr
 		typedef geometry geometry_type;
 	public:
 		mesh();
-		mesh(geometry_type geometry);
+		mesh(const geometry_type* geometry, const shader_material* material, const texture* texture);
 
-		const geometry_type& get_geometry() const;
+		const geometry_type* get_geometry() const;
+		const shader_material* get_material() const;
+		const texture* get_texture() const;
 
 	private:
-		geometry_type m_geometry;
+		const geometry_type* m_geometry;
+		const shader_material* m_material;
+		const texture* m_texture;
 	};
 }

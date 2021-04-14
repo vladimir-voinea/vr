@@ -65,10 +65,12 @@ void user_controls::process_events(float time_difference)
 	{
 		mode_switch();
 	}
-	
-	m_view_matrix = glm::lookAt(m_camera.get_position(), 
-		m_camera.get_position() + m_camera.get_direction(), 
+
+	auto view_matrix = glm::lookAt(m_camera.get_position(),
+		m_camera.get_position() + m_camera.get_direction(),
 		glm::cross(get_right_vector(), m_camera.get_direction()));
+
+	m_camera.set_view_matrix(view_matrix);
 }
 
 void user_controls::moving_process_events(float time_difference)
@@ -141,9 +143,4 @@ glm::vec3 user_controls::get_right_vector() const
 		std::cos(m_horizontal_angle - pi_2));
 
 	return right;
-}
-
-glm::mat4 user_controls::get_view_matrix() const
-{
-	return m_view_matrix;
 }

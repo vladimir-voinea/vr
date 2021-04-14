@@ -208,7 +208,7 @@ vr::mesh main_loop::import_model(const std::string& name)
 void main_loop::render_scene()
 {
 	const auto projection_matrix = m_camera->get_projection_matrix();
-	const auto view_matrix = m_controls.get_view_matrix();
+	const auto view_matrix = m_camera->get_view_matrix();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

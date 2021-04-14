@@ -1,0 +1,83 @@
+#include "object3d.hpp"
+
+namespace vr
+{
+	object3d::object3d() = default;
+
+	object3d* object3d::get_parent()
+	{
+		return m_parent;
+	}
+
+	void object3d::set_parent(object3d* parent)
+	{
+		m_parent = parent;
+	}
+
+	const std::vector<object3d*>& object3d::get_children() const
+	{
+		return m_children;
+	}
+
+	void object3d::add_child(object3d* child)
+	{
+		m_children.push_back(child);
+	}
+
+	void object3d::remove_child(object3d* child)
+	{
+		m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+	}
+
+	const std::vector<const mesh*>& object3d::get_meshes() const
+	{
+		return m_meshes;
+	}
+
+	void object3d::add_mesh(const mesh* mesh)
+	{
+		m_meshes.push_back(mesh);
+	}
+
+	void object3d::remove_mesh(const mesh* mesh)
+	{
+		m_meshes.erase(std::remove(m_meshes.begin(), m_meshes.end(), mesh), m_meshes.end());
+	}
+
+	bool object3d::has_geometry() const
+	{
+		return !m_meshes.empty();
+	}
+
+	//std::any& object3d::get_render_object()
+	//{
+	//	return m_any;
+	//}
+}
+
+/*
+	class object3d
+	{
+	public:
+		object3d();
+
+		object3d* get_parent();
+		void set_parent(object3d*);
+
+		std::vector<object3d>& get_children();
+		void add_child(object3d*);
+		void remove_child(object3d*);
+
+		const std::vector<const mesh*> get_meshes() const;
+		void add_mesh(const mesh*);
+		void remove_mesh(const mesh*);
+
+		bool has_geometry() const;
+
+	private:
+		object3d* m_parent;
+		std::vector<object3d*> m_children;
+
+		std::vector<const mesh*> m_meshes;
+	};
+*/

@@ -22,7 +22,7 @@ namespace vr
 		void set_direction(const glm::vec3& direction);
 
 		void update_projection_matrix();
-		glm::mat4 get_projection_matrix() const override;
+		const glm::mat4& get_projection_matrix() const override;
 
 	private:
 		settings m_settings;
