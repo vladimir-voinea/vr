@@ -38,5 +38,10 @@ namespace vr::gl
 		const std::string& get_vertex_shader_source() const;
 		const std::string& get_fragment_shader_source() const;
 		const std::vector<uniform>& get_uniforms() const;
+
+	private:
+		std::string m_vertex_shader_source;
+		std::string m_fragment_shader_source;
+		const std::vector<uniform>& m_uniforms;
 	};
 }

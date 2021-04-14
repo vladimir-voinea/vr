@@ -1,17 +1,24 @@
 #pragma once
 
-#include <geometry.hpp>
-#include <shader_material.hpp>
-#include <texture.hpp>
 #include "gpu_objects.hpp"
 
 #include <map>
+
+namespace vr
+{
+	class geometry;
+	class shader_material;
+	class texture;
+}
 
 namespace vr::gl
 {
 	class renderer_cache
 	{
 	public:
+		renderer_cache() = default;
+		~renderer_cache() = default;
+
 		loaded_geometry* get(const geometry*);
 		loaded_shader* get(const shader_material*);
 		loaded_texture* get(const texture*);

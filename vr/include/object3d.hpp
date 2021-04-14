@@ -30,7 +30,7 @@ namespace vr
 		bool has_geometry() const;
 
 	private:
-		object3d* m_parent;
+		object3d* m_parent = nullptr;
 		std::vector<object3d*> m_children;
 
 		std::vector<const mesh*> m_meshes;

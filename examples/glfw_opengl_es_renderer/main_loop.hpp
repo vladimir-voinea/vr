@@ -1,21 +1,16 @@
 #pragma once
 
+#include "shaders.hpp"
+#include "user_controls.hpp"
+
 #include <glfw_window.hpp>
 #include <glfw_keyboard.hpp>
 #include <glfw_mouse.hpp>
-
 #include <assimp/Importer.hpp>
-#include "geometry_data_base.hpp"
-#include <mesh.hpp>
-
-#include <shader.hpp>
-#include <shader_program.hpp>
-#include "shaders.hpp"
-
-#include <camera.hpp>
-#include "user_controls.hpp"
-
 #include <glm/glm.hpp>
+
+#include <vr-gl.hpp>
+#include <vr.hpp>
 
 #include <memory>
 
@@ -47,22 +42,16 @@ private:
 	
 	double m_last_timestamp;
 
-	shaders m_cube_shaders;
-	GLuint m_cube_mvp_uniform;
-	GLuint m_cube_vertex_array;
-	GLuint m_cube_vertex_buffer;
-	GLuint m_cube_color_buffer;
+	struct monkey {
+		vr::object3d* obj = nullptr;
+		vr::geometry geometry;
+		vr::shader_material* material = nullptr;
+		std::vector<vr::gl::uniform> uniforms; 
+		vr::texture* texture = nullptr;
+		vr::mesh mesh;
+	};
+	monkey m_monkey;
 
-	shaders m_suzanne_shaders;
-	GLuint m_suzanne_mvp_uniform;
-	GLuint m_suzanne_view_matrix_uniform;
-	GLuint m_suzanne_model_matrix_uniform;
-	GLuint m_suzanne_light_position_world_uniform;
-	GLuint m_suzanne_vertex_array;
-	GLuint m_suzanne_vertex_buffer;
-	GLuint m_suzanne_index_buffer;
-	uint64_t m_suzanne_indices;
-
-	GLuint m_suzanne_texture;
-	GLuint m_suzanne_texture_shader_sampler;
+	vr::scene m_scene;
+	vr::gl::renderer m_renderer;
 };

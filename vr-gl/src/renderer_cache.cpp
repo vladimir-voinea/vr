@@ -1,5 +1,9 @@
 #include "renderer_cache.hpp"
 
+#include <geometry.hpp>
+#include <shader_material.hpp>
+#include <texture.hpp>
+
 namespace vr::gl
 {
 	loaded_geometry* renderer_cache::get(const geometry* geometry)

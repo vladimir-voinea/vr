@@ -43,13 +43,9 @@ main_loop::main_loop(vr::glfw::window& window)
 
 main_loop::~main_loop()
 {
-	glDeleteBuffers(1, &m_suzanne_vertex_buffer);
-	glDeleteTextures(1, &m_suzanne_texture);
-	glDeleteVertexArrays(1, &m_suzanne_vertex_array);
-
-	glDeleteBuffers(1, &m_cube_color_buffer);
-	glDeleteBuffers(1, &m_cube_vertex_buffer);
-	glDeleteVertexArrays(1, &m_cube_vertex_array);
+	delete m_monkey.material;
+	delete m_monkey.texture;
+	delete m_monkey.obj;
 }
 
 void main_loop::initialize_controls()
@@ -93,79 +89,14 @@ void main_loop::print_state()
 		<< m_camera->get_direction().z << '\n';
 }
 
-void main_loop::init()
-{
-	initialize_glew();
-	initialize_controls();
-	initialize_position();
-
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(opengl_debug_callback, nullptr);
-
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-
-	{
-		// load cube
-		m_cube_shaders = load_shaders("cube", "cube");
-		m_cube_mvp_uniform = glGetUniformLocation(m_cube_shaders.program.get_id(), "mvp");
-
-		glGenVertexArrays(1, &m_cube_vertex_array);
-		glBindVertexArray(m_cube_vertex_array);
-
-		glGenBuffers(1, &m_cube_vertex_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_cube_vertex_buffer);
-		constexpr auto vertex_data_size = sizeof(vertex_data);
-		glBufferData(GL_ARRAY_BUFFER, vertex_data_size, vertex_data, GL_STATIC_DRAW);
-
-		glGenBuffers(1, &m_cube_color_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_cube_color_buffer);
-		constexpr auto color_data_size = sizeof(color_data);
-		glBufferData(GL_ARRAY_BUFFER, color_data_size, color_data, GL_STATIC_DRAW);
-	}
-
-	{
-		// load suzanne
-		const auto model = import_model("suzanne");
-
-		m_suzanne_texture = load_dds("data/models/uvmap.DDS");
-		m_suzanne_shaders = load_shaders("suzanne", "suzanne");
-		m_suzanne_mvp_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "mvp");
-		m_suzanne_view_matrix_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "v");
-		m_suzanne_model_matrix_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "m");
-		m_suzanne_light_position_world_uniform = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "light_position_world");
-		m_suzanne_texture_shader_sampler = glGetUniformLocation(m_suzanne_shaders.program.get_id(), "texture_sampler");
-
-		glGenVertexArrays(1, &m_suzanne_vertex_array);
-		glBindVertexArray(m_suzanne_vertex_array);
-
-		glGenBuffers(1, &m_suzanne_vertex_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_vertex_buffer);
-		const auto size = model.get_geometry().vertices.size() * sizeof(vr::mesh::geometry_type::vertex_type);
-		glBufferData(GL_ARRAY_BUFFER, size, model.get_geometry().vertices.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(1, &m_suzanne_index_buffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_suzanne_index_buffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.get_geometry().indices.size() * sizeof(vr::mesh::geometry_type::index_type), model.get_geometry().indices.data(), GL_STATIC_DRAW);
-
-		m_suzanne_indices = model.get_geometry().indices.size();
-	}
-
-	m_last_timestamp = vr::glfw::get_time();
-}
-
-vr::mesh main_loop::import_model(const std::string& name)
+vr::geometry import_model(const std::string& name)
 {
 	const auto path = "data/models/" + name + ".obj";
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure |
-													aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
-													aiPostProcessSteps::aiProcess_Triangulate);
+		aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
+		aiPostProcessSteps::aiProcess_Triangulate);
 	if (!scene)
 	{
 		const std::string message = "Could not import model: " + std::string(importer.GetErrorString());
@@ -200,10 +131,59 @@ vr::mesh main_loop::import_model(const std::string& name)
 		geometry.indices.push_back(mesh->mFaces[i].mIndices[2]);
 	}
 
-	m_suzanne_indices = geometry.indices.size();
-
-	return vr::mesh{ std::move(geometry) };
+	return geometry;
 }
+
+void main_loop::init()
+{
+	initialize_glew();
+	initialize_controls();
+	initialize_position();
+
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(opengl_debug_callback, nullptr);
+
+	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+
+	{
+		m_monkey.geometry = ::import_model("suzanne");
+
+		vr::gl::uniform v, m, light_position;
+		v.name = "v";
+		v.type = vr::gl::uniform_type::mat4fv;
+		v.value.mat4fv = glm::mat4(1.0f);
+
+		m.name = "m";
+		m.type = vr::gl::uniform_type::mat4fv;
+		m.value.mat4fv = glm::mat4(1.0f);
+
+		light_position.name = "light_position_world";
+		light_position.type = vr::gl::uniform_type::vec3f;
+		light_position.value.vec3f = glm::vec3(4, 4, 4);
+
+		m_monkey.uniforms.push_back(v);
+		m_monkey.uniforms.push_back(m);
+		m_monkey.uniforms.push_back(light_position);
+
+		m_monkey.material = new vr::gl::opengl_shader(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"), m_monkey.uniforms);
+		m_monkey.texture = new vr::texture("data/models/uvmap.DDS");
+		
+		m_monkey.mesh = vr::mesh(&m_monkey.geometry, m_monkey.material, m_monkey.texture);
+
+		m_monkey.obj = new vr::object3d{};
+		m_monkey.obj->add_mesh(&m_monkey.mesh);
+
+		m_scene.add(m_monkey.obj);
+	}
+
+	m_last_timestamp = vr::glfw::get_time();
+}
+
 
 void main_loop::render_scene()
 {
@@ -213,76 +193,15 @@ void main_loop::render_scene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	{
-		// cube
-		const auto model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(3, 0, 2));
+		const glm::mat4 model_matrix = glm::mat4(1.0f);
 
-		glBindVertexArray(m_cube_vertex_array);
-		glUseProgram(m_cube_shaders.program.get_id());
+		m_monkey.uniforms[0].value.mat4fv = view_matrix;
+		m_monkey.uniforms[1].value.mat4fv = model_matrix;
 
-		const auto mvp = projection_matrix * view_matrix * model_matrix;
-		glUniformMatrix4fv(m_cube_mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
-
-		const auto cube_position_attribute_location = glGetAttribLocation(m_cube_shaders.program.get_id(), "position");
-		glEnableVertexAttribArray(cube_position_attribute_location);
-		glBindBuffer(GL_ARRAY_BUFFER, m_cube_vertex_buffer);
-		glVertexAttribPointer(cube_position_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-		const auto cube_vertex_color_attribute_location = glGetAttribLocation(m_cube_shaders.program.get_id(), "vertex_color");
-		glEnableVertexAttribArray(cube_vertex_color_attribute_location);
-		glBindBuffer(GL_ARRAY_BUFFER, m_cube_color_buffer);
-		glVertexAttribPointer(cube_vertex_color_attribute_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
-
-		glDisableVertexAttribArray(cube_position_attribute_location);
-		glDisableVertexAttribArray(cube_vertex_color_attribute_location);
+		m_renderer.render(m_scene, *m_camera);
 	}
 
-	{
-		//suzanne
-		auto model_matrix = glm::mat4(1.0f);
-		model_matrix *= glm::scale(model_matrix, 2.f * glm::vec3(1.1f, 1.2f, 1.3f));
-		const auto light_position = glm::vec3(4, 4, 4);
 
-		glBindVertexArray(m_suzanne_vertex_array);
-		glUseProgram(m_suzanne_shaders.program.get_id());
-
-		const auto mvp = projection_matrix * view_matrix * model_matrix;
-		glUniformMatrix4fv(m_suzanne_mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
-		glUniformMatrix4fv(m_suzanne_model_matrix_uniform, 1, GL_FALSE, &model_matrix[0][0]);
-		glUniformMatrix4fv(m_suzanne_view_matrix_uniform, 1, GL_FALSE, &view_matrix[0][0]);
-		glUniform3f(m_suzanne_light_position_world_uniform, light_position.x, light_position.y, light_position.z);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_suzanne_texture);
-		glUniform1i(m_suzanne_texture_shader_sampler, 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_suzanne_vertex_buffer);
-		constexpr auto vertex_size = sizeof(vr::mesh::geometry_type::vertex_type);
-
-		const auto suzanne_vertex_position_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_position_model");
-		glEnableVertexAttribArray(suzanne_vertex_position_attribute_location);
-		const auto position_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::position);
-		glVertexAttribPointer(suzanne_vertex_position_attribute_location, 3, GL_FLOAT, GL_FALSE, vertex_size, reinterpret_cast<const void*>(position_offset));
-
-		const auto suzanne_uv_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_uv");
-		glEnableVertexAttribArray(suzanne_uv_attribute_location);
-		const auto uv_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::texcoords);
-		glVertexAttribPointer(suzanne_uv_attribute_location, 2, GL_FLOAT, GL_FALSE, vertex_size, reinterpret_cast<const void*>(uv_offset));
-
-		const auto suzanne_normal_attribute_location = glGetAttribLocation(m_suzanne_shaders.program.get_id(), "vertex_normal_model");
-		glEnableVertexAttribArray(suzanne_normal_attribute_location);
-		const auto normal_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::normal);
-		glVertexAttribPointer(suzanne_normal_attribute_location, 3, GL_FLOAT, GL_FALSE, vertex_size, reinterpret_cast<const void*>(normal_offset));
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_suzanne_index_buffer);
-
-		glDrawElements(GL_TRIANGLES, m_suzanne_indices, GL_UNSIGNED_SHORT, nullptr);
-
-		glDisableVertexAttribArray(suzanne_uv_attribute_location);
-		glDisableVertexAttribArray(suzanne_normal_attribute_location);
-		glDisableVertexAttribArray(suzanne_vertex_position_attribute_location);
-	}
 
 	m_window.swap_buffers();
 }

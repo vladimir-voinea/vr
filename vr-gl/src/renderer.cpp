@@ -1,6 +1,8 @@
 #include "renderer.hpp"
 #include "opengl_shader.hpp"
 #include "gpu_objects.hpp"
+#include "renderer_cache.hpp"
+#include "texture_loader.hpp"
 #include <shader_material.hpp>
 
 #include <map>
@@ -36,7 +38,49 @@ namespace
 
 namespace vr::gl
 {
+	loaded_geometry load_geometry(const geometry* geometry)
+	{
+		loaded_geometry loaded_geometry;
+		vr::gl::loaded_vertex_array_object vao;
+
+		glGenVertexArrays(1, &vao.id);
+		glBindVertexArray(vao.id);
+
+		glGenBuffers(1, &vao.buffer.id);
+		glBindBuffer(GL_ARRAY_BUFFER, vao.buffer.id);
+		glBufferData(GL_ARRAY_BUFFER, geometry->vertices.size() * sizeof(vr::geometry::vertex_type), geometry->vertices.data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &vao.indices.id);
+		glBindBuffer(GL_ARRAY_BUFFER, vao.indices.id);
+		glBufferData(GL_ARRAY_BUFFER, geometry->indices.size() * sizeof(vr::geometry::index_type), geometry->indices.data(), GL_STATIC_DRAW);
+		vao.indices_size = geometry->indices.size();
+
+		loaded_geometry.vao = vao;
+
+		return loaded_geometry;
+	}
+
+	vr::gl::loaded_shader load_shader(const shader_material* material)
+	{
+		const auto shader = static_cast<const opengl_shader*>(material);
+		vr::gl::loaded_shader loaded_shader;
+		loaded_shader.vertex = vr::gl::shader(vr::gl::shader::type::vertex, shader->get_vertex_shader_source());
+		loaded_shader.fragment = vr::gl::shader(vr::gl::shader::type::fragment, shader->get_fragment_shader_source());
+		loaded_shader.program = vr::gl::shader_program(loaded_shader.vertex, loaded_shader.fragment);
+
+		return loaded_shader;
+	}
+
+	vr::gl::loaded_texture load_texture(const texture* texture)
+	{
+		return { load_dds(texture->get_path()) };
+	}
+
 	renderer::renderer()
+		: m_cache(std::make_unique<renderer_cache>())
+	{}
+
+	renderer::~renderer()
 	{}
 
 	void renderer::render(vr::scene& scene, const vr::camera& camera)
@@ -59,17 +103,17 @@ namespace vr::gl
 			loaded_geometry* geometry = nullptr;
 			loaded_shader* shader = nullptr;
 			loaded_texture* texture = nullptr;
-			if (!m_cache.get(mesh->get_geometry()))
+			if (!m_cache->get(mesh->get_geometry()))
 			{
-				geometry = m_cache.set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
+				geometry = m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
 			}
-			if (!m_cache.get(mesh->get_material()))
+			if (!m_cache->get(mesh->get_material()))
 			{
-				shader = m_cache.set(mesh->get_material(), load_shader(mesh->get_material()));
+				shader = m_cache->set(mesh->get_material(), load_shader(mesh->get_material()));
 			}
-			if (!m_cache.get(mesh->get_texture()))
+			if (!m_cache->get(mesh->get_texture()))
 			{
-				texture = m_cache.set(mesh->get_texture(), load_texture(mesh->get_texture()));
+				texture = m_cache->set(mesh->get_texture(), load_texture(mesh->get_texture()));
 			}
 		}
 
@@ -83,17 +127,27 @@ namespace vr::gl
 	{
 		for (const auto* mesh : object->get_meshes())
 		{
-			const auto geometry = m_cache.get(mesh->get_geometry());
-			const auto shader = m_cache.get(mesh->get_material());
-			const auto texture = m_cache.get(mesh->get_texture());
+			const auto geometry = m_cache->get(mesh->get_geometry());
+			const auto shader = m_cache->get(mesh->get_material());
+			const auto texture = m_cache->get(mesh->get_texture());
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture->id);
 
 			glUseProgram(shader->program.get_id());
 			const auto gl_shader = static_cast<const opengl_shader*>(mesh->get_material());
 
-			uniform mvp;
-			mvp.name = "mvp";
-			mvp.type = uniform_type::mat4fv;
-			mvp.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * glm::mat4(1.0f);
+			uniform mvp_uniform;
+			mvp_uniform.name = "mvp";
+			mvp_uniform.type = uniform_type::mat4fv;
+			mvp_uniform.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * glm::mat4(1.0f);
+			load_uniform(shader->program, mvp_uniform);
+
+			uniform texture_sampler_uniform;
+			texture_sampler_uniform.name = "texture_sampler";
+			mvp_uniform.type = uniform_type::vec1i;
+			mvp_uniform.value.vec1i = 0;
+
 			for (const auto& uniform : gl_shader->get_uniforms())
 			{
 				load_uniform(shader->program, uniform);
@@ -118,7 +172,7 @@ namespace vr::gl
 				glVertexAttribPointer(normal_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(normal_offset));
 			}
 
-			if (true)
+			if (false)
 			{
 				const auto color_attribute_location = glGetAttribLocation(shader->program.get_id(), "vertex_color");
 				glEnableVertexAttribArray(color_attribute_location);
@@ -134,7 +188,7 @@ namespace vr::gl
 				glVertexAttribPointer(uv_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(uv_offset));
 			}
 
-			glBindBuffer(GL_ARRAY_BUFFER, geometry->vao.indices.id);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->vao.indices.id);
 
 			glDrawElements(GL_TRIANGLES, geometry->vao.indices_size, GL_UNSIGNED_SHORT, nullptr);
 		}
@@ -143,44 +197,6 @@ namespace vr::gl
 		{
 			render_object(child, camera);
 		}
-	}
-
-	loaded_geometry renderer::load_geometry(const geometry* geometry)
-	{
-		loaded_geometry loaded_geometry;
-		vr::gl::loaded_vertex_array_object vao;
-
-		glGenVertexArrays(1, &vao.id);
-		glBindVertexArray(vao.id);
-
-		glGenBuffers(GL_ARRAY_BUFFER, &vao.buffer.id);
-		glBindBuffer(GL_ARRAY_BUFFER, vao.buffer.id);
-		glBufferData(GL_ARRAY_BUFFER, geometry->vertices.size() * sizeof(vr::geometry::vertex_type), geometry->vertices.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(GL_ARRAY_BUFFER, &vao.indices.id);
-		glBindBuffer(GL_ARRAY_BUFFER, vao.indices.id);
-		glBufferData(GL_ARRAY_BUFFER, geometry->indices.size() * sizeof(vr::geometry::index_type), geometry->indices.data(), GL_STATIC_DRAW);
-		vao.indices_size = geometry->indices.size();
-
-		loaded_geometry.vao = vao;
-
-		return loaded_geometry;
-	}
-
-	vr::gl::loaded_shader renderer::load_shader(const shader_material* material)
-	{
-		const auto shader = static_cast<const opengl_shader*>(material);
-		vr::gl::loaded_shader loaded_shader;
-		loaded_shader.vertex = vr::gl::shader(vr::gl::shader::type::vertex, shader->get_vertex_shader_source());
-		loaded_shader.fragment = vr::gl::shader(vr::gl::shader::type::fragment, shader->get_fragment_shader_source());
-		loaded_shader.program = vr::gl::shader_program(loaded_shader.vertex, loaded_shader.fragment);
-
-		return loaded_shader;
-	}
-
-	vr::gl::loaded_texture renderer::load_texture(const texture* texture)
-	{
-		return { 0 };
 	}
 }
 
