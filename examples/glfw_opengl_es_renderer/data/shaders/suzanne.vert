@@ -2,7 +2,7 @@
 
 // Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 vertex_position_model;
-layout(location = 1) in vec2 vertex_uv;
+layout(location = 1) in vec2 vertex_uv_model;
 layout(location = 2) in vec3 vertex_normal_model;
 
 // Output data ; will be interpolated for each fragment.
@@ -39,5 +39,5 @@ void main(){
 	Normal_cameraspace = ( v * m * vec4(vertex_normal_model,0)).xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 	
 	// UV of the vertex. No special space for this one.
-	UV = vertex_uv;
+	UV = vertex_uv_model;
 }

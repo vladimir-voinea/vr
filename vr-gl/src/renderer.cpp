@@ -186,7 +186,7 @@ namespace vr::gl
 				const auto uv_attribute_location = glGetAttribLocation(shader->program.get_id(), "vertex_uv_model");
 				glEnableVertexAttribArray(uv_attribute_location);
 				const auto uv_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::texcoords);
-				glVertexAttribPointer(uv_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(uv_offset));
+				glVertexAttribPointer(uv_attribute_location, 2, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(uv_offset));
 			}
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->vao.indices.id);
