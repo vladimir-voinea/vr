@@ -44,13 +44,9 @@ private:
 	float m_delta_time;
 
 	struct monkey_data {
-		vr::object3d* obj = nullptr;
 		vr::geometry geometry;
-		vr::shader_material* material = nullptr;
 		vr::gl::opengl_shader* shader = nullptr;
-		std::vector<vr::gl::uniform> uniforms; 
 		vr::texture* texture = nullptr;
-		vr::mesh* mesh;
 	};
 	monkey_data m_monkey_data;
 
@@ -58,7 +54,11 @@ private:
 		vr::object3d* obj = nullptr;
 		std::vector<vr::gl::uniform> uniforms;
 		vr::shader_material* material = nullptr;
-	} m_monkeys;
+		vr::mesh* mesh;
+	};
+
+	monkey_instance m1;
+	monkey_instance m2;
 
 	vr::scene m_scene;
 	vr::gl::renderer m_renderer;
