@@ -30,10 +30,10 @@ namespace vr::gl
 		} value;
 	};
 
-	class opengl_shader : public vr::shader_material
+	class opengl_shader_material : public vr::shader_material
 	{
 	public:
-		opengl_shader(const std::string& vertex_shader_source, const std::string& fragment_shader_source, const std::vector<uniform>& uniforms);
+		opengl_shader_material(const std::string& vertex_shader_source, const std::string& fragment_shader_source, const std::vector<uniform>& uniforms);
 
 		const std::string& get_vertex_shader_source() const;
 		const std::string& get_fragment_shader_source() const;

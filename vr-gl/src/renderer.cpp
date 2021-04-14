@@ -62,7 +62,7 @@ namespace vr::gl
 
 	vr::gl::loaded_shader load_shader(const shader_material* material)
 	{
-		const auto shader = static_cast<const opengl_shader*>(material);
+		const auto shader = static_cast<const opengl_shader_material*>(material);
 		vr::gl::loaded_shader loaded_shader;
 		loaded_shader.vertex = vr::gl::shader(vr::gl::shader::type::vertex, shader->get_vertex_shader_source());
 		loaded_shader.fragment = vr::gl::shader(vr::gl::shader::type::fragment, shader->get_fragment_shader_source());
@@ -135,7 +135,7 @@ namespace vr::gl
 			glBindTexture(GL_TEXTURE_2D, texture->id);
 
 			glUseProgram(shader->program.get_id());
-			const auto gl_shader = static_cast<const opengl_shader*>(mesh->get_material());
+			const auto gl_shader = static_cast<const opengl_shader_material*>(mesh->get_material());
 
 			uniform mvp_uniform;
 			mvp_uniform.name = "mvp";
