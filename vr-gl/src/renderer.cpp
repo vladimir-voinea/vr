@@ -147,6 +147,7 @@ namespace vr::gl
 			texture_sampler_uniform.name = "texture_sampler";
 			mvp_uniform.type = uniform_type::vec1i;
 			mvp_uniform.value.vec1i = 0;
+			load_uniform(shader->program, texture_sampler_uniform);
 
 			for (const auto& uniform : gl_shader->get_uniforms())
 			{
