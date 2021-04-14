@@ -43,9 +43,10 @@ main_loop::main_loop(vr::glfw::window& window)
 
 main_loop::~main_loop()
 {
-	delete m_monkey.material;
-	delete m_monkey.texture;
-	delete m_monkey.obj;
+	delete m_monkey_data.obj;
+	delete m_monkey_data.mesh;
+	delete m_monkey_data.material;
+	delete m_monkey_data.texture;
 }
 
 void main_loop::initialize_controls()
@@ -147,7 +148,7 @@ void main_loop::init()
 
 
 	{
-		m_monkey.geometry = ::import_model("suzanne");
+		m_monkey_data.geometry = ::import_model("suzanne");
 
 		vr::gl::uniform v, m, light_position;
 		v.name = "v";
@@ -162,19 +163,19 @@ void main_loop::init()
 		light_position.type = vr::gl::uniform_type::vec3f;
 		light_position.value.vec3f = glm::vec3(4, 4, 4);
 
-		m_monkey.uniforms.push_back(v);
-		m_monkey.uniforms.push_back(m);
-		m_monkey.uniforms.push_back(light_position);
+		m_monkey_data.uniforms.push_back(v);
+		m_monkey_data.uniforms.push_back(m);
+		m_monkey_data.uniforms.push_back(light_position);
 
-		m_monkey.material = new vr::gl::opengl_shader(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"), m_monkey.uniforms);
-		m_monkey.texture = new vr::texture("data/models/uvmap.DDS");
+		m_monkey_data.material = new vr::gl::opengl_shader(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"), m_monkey_data.uniforms);
+		m_monkey_data.texture = new vr::texture("data/models/uvmap.DDS");
 		
-		m_monkey.mesh = vr::mesh(&m_monkey.geometry, m_monkey.material, m_monkey.texture);
+		m_monkey_data.mesh = new vr::mesh{ &m_monkey_data.geometry, m_monkey_data.material, m_monkey_data.texture };
 
-		m_monkey.obj = new vr::object3d{};
-		m_monkey.obj->add_mesh(&m_monkey.mesh);
+		m_monkey_data.obj = new vr::object3d{};
+		m_monkey_data.obj->add_mesh(m_monkey_data.mesh);
 
-		m_scene.add(m_monkey.obj);
+		m_scene.add(m_monkey_data.obj);
 	}
 
 	m_last_timestamp = vr::glfw::get_time();
@@ -193,10 +194,11 @@ void main_loop::render_scene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	{
-		auto mk = m_monkey.obj;
+		auto mk = m_monkey_data.obj;
 		mk->set_position(mk->get_position() + glm::vec3(0.5, 0.0, 0.0) * m_delta_time);
-		m_monkey.uniforms[0].value.mat4fv = view_matrix;
-		m_monkey.uniforms[1].value.mat4fv = m_monkey.obj->get_transformation_matrix();
+		
+		m_monkey_data.uniforms[0].value.mat4fv = view_matrix;
+		m_monkey_data.uniforms[1].value.mat4fv = m_monkey_data.obj->get_transformation_matrix();
 
 		m_renderer.render(m_scene, *m_camera);
 	}
