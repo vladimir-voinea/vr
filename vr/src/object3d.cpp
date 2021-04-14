@@ -1,5 +1,7 @@
 #include "object3d.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace vr
 {
 	object3d::object3d() = default;
@@ -47,6 +49,21 @@ namespace vr
 	bool object3d::has_geometry() const
 	{
 		return !m_meshes.empty();
+	}
+
+	glm::mat4 object3d::get_transformation_matrix() const
+	{
+		return glm::translate(glm::mat4(1.0f), m_position);
+	}
+
+	void object3d::set_position(const glm::vec3& position)
+	{
+		m_position = position;
+	}
+
+	const glm::vec3& object3d::get_position() const
+	{
+		return m_position;
 	}
 
 	//std::any& object3d::get_render_object()

@@ -40,7 +40,8 @@ private:
 	std::unique_ptr<vr::camera> m_camera;
 	user_controls m_controls;
 	
-	double m_last_timestamp;
+	float m_last_timestamp;
+	float m_delta_time;
 
 	struct monkey {
 		vr::object3d* obj = nullptr;

@@ -63,17 +63,13 @@ void main_loop::initialize_position()
 
 void main_loop::process_input()
 {
-	const auto current_time = vr::glfw::get_time();
-	const float delta_time = static_cast<float>(current_time - m_last_timestamp);
-
-	m_controls.process_events(delta_time);
+	m_controls.process_events(m_delta_time);
 
 	if (m_kb.get_key_state(vr::glfw::keyboard::key::escape) == vr::glfw::keyboard::state::press)
 	{
 		m_window.request_close();
 	}
 
-	m_last_timestamp = current_time;
 }
 
 void main_loop::print_state()
@@ -187,16 +183,20 @@ void main_loop::init()
 
 void main_loop::render_scene()
 {
+	const auto current_time = static_cast<float>(vr::glfw::get_time());
+	m_delta_time = current_time - m_last_timestamp;
+	m_last_timestamp = current_time;
+
 	const auto projection_matrix = m_camera->get_projection_matrix();
 	const auto view_matrix = m_camera->get_view_matrix();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	{
-		const glm::mat4 model_matrix = glm::mat4(1.0f);
-
+		auto mk = m_monkey.obj;
+		mk->set_position(mk->get_position() + glm::vec3(0.5, 0.0, 0.0) * m_delta_time);
 		m_monkey.uniforms[0].value.mat4fv = view_matrix;
-		m_monkey.uniforms[1].value.mat4fv = model_matrix;
+		m_monkey.uniforms[1].value.mat4fv = m_monkey.obj->get_transformation_matrix();
 
 		m_renderer.render(m_scene, *m_camera);
 	}

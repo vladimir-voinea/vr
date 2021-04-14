@@ -140,7 +140,7 @@ namespace vr::gl
 			uniform mvp_uniform;
 			mvp_uniform.name = "mvp";
 			mvp_uniform.type = uniform_type::mat4fv;
-			mvp_uniform.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * glm::mat4(1.0f);
+			mvp_uniform.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * object->get_transformation_matrix();
 			load_uniform(shader->program, mvp_uniform);
 
 			uniform texture_sampler_uniform;
