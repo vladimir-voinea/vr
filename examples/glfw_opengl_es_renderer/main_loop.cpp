@@ -167,7 +167,8 @@ void main_loop::init()
 		m_monkey_data.uniforms.push_back(m);
 		m_monkey_data.uniforms.push_back(light_position);
 
-		m_monkey_data.material = new vr::gl::opengl_shader_material(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"), m_monkey_data.uniforms);
+		m_monkey_data.shader = new vr::gl::opengl_shader{ load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne") };
+		m_monkey_data.material = new vr::gl::opengl_shader_material(*m_monkey_data.shader, m_monkey_data.uniforms);
 		m_monkey_data.texture = new vr::texture("data/models/uvmap.DDS");
 		
 		m_monkey_data.mesh = new vr::mesh{ &m_monkey_data.geometry, m_monkey_data.material, m_monkey_data.texture };

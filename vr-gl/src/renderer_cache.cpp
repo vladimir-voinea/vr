@@ -1,6 +1,7 @@
 #include "renderer_cache.hpp"
 
 #include <geometry.hpp>
+#include "opengl_shader.hpp"
 #include <shader_material.hpp>
 #include <texture.hpp>
 
@@ -12,7 +13,7 @@ namespace vr::gl
 		return it != m_loaded_geometry.end() ? &it->second : nullptr;
 	}
 
-	loaded_shader* renderer_cache::get(const shader_material* shader)
+	loaded_shader* renderer_cache::get(const opengl_shader* shader)
 	{
 		auto it = m_loaded_shaders.find(shader);
 		return it != m_loaded_shaders.end() ? &(it->second) : nullptr;
@@ -29,7 +30,7 @@ namespace vr::gl
 		return &m_loaded_geometry.insert({ geometry, std::move(loaded) }).first->second;
 	}
 
-	loaded_shader* renderer_cache::set(const shader_material* shader, loaded_shader loaded)
+	loaded_shader* renderer_cache::set(const opengl_shader* shader, loaded_shader loaded)
 	{
 		return &m_loaded_shaders.insert({ shader, std::move(loaded) }).first->second;
 	}

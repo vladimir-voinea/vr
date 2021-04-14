@@ -1,5 +1,5 @@
 #include "renderer.hpp"
-#include "opengl_shader.hpp"
+#include "opengl_shader_material.hpp"
 #include "gpu_objects.hpp"
 #include "renderer_cache.hpp"
 #include "texture_loader.hpp"
@@ -60,12 +60,11 @@ namespace vr::gl
 		return loaded_geometry;
 	}
 
-	vr::gl::loaded_shader load_shader(const shader_material* material)
+	vr::gl::loaded_shader load_shader(const opengl_shader& shader)
 	{
-		const auto shader = static_cast<const opengl_shader_material*>(material);
 		vr::gl::loaded_shader loaded_shader;
-		loaded_shader.vertex = vr::gl::shader(vr::gl::shader::type::vertex, shader->get_vertex_shader_source());
-		loaded_shader.fragment = vr::gl::shader(vr::gl::shader::type::fragment, shader->get_fragment_shader_source());
+		loaded_shader.vertex = vr::gl::shader(vr::gl::shader::type::vertex, shader.get_vertex_shader_source());
+		loaded_shader.fragment = vr::gl::shader(vr::gl::shader::type::fragment, shader.get_fragment_shader_source());
 		loaded_shader.program = vr::gl::shader_program(loaded_shader.vertex, loaded_shader.fragment);
 
 		return loaded_shader;
@@ -103,13 +102,14 @@ namespace vr::gl
 			loaded_geometry* geometry = nullptr;
 			loaded_shader* shader = nullptr;
 			loaded_texture* texture = nullptr;
+			
 			if (!m_cache->get(mesh->get_geometry()))
 			{
 				geometry = m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
 			}
-			if (!m_cache->get(mesh->get_material()))
+			if (const auto opengl_shader = &static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader(); !m_cache->get(opengl_shader))
 			{
-				shader = m_cache->set(mesh->get_material(), load_shader(mesh->get_material()));
+				shader = m_cache->set(opengl_shader, load_shader(*opengl_shader));
 			}
 			if (!m_cache->get(mesh->get_texture()))
 			{
@@ -128,7 +128,7 @@ namespace vr::gl
 		for (const auto* mesh : object->get_meshes())
 		{
 			const auto geometry = m_cache->get(mesh->get_geometry());
-			const auto shader = m_cache->get(mesh->get_material());
+			const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
 			const auto texture = m_cache->get(mesh->get_texture());
 
 			glActiveTexture(GL_TEXTURE0);

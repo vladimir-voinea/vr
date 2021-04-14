@@ -47,6 +47,7 @@ private:
 		vr::object3d* obj = nullptr;
 		vr::geometry geometry;
 		vr::shader_material* material = nullptr;
+		vr::gl::opengl_shader* shader = nullptr;
 		std::vector<vr::gl::uniform> uniforms; 
 		vr::texture* texture = nullptr;
 		vr::mesh* mesh;

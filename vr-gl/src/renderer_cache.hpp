@@ -7,7 +7,7 @@
 namespace vr
 {
 	class geometry;
-	class shader_material;
+	class opengl_shader;
 	class texture;
 }
 
@@ -20,16 +20,16 @@ namespace vr::gl
 		~renderer_cache() = default;
 
 		loaded_geometry* get(const geometry*);
-		loaded_shader* get(const shader_material*);
+		loaded_shader* get(const opengl_shader*);
 		loaded_texture* get(const texture*);
 
 		loaded_geometry* set(const geometry*, loaded_geometry);
-		loaded_shader* set(const shader_material*, loaded_shader);
+		loaded_shader* set(const opengl_shader*, loaded_shader);
 		loaded_texture* set(const texture*, loaded_texture);
 
 	private:
 		std::map<const geometry*, loaded_geometry> m_loaded_geometry;
-		std::map<const shader_material*, loaded_shader> m_loaded_shaders;
+		std::map<const opengl_shader*, loaded_shader> m_loaded_shaders;
 		std::map<const texture*, loaded_texture> m_loaded_textures;
 	};
 }
