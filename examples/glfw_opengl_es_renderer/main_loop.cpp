@@ -56,8 +56,8 @@ void main_loop::initialize_controls()
 
 void main_loop::initialize_position()
 {
-	m_camera->set_position({ -8.96424, 2.70909, 4.2585 });
-	m_camera->set_direction({ 0.827756, -0.307191, -0.469526 });
+	//m_camera->set_position({ -8.96424, 2.70909, 4.2585 });
+	//m_camera->set_direction({ 0.827756, -0.307191, -0.469526 });
 }
 
 void main_loop::process_input()
@@ -195,8 +195,18 @@ void main_loop::init()
 		inst.z_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
 		//inst.light_position = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
 
+		vr::object3d* previous_monkey = !m_monkeys.empty() ? m_monkeys.back().obj.get() : nullptr;
 		m_monkeys.push_back(std::move(inst));
-		m_scene.add(m_monkeys.back().obj.get());
+		vr::object3d* last_added_monkey = m_monkeys.back().obj.get();
+		if (!i)
+		{
+			m_scene.add(m_monkeys.back().obj.get());
+		}
+		else
+		{
+			previous_monkey->add_child(last_added_monkey);
+			last_added_monkey->set_parent(previous_monkey);
+		}
 
 	}
 
@@ -230,6 +240,8 @@ void main_loop::render_scene()
 		auto& monkey = m_monkeys[i];
 		
 		auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
+		auto new_rotation = glm::vec3(0.f, glm::radians(70.f), 0.f);
+		monkey.obj->set_rotation(monkey.obj->get_rotation() + new_rotation * m_delta_time);
 
 		monkey.obj->set_position(monkey.obj->get_position() + new_position * m_delta_time);
 		monkey.uniforms->at(0).value.mat4fv = view_matrix;

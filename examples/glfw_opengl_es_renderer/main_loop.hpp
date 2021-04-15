@@ -89,7 +89,7 @@ private:
 
 	std::default_random_engine m_random_engine;
 
-	const size_t n_monkeys = 5000;
+	const size_t n_monkeys = 1;
 	std::vector<monkey_instance> m_monkeys;
 
 

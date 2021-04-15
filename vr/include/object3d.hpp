@@ -32,14 +32,18 @@ namespace vr
 		virtual glm::mat4 get_transformation_matrix() const;
 
 		void set_scale();
-		void set_rotation();
-		void set_position(const glm::vec3& position);
+
+		const glm::vec3& get_rotation() const;
+		void set_rotation(const glm::vec3& rotation);
 
 		const glm::vec3& get_position() const;
+		void set_position(const glm::vec3& position);
+
 	private:
 		object3d* m_parent = nullptr;
 		std::vector<object3d*> m_children;
 		std::vector<const mesh*> m_meshes;
 		glm::vec3 m_position;
+		glm::vec3 m_rotation;
 	};
 }

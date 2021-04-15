@@ -1,6 +1,9 @@
 #include "object3d.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace vr
 {
@@ -53,7 +56,20 @@ namespace vr
 
 	glm::mat4 object3d::get_transformation_matrix() const
 	{
-		return glm::translate(glm::mat4(1.0f), m_position);
+		const auto rot = glm::toMat4(glm::quat(m_rotation));
+		const auto trans = glm::translate(glm::mat4(1.0f), m_position);
+
+		return trans * rot;
+	}
+
+	const glm::vec3& object3d::get_rotation() const
+	{
+		return m_rotation;
+	}
+
+	void object3d::set_rotation(const glm::vec3& rotation)
+	{
+		m_rotation = rotation;
 	}
 
 	void object3d::set_position(const glm::vec3& position)

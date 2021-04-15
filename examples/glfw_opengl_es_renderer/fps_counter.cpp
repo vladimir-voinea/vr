@@ -14,7 +14,7 @@ void fps_counter::frame(float timestamp)
 	++m_n_frames;
 
 	const float diff = timestamp - m_first_timestamp;
-	if (diff > 0.25f && get_rendered_frames() > 10)
+	if (diff > 0.25f)
 	{
 		m_fps = static_cast<uint16_t>(static_cast<float>(get_rendered_frames()) / (diff));
 		m_first_timestamp = timestamp;
