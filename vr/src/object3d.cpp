@@ -61,69 +61,13 @@ namespace vr
 
 	glm::mat4 object3d::get_transformation_matrix() const
 	{
-		const auto rotation = glm::toMat4(glm::quat(get_rotation()));
-		const auto transation = glm::translate(glm::mat4(1.0f), get_position());
-		const auto transformation = transation * rotation;
-
 		if (get_parent() != nullptr)
 		{
-			return get_parent()->get_transformation_matrix() * transformation;
+			return get_parent()->get_transformation_matrix() * transformable::get_transformation_matrix();
 		}
 		else
 		{
-			return transformation;
+			return transformable::get_transformation_matrix();
 		}
 	}
-
-	const glm::vec3& object3d::get_rotation() const
-	{
-		return m_rotation;
-	}
-
-	void object3d::set_rotation(const glm::vec3& rotation)
-	{
-		m_rotation = rotation;
-	}
-
-	void object3d::set_position(const glm::vec3& position)
-	{
-		m_position = position;
-	}
-
-	const glm::vec3& object3d::get_position() const
-	{
-		return m_position;
-	}
-
-	//std::any& object3d::get_render_object()
-	//{
-	//	return m_any;
-	//}
 }
-
-/*
-	class object3d
-	{
-	public:
-		object3d();
-
-		object3d* get_parent();
-		void set_parent(object3d*);
-
-		std::vector<object3d>& get_children();
-		void add_child(object3d*);
-		void remove_child(object3d*);
-
-		const std::vector<const mesh*> get_meshes() const;
-		void add_mesh(const mesh*);
-		void remove_mesh(const mesh*);
-
-		bool has_geometry() const;
-
-	private:
-		object3d* m_parent;
-		std::vector<object3d*> m_children;
-
-		std::vector<const mesh*> m_meshes;
-	};
-*/

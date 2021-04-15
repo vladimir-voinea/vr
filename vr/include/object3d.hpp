@@ -4,6 +4,7 @@
 #include "shader_material.hpp"
 #include "texture.hpp"
 #include "renderer_object.hpp"
+#include "transformable.hpp"
 
 #include <glm/glm.hpp>
 
@@ -11,7 +12,7 @@
 
 namespace vr
 {
-	class object3d : public has_renderer_object
+	class object3d : public has_renderer_object, public transformable
 	{
 	public:
 		object3d();
@@ -30,15 +31,7 @@ namespace vr
 
 		bool has_geometry() const;
 
-		virtual glm::mat4 get_transformation_matrix() const;
-
-		void set_scale();
-
-		const glm::vec3& get_rotation() const;
-		void set_rotation(const glm::vec3& rotation);
-
-		const glm::vec3& get_position() const;
-		void set_position(const glm::vec3& position);
+		virtual glm::mat4 get_transformation_matrix() const override;
 
 	private:
 		object3d* m_parent = nullptr;

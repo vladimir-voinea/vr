@@ -87,7 +87,7 @@ void main_loop::print_state()
 	
 	for (auto i = 0u; i < m_monkeys.size(); ++i)
 	{
-		std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_position().x << ' ' << m_monkeys[i].obj->get_position().y << ' ' << m_monkeys[i].obj->get_position().z << '\n';
+		std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_translation().x << ' ' << m_monkeys[i].obj->get_translation().y << ' ' << m_monkeys[i].obj->get_translation().z << '\n';
 		std::cout << "Monkey " << i << " lpos: " << m_monkeys[i].uniforms->at(2).value.vec3f.x << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.y << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.z << '\n';
 	}
 }
@@ -212,7 +212,7 @@ void main_loop::init()
 		{
 			previous_monkey->add_child(last_added_monkey);
 			last_added_monkey->set_parent(previous_monkey);
-			last_added_monkey->set_position(previous_monkey->get_position() + glm::vec3(4.f, 0.f, 0.f));
+			last_added_monkey->translate(previous_monkey->get_translation() + glm::vec3(4.f, 0.f, 0.f));
 		}
 
 	}
@@ -246,15 +246,15 @@ void main_loop::render_scene()
 	{
 		auto& monkey = m_monkeys[i];
 		
-		//auto new_rotation = glm::vec3(0.f, glm::radians(70.f), 0.f);
-		//monkey.obj->set_rotation(monkey.obj->get_rotation() + new_rotation * m_delta_time);
+		constexpr auto rotation_angle = 2.f;
+		monkey.obj->rotate(vr::y_axis, rotation_angle * m_delta_time);
 
-		auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
-		monkey.obj->set_position(monkey.obj->get_position() + new_position * m_delta_time);
+		//auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
+		//monkey.obj->translate(monkey.obj->get_translation() + new_position * m_delta_time);
 
 		monkey.uniforms->at(0).value.mat4fv = view_matrix;
 		monkey.uniforms->at(1).value.mat4fv = monkey.obj->get_transformation_matrix();
-		monkey.uniforms->at(2).value.vec3f = monkey.obj->get_position() + light_direction_from_object;
+		monkey.uniforms->at(2).value.vec3f = monkey.obj->get_translation() + light_direction_from_object;
 	}
 
 	m_renderer.render(m_scene, *m_camera);
