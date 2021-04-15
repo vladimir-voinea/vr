@@ -71,17 +71,17 @@ void main_loop::process_input()
 
 void main_loop::print_state()
 {
-	std::cout << "Position: "
-		<< m_camera->get_position().x << ", "
-		<< m_camera->get_position().y << ", "
-		<< m_camera->get_position().z << '\n';
+	//std::cout << "Position: "
+	//	<< m_camera->get_position().x << ", "
+	//	<< m_camera->get_position().y << ", "
+	//	<< m_camera->get_position().z << '\n';
 
-	std::cout << "Direction: " <<
-		m_camera->get_direction().x << ", "
-		<< m_camera->get_direction().y << ", "
-		<< m_camera->get_direction().z << '\n';
+	//std::cout << "Direction: " <<
+	//	m_camera->get_direction().x << ", "
+	//	<< m_camera->get_direction().y << ", "
+	//	<< m_camera->get_direction().z << '\n';
 
-	//std::cout << "FPS: " << m_fps_counter->get_fps() << '\n';
+	std::cout << "FPS: " << m_fps_counter->get_fps() << '\n';
 	//
 	//for (auto i = 0u; i < m_monkeys.size(); ++i)
 	//{
@@ -149,13 +149,25 @@ void main_loop::init()
 
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
-	glEnable(GL_CULL_FACE);
+	if (!m_wireframe_mode)
+	{
+		glEnable(GL_CULL_FACE);
+	}
+	
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS); 
+
+	if (m_wireframe_mode)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else
+	{
+	}
 
 
 	{
-		m_monkey_data.geometry = ::import_model("cylinder");
+		m_monkey_data.geometry = ::import_model("textured_cube");
 		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
 		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.DDS");
 		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");

@@ -41,6 +41,7 @@ private:
 
 	std::unique_ptr<vr::camera> m_camera;
 	user_controls m_controls;
+	const bool m_wireframe_mode = false;
 	
 	float m_last_timestamp;
 	float m_delta_time;
