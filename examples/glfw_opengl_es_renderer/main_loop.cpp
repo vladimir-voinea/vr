@@ -55,7 +55,7 @@ void main_loop::initialize_controls()
 void main_loop::initialize_position()
 {
 	m_camera->set_position({ -2.7872, 1.74459, 9.47206 });
-	m_camera->set_direction({ 0.507373, -0.231316, -0.8301 });
+	m_camera->set_direction({ 0.f, -0.231316, 0.f });
 }
 
 void main_loop::process_input()
@@ -155,10 +155,10 @@ void main_loop::init()
 
 
 	{
-		m_monkey_data.geometry = ::import_model("suzanne");
+		m_monkey_data.geometry = ::import_model("cylinder");
 		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
 		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.DDS");
-		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/cobblestone.png");
+		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");
 	}
 
 	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
@@ -189,7 +189,7 @@ void main_loop::init()
 		{
 			previous_monkey->add_child(last_added_monkey);
 			last_added_monkey->set_parent(previous_monkey);
-			last_added_monkey->translate(previous_monkey->get_translation() + glm::vec3(4.f, 0.f, 0.f));
+			last_added_monkey->translate(previous_monkey->get_translation() + glm::vec3(10.f, 0.f, 0.f));
 		}
 
 	}
@@ -244,7 +244,7 @@ void main_loop::render_scene()
 		return glm::normalize(glm::vec3(axis_rand(m_random_engine), axis_rand(m_random_engine), axis_rand(m_random_engine)));
 	};
 
-	m_monkeys.front().obj->rotate(vr::z_axis, 2.f * m_delta_time);
+//	m_monkeys.front().obj->rotate(vr::z_axis, 2.f * m_delta_time);
 
 	//for (auto i = 0; i < m_monkeys.size(); ++i)
 	//{

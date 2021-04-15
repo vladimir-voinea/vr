@@ -17,6 +17,7 @@ namespace vr::gl
 		int height = 0;
 		int channels = 0;
 
+		stbi_set_flip_vertically_on_load(true);
 		auto stb_result = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb);
 
 		GLuint texture;
@@ -25,6 +26,16 @@ namespace vr::gl
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, stb_result);
 		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+		
+		
+		GLfloat value;
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &value);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, value);
 
 		stbi_image_free(stb_result);
 
