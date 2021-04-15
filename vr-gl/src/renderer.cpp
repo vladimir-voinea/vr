@@ -131,10 +131,19 @@ namespace vr::gl
 			const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
 			const auto texture = m_cache->get(mesh->get_texture());
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture->id);
+			if (texture->id != m_last_shader_id)
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, texture->id);
+				m_last_texture_id = texture->id;
+			}
 
-			glUseProgram(shader->program.get_id());
+			if (shader->program.get_id() != m_last_shader_id)
+			{
+				glUseProgram(shader->program.get_id());
+				m_last_shader_id = shader->program.get_id();
+			}
+
 			const auto gl_shader = static_cast<const opengl_shader_material*>(mesh->get_material());
 
 			uniform mvp_uniform;

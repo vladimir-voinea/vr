@@ -4,6 +4,8 @@
 #include <camera.hpp>
 #include <scene.hpp>
 
+#include "vr-opengl.h"
+
 #include <memory>
 
 namespace vr::gl
@@ -25,6 +27,8 @@ namespace vr::gl
 		void render_object(const vr::object3d* object, const vr::camera& camera);
 
 	private:
+		GLuint m_last_shader_id = 0;
+		GLuint m_last_texture_id = 0;
 		std::unique_ptr<renderer_cache> m_cache;
 	};
 }
