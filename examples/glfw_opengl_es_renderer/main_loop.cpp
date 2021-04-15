@@ -56,8 +56,8 @@ void main_loop::initialize_controls()
 
 void main_loop::initialize_position()
 {
-	//m_camera->set_position({ -8.96424, 2.70909, 4.2585 });
-	//m_camera->set_direction({ 0.827756, -0.307191, -0.469526 });
+	m_camera->set_position({ -2.7872, 1.74459, 9.47206 });
+	m_camera->set_direction({ 0.507373, -0.231316, -0.8301 });
 }
 
 void main_loop::process_input()
@@ -73,23 +73,23 @@ void main_loop::process_input()
 
 void main_loop::print_state()
 {
-	//std::cout << "Position: "
-	//	<< m_camera->get_position().x << ", "
-	//	<< m_camera->get_position().y << ", "
-	//	<< m_camera->get_position().z << '\n';
+	std::cout << "Position: "
+		<< m_camera->get_position().x << ", "
+		<< m_camera->get_position().y << ", "
+		<< m_camera->get_position().z << '\n';
 
-	//std::cout << "Direction: " <<
-	//	m_camera->get_direction().x << ", "
-	//	<< m_camera->get_direction().y << ", "
-	//	<< m_camera->get_direction().z << '\n';
+	std::cout << "Direction: " <<
+		m_camera->get_direction().x << ", "
+		<< m_camera->get_direction().y << ", "
+		<< m_camera->get_direction().z << '\n';
 
-	std::cout << "FPS: " << m_fps_counter->get_fps() << '\n';
-	
-	for (auto i = 0u; i < m_monkeys.size(); ++i)
-	{
-		std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_translation().x << ' ' << m_monkeys[i].obj->get_translation().y << ' ' << m_monkeys[i].obj->get_translation().z << '\n';
-		std::cout << "Monkey " << i << " lpos: " << m_monkeys[i].uniforms->at(2).value.vec3f.x << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.y << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.z << '\n';
-	}
+	//std::cout << "FPS: " << m_fps_counter->get_fps() << '\n';
+	//
+	//for (auto i = 0u; i < m_monkeys.size(); ++i)
+	//{
+	//	std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_translation().x << ' ' << m_monkeys[i].obj->get_translation().y << ' ' << m_monkeys[i].obj->get_translation().z << '\n';
+	//	std::cout << "Monkey " << i << " lpos: " << m_monkeys[i].uniforms->at(2).value.vec3f.x << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.y << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.z << '\n';
+	//}
 }
 
 vr::geometry import_model(const std::string& name)
@@ -199,7 +199,6 @@ void main_loop::init()
 		inst.x_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
 		inst.y_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
 		inst.z_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
-		//inst.light_position = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
 
 		vr::object3d* previous_monkey = !m_monkeys.empty() ? m_monkeys.back().obj.get() : nullptr;
 		m_monkeys.push_back(std::move(inst));
@@ -242,15 +241,44 @@ void main_loop::render_scene()
 	int light_distance_from_object = distance_rand(m_random_engine);
 	auto light_direction_from_object = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
 
+	std::uniform_int_distribution axis_picker_rand(1, 3);
+	auto pick_axis = [&, axis_picker_rand, this]()
+	{
+		const auto random = axis_picker_rand(m_random_engine);
+		switch (random)
+		{
+		case 1:
+		{
+			return vr::x_axis;
+		}
+		case 2:
+		{
+			return vr::y_axis;
+		}
+		case 3:
+			return vr::z_axis;
+		}
+	};
+
+	std::uniform_real_distribution axis_rand(0.f, 1.f);
+	auto random_axis = [&, axis_rand, this]()
+	{
+		return glm::normalize(glm::vec3(axis_rand(m_random_engine), axis_rand(m_random_engine), axis_rand(m_random_engine)));
+	};
+
 	for (auto i = 0; i < m_monkeys.size(); ++i)
 	{
 		auto& monkey = m_monkeys[i];
 		
-		constexpr auto rotation_angle = 2.f;
-		monkey.obj->rotate(vr::y_axis, rotation_angle * m_delta_time);
+		if (!i) {
+			const auto rotation_angle = p_or_n() * 30.f;
+			monkey.obj->rotate(random_axis(), rotation_angle * m_delta_time);
+		}
 
-		//auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
-		//monkey.obj->translate(monkey.obj->get_translation() + new_position * m_delta_time);
+		//if (i) {
+		//	auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
+		//	monkey.obj->translate(monkey.obj->get_translation() + new_position * m_delta_time);
+		//}
 
 		monkey.uniforms->at(0).value.mat4fv = view_matrix;
 		monkey.uniforms->at(1).value.mat4fv = monkey.obj->get_transformation_matrix();

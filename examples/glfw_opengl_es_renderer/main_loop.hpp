@@ -57,7 +57,6 @@ private:
 		std::unique_ptr<std::vector<vr::gl::uniform>> uniforms;
 		std::unique_ptr<vr::shader_material> material;
 		std::unique_ptr<vr::mesh> mesh;
-		glm::vec3 light_position;
 
 		std::uniform_real_distribution<> x_rand;
 		std::uniform_real_distribution<> y_rand;
@@ -78,7 +77,6 @@ private:
 				std::swap(uniforms, other.uniforms);
 				std::swap(material, other.material);
 				std::swap(mesh, other.mesh);
-				std::swap(light_position, other.light_position);
 				std::swap(x_rand, other.x_rand);
 				std::swap(y_rand, other.y_rand);
 				std::swap(z_rand, other.z_rand);
@@ -91,8 +89,6 @@ private:
 
 	const size_t n_monkeys = 2;
 	std::vector<monkey_instance> m_monkeys;
-
-
 
 	vr::scene m_scene;
 	vr::gl::renderer m_renderer;
