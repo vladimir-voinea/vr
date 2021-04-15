@@ -2,6 +2,7 @@
 
 #include "vr-opengl.h"
 
+#include <iostream>
 #include <stdexcept>
 
 namespace vr::gl
@@ -51,6 +52,8 @@ namespace vr::gl
 			std::swap(m_program_id, other.m_program_id);
 			std::swap(m_vertex_shader, other.m_vertex_shader);
 			std::swap(m_fragment_shader, other.m_fragment_shader);
+			std::swap(m_uniform_names, other.m_uniform_names);
+			std::swap(m_attribute_names, other.m_attribute_names);
 		}
 
 		return *this;
@@ -59,6 +62,16 @@ namespace vr::gl
 	GLuint shader_program::get_id() const
 	{
 		return m_program_id;
+	}
+
+	const std::vector<std::string>& shader_program::get_uniform_names() const
+	{
+		return m_uniform_names;
+	}
+
+	const std::vector<std::string>& shader_program::get_attribute_names() const
+	{
+		return m_attribute_names;
 	}
 
 	bool shader_program::link()
@@ -71,7 +84,13 @@ namespace vr::gl
 		GLint result = GL_FALSE;
 		glGetProgramiv(m_program_id, GL_LINK_STATUS, &result);
 
-		return result == GL_TRUE;
+		if (result == GL_TRUE)
+		{
+			store_uniform_and_attribute_names();
+			return true;
+		}
+
+		return false;
 	}
 
 	std::string shader_program::get_linkage_info()
@@ -87,5 +106,30 @@ namespace vr::gl
 		}
 
 		return compilation_info;
+	}
+	
+	void shader_program::store_uniform_and_attribute_names()
+	{
+		GLint uniforms = 0;
+		glGetProgramiv(m_program_id, GL_ACTIVE_UNIFORMS, &uniforms);
+		for (auto i = 0u; i < uniforms; ++i)
+		{
+			GLint size;
+			GLenum type;
+			char buf[GL_ACTIVE_UNIFORM_MAX_LENGTH];
+			glGetActiveUniform(m_program_id, i, GL_ACTIVE_UNIFORM_MAX_LENGTH, nullptr, &size, &type, buf);
+			m_uniform_names.push_back(buf);
+		}
+
+		GLint attributes = 0;
+		glGetProgramiv(m_program_id, GL_ACTIVE_ATTRIBUTES, &attributes);
+		for (auto i = 0u; i < attributes; ++i)
+		{
+			GLint size;
+			GLenum type;
+			char buf[GL_ACTIVE_ATTRIBUTE_MAX_LENGTH];
+			glGetActiveAttrib(m_program_id, i, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, nullptr, &size, &type, buf);
+			m_attribute_names.push_back(buf);
+		}
 	}
 }

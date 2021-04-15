@@ -1,11 +1,36 @@
 #include "texture_loader.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION 
+#include "stb_image.h"
+
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
 #define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
 
+#include <regex>
+
 namespace vr::gl
 {
+	GLuint load_stb(const std::string& path)
+	{
+		int width = 0;
+		int height = 0;
+		int channels = 0;
+
+		auto stb_result = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb);
+
+		GLuint texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, stb_result);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		stbi_image_free(stb_result);
+
+		return texture;
+	}
+
 	GLuint load_dds(const std::string& path)
 	{
 
@@ -96,5 +121,17 @@ namespace vr::gl
 		free(buffer);
 
 		return textureID;
+	}
+
+	GLuint load_texture(const std::string& path)
+	{
+		std::regex e("(.*)(\\.DDS)", std::regex::ECMAScript | std::regex::icase);
+		if (std::regex_match(path, e)) {
+			return load_dds(path);
+		}
+		else
+		{
+			return load_stb(path);
+		}
 	}
 }

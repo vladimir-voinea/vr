@@ -43,12 +43,4 @@ namespace vr::gl
 	{
 		loaded_vertex_array_object vao;
 	};
-
-	class object_on_gpu : public vr::renderer_object
-	{
-	public:
-		loaded_texture* texture;
-		loaded_geometry* vao;
-		loaded_shader* shader;
-	};
 }

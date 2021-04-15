@@ -5,5 +5,5 @@
 
 namespace vr::gl
 {
-	GLuint load_dds(const std::string& path);
+	GLuint load_texture(const std::string& path);
 }

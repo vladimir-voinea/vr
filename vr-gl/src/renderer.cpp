@@ -6,33 +6,85 @@
 #include <shader_material.hpp>
 
 #include <map>
+#include <iostream>
 
 namespace
 {
+	constexpr auto builtin_vertex_position_attribute_name = "vr_vertex_position";
+	constexpr auto builtin_vertex_normal_attribute_name = "vr_vertex_normal";
+	constexpr auto builtin_vertex_color_attribute_name = "vr_vertex_color";
+	constexpr auto builtin_vertex_uv_attribute_name = "vr_vertex_uv";
+
+	constexpr auto builtin_mvp_uniform_name = "vr_mvp";
+	constexpr auto builtin_view_uniform_name = "vr_view";
+	constexpr auto builtin_model_uniform_name = "vr_model";
+	constexpr auto builtin_texture_sampler_uniform_name = "vr_texture_sampler";
+
 	void load_uniform(const vr::gl::shader_program& program, const vr::gl::uniform& uniform)
 	{
-		const auto location = glGetUniformLocation(program.get_id(), uniform.name.c_str());
+		const auto& uniforms = program.get_uniform_names();
+		if (std::find(uniforms.begin(), uniforms.end(), uniform.name) != uniforms.end())
+		{
+			const auto location = glGetUniformLocation(program.get_id(), uniform.name.c_str());
 
-		using ut = vr::gl::uniform_type;
-		switch (uniform.type)
-		{
-		case ut::mat4fv:
-		{
-			glUniformMatrix4fv(location, 1, GL_FALSE, &uniform.value.mat4fv[0][0]);
-			break;
+			using ut = vr::gl::uniform_type;
+			switch (uniform.type)
+			{
+			case ut::mat4fv:
+			{
+				glUniformMatrix4fv(location, 1, GL_FALSE, &uniform.value.mat4fv[0][0]);
+				break;
+			}
+			case ut::vec3f:
+			{
+				const glm::vec3& value = uniform.value.vec3f;
+				glUniform3f(location, value.x, value.y, value.z);
+				break;
+			}
+			case ut::vec1i:
+			{
+				glUniform1i(location, uniform.value.vec1i);
+				break;
+			}
+			}
 		}
-		case ut::vec3f:
+		else
 		{
-			const glm::vec3& value = uniform.value.vec3f;
-			glUniform3f(location, value.x, value.y, value.z);
-			break;
+			if (uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_view_uniform_name &&
+				uniform.name != builtin_model_uniform_name && uniform.name != builtin_texture_sampler_uniform_name)
+			{
+				std::cout << "Uniform " << uniform.name << " not found\n";
+			}
 		}
-		case ut::vec1i:
-		{
-			glUniform1i(location, uniform.value.vec1i);
-			break;
-		}
-		}
+	}
+
+	void load_builtin_uniforms(const vr::gl::loaded_shader* shader, const vr::object3d* object, const vr::camera& camera)
+	{
+		const auto model_transformation = object->get_transformation_matrix();
+
+		vr::gl::uniform mvp_uniform;
+		mvp_uniform.name = builtin_mvp_uniform_name;
+		mvp_uniform.type = vr::gl::uniform_type::mat4fv;
+		mvp_uniform.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * model_transformation;
+		load_uniform(shader->program, mvp_uniform);
+
+		vr::gl::uniform view_uniform;
+		view_uniform.name = builtin_view_uniform_name;
+		view_uniform.type = vr::gl::uniform_type::mat4fv;
+		view_uniform.value.mat4fv = camera.get_view_matrix();
+		load_uniform(shader->program, view_uniform);
+
+		vr::gl::uniform model_uniform;
+		model_uniform.name = builtin_model_uniform_name;
+		model_uniform.type = vr::gl::uniform_type::mat4fv;
+		model_uniform.value.mat4fv = model_transformation;
+		load_uniform(shader->program, model_uniform);
+
+		vr::gl::uniform texture_sampler_uniform;
+		texture_sampler_uniform.name = builtin_texture_sampler_uniform_name;
+		mvp_uniform.type = vr::gl::uniform_type::vec1i;
+		mvp_uniform.value.vec1i = 0;
+		load_uniform(shader->program, texture_sampler_uniform);
 	}
 }
 
@@ -72,7 +124,7 @@ namespace vr::gl
 
 	vr::gl::loaded_texture load_texture(const texture* texture)
 	{
-		return { load_dds(texture->get_path()) };
+		return { load_texture(texture->get_path()) };
 	}
 
 	renderer::renderer()
@@ -102,7 +154,7 @@ namespace vr::gl
 			loaded_geometry* geometry = nullptr;
 			loaded_shader* shader = nullptr;
 			loaded_texture* texture = nullptr;
-			
+
 			if (!m_cache->get(mesh->get_geometry()))
 			{
 				geometry = m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
@@ -144,55 +196,48 @@ namespace vr::gl
 				m_last_shader_id = shader->program.get_id();
 			}
 
+			load_builtin_uniforms(shader, object, camera);
+
 			const auto gl_shader = static_cast<const opengl_shader_material*>(mesh->get_material());
-
-			uniform mvp_uniform;
-			mvp_uniform.name = "mvp";
-			mvp_uniform.type = uniform_type::mat4fv;
-			mvp_uniform.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * object->get_transformation_matrix();
-			load_uniform(shader->program, mvp_uniform);
-
-			uniform texture_sampler_uniform;
-			texture_sampler_uniform.name = "texture_sampler";
-			mvp_uniform.type = uniform_type::vec1i;
-			mvp_uniform.value.vec1i = 0;
-			load_uniform(shader->program, texture_sampler_uniform);
-
-			for (const auto& uniform : gl_shader->get_uniforms())
+			if (gl_shader->get_uniforms())
 			{
-				load_uniform(shader->program, uniform);
+				for (const auto& uniform : *gl_shader->get_uniforms())
+				{
+					load_uniform(shader->program, uniform);
+				}
 			}
 
 			glBindVertexArray(geometry->vao.id);
 			glBindBuffer(GL_ARRAY_BUFFER, geometry->vao.buffer.id);
 
-			if (true)
+			const auto& attributes = shader->program.get_attribute_names();
+			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_position_attribute_name) != attributes.end())
 			{
-				const auto position_attribute_location = glGetAttribLocation(shader->program.get_id(), "vertex_position_model");
+				const auto position_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_position_attribute_name);
 				glEnableVertexAttribArray(position_attribute_location);
 				const auto position_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::position);
 				glVertexAttribPointer(position_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(position_offset));
 			}
 
-			if (true)
+			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_normal_attribute_name) != attributes.end())
 			{
-				const auto normal_attribute_location = glGetAttribLocation(shader->program.get_id(), "vertex_normal_model");
+				const auto normal_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_normal_attribute_name);
 				glEnableVertexAttribArray(normal_attribute_location);
 				const auto normal_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::normal);
 				glVertexAttribPointer(normal_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(normal_offset));
 			}
 
-			if (false)
+			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_color_attribute_name) != attributes.end())
 			{
-				const auto color_attribute_location = glGetAttribLocation(shader->program.get_id(), "vertex_color");
+				const auto color_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_color_attribute_name);
 				glEnableVertexAttribArray(color_attribute_location);
 				const auto color_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::color);
 				glVertexAttribPointer(color_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(color_offset));
 			}
 
-			if (true)
+			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_uv_attribute_name) != attributes.end())
 			{
-				const auto uv_attribute_location = glGetAttribLocation(shader->program.get_id(), "vertex_uv_model");
+				const auto uv_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_uv_attribute_name);
 				glEnableVertexAttribArray(uv_attribute_location);
 				const auto uv_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::texcoords);
 				glVertexAttribPointer(uv_attribute_location, 2, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(uv_offset));
@@ -209,85 +254,3 @@ namespace vr::gl
 		}
 	}
 }
-
-//const auto& on_gpu = m_loaded_gpu_objects[&mesh];
-//const auto& projection_matrix = camera.get_projection_matrix();
-//const auto& view_matrix = camera.get_view_matrix();
-//const auto& model_matrix = glm::mat4(1.0f);// mesh.get_model_matrix();
-
-//glUseProgram(on_gpu.shader->program.get_id());
-//const auto mvp = projection_matrix * view_matrix * model_matrix;
-//const auto mvp_matrix_uniform_location = glGetUniformLocation(on_gpu.shader->program.get_id(), "mvp_matrix");
-//glUniformMatrix4fv(mvp_matrix_uniform_location, 1, GL_FALSE, &mvp[0][0]);
-
-
-//loaded_geometry* geometry = nullptr;
-//glBindVertexArray(geometry->vao.id);
-//glBindBuffer(GL_ARRAY_BUFFER, on_gpu.vao->buffer.id);
-
-//if (true)
-//{
-//	const auto position_attribute_location = glGetAttribLocation(on_gpu.shader->program.get_id(), "vertex_position_model");
-//	glEnableVertexAttribArray(position_attribute_location);
-//	const auto position_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::position);
-//	glVertexAttribPointer(position_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(position_offset));
-//}
-
-//if (true)
-//{
-//	const auto normal_attribute_location = glGetAttribLocation(on_gpu.shader->program.get_id(), "vertex_normal_model");
-//	glEnableVertexAttribArray(normal_attribute_location);
-//	const auto normal_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::normal);
-//	glVertexAttribPointer(normal_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(normal_offset));
-//}
-
-//if (true)
-//{
-//	const auto color_attribute_location = glGetAttribLocation(on_gpu.shader->program.get_id(), "vertex_color");
-//	glEnableVertexAttribArray(color_attribute_location);
-//	const auto color_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::color);
-//	glVertexAttribPointer(color_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(color_offset));
-//}
-
-//if (true)
-//{
-//	const auto uv_attribute_location = glGetAttribLocation(on_gpu.shader->program.get_id(), "vertex_uv_model");
-//	glEnableVertexAttribArray(uv_attribute_location);
-//	const auto uv_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::texcoords);
-//	glVertexAttribPointer(uv_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(uv_offset));
-//}
-
-//glBindBuffer(GL_ARRAY_BUFFER, on_gpu.vao->indices.id);
-
-//glDrawElements(GL_TRIANGLES, on_gpu.vao->indices_size, GL_UNSIGNED_SHORT, nullptr);
-//}
-
-	//object_on_gpu renderer::buffer_object(const mesh& mesh)
-	//{
-	//	object_on_gpu on_gpu;
-	//	on_gpu.m_corresponding_object = &mesh;
-
-	//	if (auto loaded_shader_it = m_loaded_shaders.find(&mesh.get_material()); loaded_shader_it == m_loaded_shaders.end())
-	//	{
-	//		auto loaded_shader = load_material(mesh.get_material());
-	//		auto [it, result] = m_loaded_shaders.emplace(&mesh.get_material(), std::move(loaded_shader));
-	//		on_gpu.shader = &it->second;
-	//	}
-	//	else
-	//	{
-	//		on_gpu.shader = &loaded_shader_it->second;
-	//	}
-
-	//	if (auto loaded_geometry_it = m_loaded_geometry.find(&mesh.get_geometry()); loaded_geometry_it == m_loaded_geometry.end())
-	//	{
-	//		auto loaded_buffers = load_geometry(mesh.get_geometry());
-	//		auto [it, result] = m_loaded_geometry.emplace(&mesh.get_geometry(), loaded_buffers);
-	//		on_gpu.vao = &it->second;
-	//	}
-	//	else
-	//	{
-	//		on_gpu.vao = &loaded_geometry_it->second;
-	//	}
-
-	//	return on_gpu;
-	//}

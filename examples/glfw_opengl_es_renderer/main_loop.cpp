@@ -43,8 +43,6 @@ main_loop::main_loop(vr::glfw::window& window)
 
 main_loop::~main_loop()
 {
-	delete m_monkey_data.shader;
-	delete m_monkey_data.texture;
 }
 
 void main_loop::initialize_controls()
@@ -158,41 +156,21 @@ void main_loop::init()
 
 	{
 		m_monkey_data.geometry = ::import_model("suzanne");
-		m_monkey_data.shader = new vr::gl::opengl_shader{ load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne") };
-		m_monkey_data.texture = new vr::texture("data/models/uvmap.DDS");
+		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
+		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.DDS");
+		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/cobblestone.png");
 	}
-
-	vr::gl::uniform v, m, light_position;
-	v.name = "v";
-	v.type = vr::gl::uniform_type::mat4fv;
-	m.name = "m";
-	m.type = vr::gl::uniform_type::mat4fv;
-	light_position.name = "light_position_world";
-	light_position.type = vr::gl::uniform_type::vec3f;
-	light_position.value.vec3f = glm::vec3(4, 4, 4);
 
 	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
 	std::uniform_real_distribution<> limits_p(0.f, 5.f);
 
 	for (auto i = 0u; i < n_monkeys; ++i)
 	{
-		vr::gl::uniform v, m, light_position;
-		v.name = "v";
-		v.type = vr::gl::uniform_type::mat4fv;
-		m.name = "m";
-		m.type = vr::gl::uniform_type::mat4fv;
-		light_position.name = "light_position_world";
-		light_position.type = vr::gl::uniform_type::vec3f;
-
 		monkey_instance inst;
 		inst.obj = std::make_unique<vr::object3d>();
-		inst.uniforms = std::make_unique<std::vector<vr::gl::uniform>>();
-		inst.uniforms->push_back(v);
-		inst.uniforms->push_back(m);
-		inst.uniforms->push_back(light_position);
 
-		inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, *inst.uniforms);
-		inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, inst.material.get(), m_monkey_data.texture);
+		inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, inst.uniforms.get());
+		inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, inst.material.get(), i ? m_monkey_data.texture_uvmap.get() : m_monkey_data.texture_cobblestone.get());
 
 		inst.obj->add_mesh(inst.mesh.get());
 
@@ -266,24 +244,22 @@ void main_loop::render_scene()
 		return glm::normalize(glm::vec3(axis_rand(m_random_engine), axis_rand(m_random_engine), axis_rand(m_random_engine)));
 	};
 
-	for (auto i = 0; i < m_monkeys.size(); ++i)
-	{
-		auto& monkey = m_monkeys[i];
-		
-		if (!i) {
-			const auto rotation_angle = p_or_n() * 30.f;
-			monkey.obj->rotate(random_axis(), rotation_angle * m_delta_time);
-		}
+	m_monkeys.front().obj->rotate(vr::z_axis, 2.f * m_delta_time);
+
+	//for (auto i = 0; i < m_monkeys.size(); ++i)
+	//{
+	//	auto& monkey = m_monkeys[i];
+	//	
+	//	if (!i) {
+	//		const auto rotation_angle = p_or_n() * 2.f;
+	//		monkey.obj->rotate(vr::z_axis, rotation_angle * m_delta_time);
+	//	}
 
 		//if (i) {
 		//	auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
 		//	monkey.obj->translate(monkey.obj->get_translation() + new_position * m_delta_time);
 		//}
-
-		monkey.uniforms->at(0).value.mat4fv = view_matrix;
-		monkey.uniforms->at(1).value.mat4fv = monkey.obj->get_transformation_matrix();
-		monkey.uniforms->at(2).value.vec3f = monkey.obj->get_translation() + light_direction_from_object;
-	}
+	//}
 
 	m_renderer.render(m_scene, *m_camera);
 

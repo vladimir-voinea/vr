@@ -47,8 +47,9 @@ private:
 
 	struct monkey_data {
 		vr::geometry geometry;
-		vr::gl::opengl_shader* shader = nullptr;
-		vr::texture* texture = nullptr;
+		std::unique_ptr<vr::gl::opengl_shader> shader = nullptr;
+		std::unique_ptr<vr::texture> texture_uvmap = nullptr;
+		std::unique_ptr<vr::texture> texture_cobblestone = nullptr;
 	};
 	monkey_data m_monkey_data;
 
