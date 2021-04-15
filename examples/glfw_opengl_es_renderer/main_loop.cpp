@@ -73,15 +73,17 @@ void main_loop::process_input()
 
 void main_loop::print_state()
 {
-	std::cout << "Position: "
-		<< m_camera->get_position().x << ", "
-		<< m_camera->get_position().y << ", "
-		<< m_camera->get_position().z << '\n';
+	//std::cout << "Position: "
+	//	<< m_camera->get_position().x << ", "
+	//	<< m_camera->get_position().y << ", "
+	//	<< m_camera->get_position().z << '\n';
 
-	std::cout << "Direction: " <<
-		m_camera->get_direction().x << ", "
-		<< m_camera->get_direction().y << ", "
-		<< m_camera->get_direction().z << '\n';
+	//std::cout << "Direction: " <<
+	//	m_camera->get_direction().x << ", "
+	//	<< m_camera->get_direction().y << ", "
+	//	<< m_camera->get_direction().z << '\n';
+
+	std::cout << "FPS: " << m_fps_counter->get_fps() << '\n';
 }
 
 vr::geometry import_model(const std::string& name)
@@ -199,6 +201,7 @@ void main_loop::init()
 	}
 
 	m_last_timestamp = vr::glfw::get_time();
+	m_fps_counter = std::make_unique<fps_counter>(m_last_timestamp);
 }
 
 
@@ -207,6 +210,8 @@ void main_loop::render_scene()
 	const auto current_time = static_cast<float>(vr::glfw::get_time());
 	m_delta_time = current_time - m_last_timestamp;
 	m_last_timestamp = current_time;
+
+	m_fps_counter->frame(current_time);
 
 	const auto projection_matrix = m_camera->get_projection_matrix();
 	const auto view_matrix = m_camera->get_view_matrix();

@@ -2,6 +2,7 @@
 
 #include "shaders.hpp"
 #include "user_controls.hpp"
+#include "fps_counter.hpp"
 
 #include <glfw_window.hpp>
 #include <glfw_keyboard.hpp>
@@ -88,11 +89,12 @@ private:
 
 	std::default_random_engine m_random_engine;
 
-	const size_t n_monkeys = 500;
+	const size_t n_monkeys = 5000;
 	std::vector<monkey_instance> m_monkeys;
 
 
 
 	vr::scene m_scene;
 	vr::gl::renderer m_renderer;
+	std::unique_ptr<fps_counter> m_fps_counter;
 };

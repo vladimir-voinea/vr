@@ -24,5 +24,5 @@ add_subdirectory ("vr-vk")
 
 # examples directory
 add_subdirectory ("examples")
-
+set(CMAKE_CXX_FLAGS "/O2")
 message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")
