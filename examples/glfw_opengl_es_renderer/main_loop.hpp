@@ -88,7 +88,7 @@ private:
 
 	std::default_random_engine m_random_engine;
 
-	const size_t n_monkeys = 50;
+	const size_t n_monkeys = 500;
 	std::vector<monkey_instance> m_monkeys;
 
 

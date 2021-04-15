@@ -216,15 +216,15 @@ void main_loop::render_scene()
 	std::bernoulli_distribution true_or_false;
 	auto p_or_n = [&, true_or_false, this]() -> int { return  true_or_false(m_random_engine) ? 1 : -1; };
 
-	std::uniform_int_distribution distance_rand(1, 50);
+	std::uniform_int_distribution distance_rand(1, 20);
 	int light_distance_from_object = distance_rand(m_random_engine);
+	auto light_direction_from_object = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
 
 	for (auto i = 0; i < m_monkeys.size(); ++i)
 	{
 		auto& monkey = m_monkeys[i];
 		
 		auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
-		auto light_direction_from_object = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
 
 		monkey.obj->set_position(monkey.obj->get_position() + new_position * m_delta_time);
 		monkey.uniforms->at(0).value.mat4fv = view_matrix;
