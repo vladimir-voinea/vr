@@ -14,6 +14,11 @@ namespace vr
 		return m_parent;
 	}
 
+	const object3d* object3d::get_parent() const
+	{
+		return m_parent;
+	}
+
 	void object3d::set_parent(object3d* parent)
 	{
 		m_parent = parent;
@@ -56,10 +61,18 @@ namespace vr
 
 	glm::mat4 object3d::get_transformation_matrix() const
 	{
-		const auto rot = glm::toMat4(glm::quat(m_rotation));
-		const auto trans = glm::translate(glm::mat4(1.0f), m_position);
+		const auto rotation = glm::toMat4(glm::quat(get_rotation()));
+		const auto transation = glm::translate(glm::mat4(1.0f), get_position());
+		const auto transformation = transation * rotation;
 
-		return trans * rot;
+		if (get_parent() != nullptr)
+		{
+			return get_parent()->get_transformation_matrix() * transformation;
+		}
+		else
+		{
+			return transformation;
+		}
 	}
 
 	const glm::vec3& object3d::get_rotation() const

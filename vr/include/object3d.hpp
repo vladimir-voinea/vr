@@ -17,6 +17,7 @@ namespace vr
 		object3d();
 
 		object3d* get_parent();
+		const object3d* get_parent() const;
 		void set_parent(object3d*);
 
 		const std::vector<object3d*>& get_children() const;
