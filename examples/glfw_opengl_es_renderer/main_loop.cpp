@@ -135,6 +135,9 @@ void main_loop::init()
 	initialize_controls();
 	initialize_position();
 
+	std::random_device dev;
+	m_random_engine = std::default_random_engine(dev());
+
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(opengl_debug_callback, nullptr);
 
@@ -154,38 +157,45 @@ void main_loop::init()
 	vr::gl::uniform v, m, light_position;
 	v.name = "v";
 	v.type = vr::gl::uniform_type::mat4fv;
-	v.value.mat4fv = glm::mat4(1.0f);
 	m.name = "m";
 	m.type = vr::gl::uniform_type::mat4fv;
-	m.value.mat4fv = glm::mat4(1.0f);
 	light_position.name = "light_position_world";
 	light_position.type = vr::gl::uniform_type::vec3f;
 	light_position.value.vec3f = glm::vec3(4, 4, 4);
 
+	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
+	std::uniform_real_distribution<> limits_p(0.f, 5.f);
+
+	for (auto i = 0u; i < n_monkeys; ++i)
 	{
-		m1.uniforms.push_back(v);
-		m1.uniforms.push_back(m);
-		m1.uniforms.push_back(light_position);
+		vr::gl::uniform v, m, light_position;
+		v.name = "v";
+		v.type = vr::gl::uniform_type::mat4fv;
+		m.name = "m";
+		m.type = vr::gl::uniform_type::mat4fv;
+		light_position.name = "light_position_world";
+		light_position.type = vr::gl::uniform_type::vec3f;
 
-		m1.material = new vr::gl::opengl_shader_material(*m_monkey_data.shader, m1.uniforms);
-		m1.mesh = new vr::mesh{ &m_monkey_data.geometry, m1.material, m_monkey_data.texture };
-		m1.obj = new vr::object3d{};
-		m1.obj->add_mesh(m1.mesh);
+		monkey_instance inst;
+		inst.obj = std::make_unique<vr::object3d>();
+		inst.uniforms = std::make_unique<std::vector<vr::gl::uniform>>();
+		inst.uniforms->push_back(v);
+		inst.uniforms->push_back(m);
+		inst.uniforms->push_back(light_position);
 
-		m_scene.add(m1.obj);
-	}
+		inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, *inst.uniforms);
+		inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, inst.material.get(), m_monkey_data.texture);
 
-	{
-		m2.uniforms.push_back(v);
-		m2.uniforms.push_back(m);
-		m2.uniforms.push_back(light_position);
+		inst.obj->add_mesh(inst.mesh.get());
 
-		m2.material = new vr::gl::opengl_shader_material(*m_monkey_data.shader, m2.uniforms);
-		m2.mesh = new vr::mesh{ &m_monkey_data.geometry, m2.material, m_monkey_data.texture };
-		m2.obj = new vr::object3d{};
-		m2.obj->add_mesh(m2.mesh);
+		inst.x_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
+		inst.y_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
+		inst.z_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
+		//inst.light_position = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
 
-		m_scene.add(m2.obj);
+		m_monkeys.push_back(std::move(inst));
+		m_scene.add(m_monkeys.back().obj.get());
+
 	}
 
 	m_last_timestamp = vr::glfw::get_time();
@@ -203,17 +213,23 @@ void main_loop::render_scene()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	std::bernoulli_distribution true_or_false;
+	auto p_or_n = [&, true_or_false, this]() -> int { return  true_or_false(m_random_engine) ? 1 : -1; };
+
+	std::uniform_int_distribution distance_rand(1, 50);
+	int light_distance_from_object = distance_rand(m_random_engine);
+
+	for (auto i = 0; i < m_monkeys.size(); ++i)
 	{
-		auto mk = m1.obj;
-		mk->set_position(mk->get_position() + glm::vec3(0.5, 0.0, 0.0) * m_delta_time);
-		m1.uniforms[0].value.mat4fv = view_matrix;
-		m1.uniforms[1].value.mat4fv = mk->get_transformation_matrix();
-	}
-	{
-		auto mk2 = m2.obj;
-		mk2->set_position(mk2->get_position() + glm::vec3(0.25, 0.0, 0.0) * m_delta_time);
-		m2.uniforms[0].value.mat4fv = view_matrix;
-		m2.uniforms[1].value.mat4fv = mk2->get_transformation_matrix();
+		auto& monkey = m_monkeys[i];
+		
+		auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
+		auto light_direction_from_object = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
+
+		monkey.obj->set_position(monkey.obj->get_position() + new_position * m_delta_time);
+		monkey.uniforms->at(0).value.mat4fv = view_matrix;
+		monkey.uniforms->at(1).value.mat4fv = monkey.obj->get_transformation_matrix();
+		monkey.uniforms->at(2).value.vec3f = monkey.obj->get_position() + light_direction_from_object;
 	}
 
 	m_renderer.render(m_scene, *m_camera);

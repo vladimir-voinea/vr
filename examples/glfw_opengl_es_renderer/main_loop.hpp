@@ -13,6 +13,7 @@
 #include <vr.hpp>
 
 #include <memory>
+#include <random>
 
 class main_loop
 {
@@ -51,14 +52,46 @@ private:
 	monkey_data m_monkey_data;
 
 	struct monkey_instance {
-		vr::object3d* obj = nullptr;
-		std::vector<vr::gl::uniform> uniforms;
-		vr::shader_material* material = nullptr;
-		vr::mesh* mesh;
+		std::unique_ptr<vr::object3d> obj;
+		std::unique_ptr<std::vector<vr::gl::uniform>> uniforms;
+		std::unique_ptr<vr::shader_material> material;
+		std::unique_ptr<vr::mesh> mesh;
+		glm::vec3 light_position;
+
+		std::uniform_real_distribution<> x_rand;
+		std::uniform_real_distribution<> y_rand;
+		std::uniform_real_distribution<> z_rand;
+
+		monkey_instance() = default;
+
+		monkey_instance(monkey_instance&& other)
+		{
+			*this = std::move(other);
+		}
+
+		monkey_instance& operator=(monkey_instance&& other)
+		{
+			if (this != &other)
+			{
+				std::swap(obj, other.obj);
+				std::swap(uniforms, other.uniforms);
+				std::swap(material, other.material);
+				std::swap(mesh, other.mesh);
+				std::swap(light_position, other.light_position);
+				std::swap(x_rand, other.x_rand);
+				std::swap(y_rand, other.y_rand);
+				std::swap(z_rand, other.z_rand);
+			}
+			return *this;
+		}
 	};
 
-	monkey_instance m1;
-	monkey_instance m2;
+	std::default_random_engine m_random_engine;
+
+	const size_t n_monkeys = 50;
+	std::vector<monkey_instance> m_monkeys;
+
+
 
 	vr::scene m_scene;
 	vr::gl::renderer m_renderer;
