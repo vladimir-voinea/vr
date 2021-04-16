@@ -88,22 +88,9 @@ namespace
 		load_uniform(shader->program, texture_sampler_uniform);
 	}
 
-	void initialize_glew()
+	vr::gl::loaded_geometry load_geometry(const vr::geometry* geometry)
 	{
-		glewExperimental = GL_TRUE;
-		const auto glew_initialization = glewInit();
-		if (glew_initialization != GLEW_OK)
-		{
-			throw std::runtime_error("Could not initialize glew");
-		}
-	}
-}
-
-namespace vr::gl
-{
-	loaded_geometry load_geometry(const geometry* geometry)
-	{
-		loaded_geometry loaded_geometry;
+		vr::gl::loaded_geometry loaded_geometry;
 		vr::gl::loaded_vertex_array_object vao;
 
 		glGenVertexArrays(1, &vao.id);
@@ -123,7 +110,7 @@ namespace vr::gl
 		return loaded_geometry;
 	}
 
-	vr::gl::loaded_shader load_shader(const opengl_shader& shader)
+	vr::gl::loaded_shader load_shader(const vr::gl::opengl_shader& shader)
 	{
 		vr::gl::loaded_shader loaded_shader;
 		loaded_shader.vertex = vr::gl::shader(vr::gl::shader::type::vertex, shader.get_vertex_shader_source());
@@ -133,10 +120,25 @@ namespace vr::gl
 		return loaded_shader;
 	}
 
-	vr::gl::loaded_texture load_texture(const texture* texture)
+	vr::gl::loaded_texture load_texture(const vr::texture* texture)
 	{
-		return { load_texture(texture->get_path()) };
+		return { vr::gl::load_texture(texture->get_path()) };
 	}
+
+	void initialize_glew()
+	{
+		glewExperimental = GL_TRUE;
+		const auto glew_initialization = glewInit();
+		if (glew_initialization != GLEW_OK)
+		{
+			throw std::runtime_error("Could not initialize glew");
+		}
+	}
+}
+
+namespace vr::gl
+{
+
 
 	renderer::renderer(const renderer_settings& settings)
 		: m_settings(settings)
@@ -198,7 +200,7 @@ namespace vr::gl
 			}
 			if (!m_cache->get(mesh->get_texture()))
 			{
-				texture = m_cache->set(mesh->get_texture(), load_texture(mesh->get_texture()));
+				texture = m_cache->set(mesh->get_texture(), ::load_texture(mesh->get_texture()));
 			}
 		}
 
