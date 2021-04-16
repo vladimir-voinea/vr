@@ -24,9 +24,11 @@ namespace vr::gl
 
 	private:
 		void load_object(object3d* object);
+		void load_skybox(const skybox* skybox);
 
 	private:
-		void render_object(const vr::object3d* object, const vr::camera& camera);
+		void render_object(const object3d* object, const camera& camera);
+		void render_skybox(const skybox* skybox, const camera& camera);
 
 	private:
 		const renderer_settings& m_settings;

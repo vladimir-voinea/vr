@@ -11,6 +11,7 @@ namespace
 		layout(location = 3) in vec2 vr_vertex_uv;
 
 		uniform mat4 vr_mvp;
+		uniform mat4 vr_projection;
 		uniform mat4 vr_view;
 		uniform mat4 vr_model;
 

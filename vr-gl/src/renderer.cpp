@@ -1,5 +1,6 @@
 #include "renderer.hpp"
 #include "opengl_shader_material.hpp"
+#include "cube_texture_material.hpp"
 #include "gpu_objects.hpp"
 #include "renderer_cache.hpp"
 #include "texture_loader.hpp"
@@ -20,6 +21,7 @@ namespace
 	constexpr auto builtin_vertex_uv_attribute_name = "vr_vertex_uv";
 
 	constexpr auto builtin_mvp_uniform_name = "vr_mvp";
+	constexpr auto builtin_projection_uniform_name = "vr_projection";
 	constexpr auto builtin_view_uniform_name = "vr_view";
 	constexpr auto builtin_model_uniform_name = "vr_model";
 	constexpr auto builtin_texture_sampler_uniform_name = "vr_texture_sampler";
@@ -60,10 +62,11 @@ namespace
 		}
 		else
 		{
-			if (uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_view_uniform_name &&
-				uniform.name != builtin_model_uniform_name && uniform.name != builtin_texture_sampler_uniform_name)
+			if (uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_projection_uniform_name &&
+				uniform.name != builtin_view_uniform_name && uniform.name != builtin_model_uniform_name && 
+				uniform.name != builtin_texture_sampler_uniform_name)
 			{
-				spdlog::error("Uniform {0} not found");
+				spdlog::error("Uniform {0} not found", uniform.name);
 			}
 		}
 	}
@@ -77,6 +80,12 @@ namespace
 		mvp_uniform.type = vr::gl::uniform_type::mat4fv;
 		mvp_uniform.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * model_transformation;
 		load_uniform(shader->program, mvp_uniform);
+
+		vr::gl::uniform projection_uniform;
+		projection_uniform.name = builtin_projection_uniform_name;
+		projection_uniform.type = vr::gl::uniform_type::mat4fv;
+		projection_uniform.value.mat4fv = camera.get_projection_matrix();
+		load_uniform(shader->program, projection_uniform);
 
 		vr::gl::uniform view_uniform;
 		view_uniform.name = builtin_view_uniform_name;
@@ -152,7 +161,12 @@ namespace
 
 	vr::gl::loaded_texture load_texture(const vr::texture* texture)
 	{
-		return { vr::gl::load_texture(texture->get_path()) };
+		return { vr::gl::load_texture(texture) };
+	}
+
+	vr::gl::loaded_texture load_texture(const vr::cube_texture* texture)
+	{
+		return { vr::gl::load_texture(texture) };
 	}
 
 	int convert_to_gl_enum(const vr::attribute::data_type& type)
@@ -198,9 +212,6 @@ namespace vr::gl
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(opengl_debug_callback, nullptr);
 
-		const auto clear_color = glm::normalize(glm::vec3(m_settings.clear_color.x, m_settings.clear_color.y, m_settings.clear_color.z));
-		glClearColor(clear_color.r, clear_color.g, clear_color.b, 0.0f);
-
 		if (m_settings.cull_faces)
 		{
 			glEnable(GL_CULL_FACE);
@@ -220,6 +231,12 @@ namespace vr::gl
 
 	void renderer::render(vr::scene& scene, const vr::camera& camera)
 	{
+		if (m_settings.clear_color)
+		{
+			const auto clear_color = glm::normalize(glm::vec3(m_settings.clear_color->x, m_settings.clear_color->y, m_settings.clear_color->z));
+			glClearColor(clear_color.r, clear_color.g, clear_color.b, 0.0f);
+		}
+
 		for (auto object : scene.get_objects())
 		{
 			load_object(object);
@@ -229,6 +246,101 @@ namespace vr::gl
 		{
 			render_object(object, camera);
 		}
+
+		if (m_settings.skybox)
+		{
+			load_skybox(m_settings.skybox.get());
+			render_skybox(m_settings.skybox.get(), camera);
+		}
+	}
+
+	void renderer::load_skybox(const skybox* skybox)
+	{
+		loaded_texture* texture = nullptr;
+		loaded_geometry* geometry = nullptr;
+		loaded_shader* shader = nullptr;
+		if (!m_cache->get(skybox->get_texture()))
+		{
+			texture = m_cache->set(skybox->get_texture(), ::load_texture(skybox->get_texture()));
+		}
+		if (!m_cache->get(m_settings.skybox->get_geometry()))
+		{
+			geometry = m_cache->set(skybox->get_geometry(), load_geometry(skybox->get_geometry()));
+		}
+		if (const auto opengl_shader = &static_cast<const opengl_shader_material*>(skybox->get_material())->get_shader(); !m_cache->get(opengl_shader))
+		{
+			shader = m_cache->set(opengl_shader, load_shader(*opengl_shader));
+		}
+	}
+
+	void renderer::render_skybox(const skybox* skybox, const camera& camera)
+	{
+		glDepthFunc(GL_LEQUAL);
+		glDisable(GL_CULL_FACE);
+
+		auto cube_texture = m_cache->get(skybox->get_texture());
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cube_texture->id);
+
+		const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(skybox->get_material())->get_shader());
+		glUseProgram(shader->program.get_id());
+		m_last_shader_id = shader->program.get_id();
+
+		vr::gl::uniform projection_uniform;
+		projection_uniform.name = builtin_projection_uniform_name;
+		projection_uniform.type = vr::gl::uniform_type::mat4fv;
+		projection_uniform.value.mat4fv = camera.get_projection_matrix();
+		load_uniform(shader->program, projection_uniform);
+
+		vr::gl::uniform view_uniform;
+		view_uniform.name = builtin_view_uniform_name;
+		view_uniform.type = vr::gl::uniform_type::mat4fv;
+		view_uniform.value.mat4fv = glm::mat4(glm::mat3(camera.get_view_matrix()));
+		load_uniform(shader->program, view_uniform);
+		
+		const auto gl_shader = static_cast<const opengl_shader_material*>(skybox->get_material());
+		if (gl_shader->get_uniforms())
+		{
+			for (const auto& uniform : *gl_shader->get_uniforms())
+			{
+				load_uniform(shader->program, uniform);
+			}
+		}
+
+		const auto geometry = m_cache->get(skybox->get_geometry());
+
+		glBindVertexArray(geometry->vao.id);
+		glBindBuffer(GL_ARRAY_BUFFER, geometry->vao.buffer.id);
+
+		ptrdiff_t accumulated_offset = 0;
+		std::vector<GLint> bound_attributes;
+		const auto& shader_attributes = shader->program.get_attribute_names();
+		for (const auto& attribute : skybox->get_geometry()->attributes)
+		{
+			const auto& name = attribute.first;
+			if (std::find(shader_attributes.begin(), shader_attributes.end(), name) != shader_attributes.end())
+			{
+				const auto attribute_location = glGetAttribLocation(shader->program.get_id(), name.c_str());
+				glEnableVertexAttribArray(attribute_location);
+				glVertexAttribPointer(attribute_location, geometry->vao.buffer.loaded_attributes[name].components,
+					::convert_to_gl_enum(geometry->vao.buffer.loaded_attributes[name].type), GL_FALSE, 0,
+					static_cast<const void*>(static_cast<const uint8_t*>(nullptr) + geometry->vao.buffer.loaded_attributes[name].start));
+				accumulated_offset += attribute.second.data.size();
+				bound_attributes.push_back(attribute_location);
+			}
+		}
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->vao.indices.id);
+
+		glDrawElements(GL_TRIANGLES, geometry->vao.indices_size, GL_UNSIGNED_SHORT, nullptr);
+
+		for (const auto& bound_attribute : bound_attributes)
+		{
+			glDisableVertexAttribArray(bound_attribute);
+		}
+
+		glEnable(GL_CULL_FACE);
+		glDepthFunc(GL_LESS);
 	}
 
 	void renderer::load_object(object3d* object)

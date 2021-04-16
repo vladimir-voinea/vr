@@ -11,3 +11,4 @@
 #include "shader_material.hpp"
 #include "texture.hpp"
 #include "vertex.hpp"
+#include "cube_texture.hpp"

@@ -4,6 +4,8 @@
 #include "shader_loader.hpp"
 #include "texture_loader.hpp"
 
+#include <cube_texture_material.hpp>
+
 #include <glfw_util.hpp>
 
 #include <glm/glm.hpp>
@@ -90,6 +92,7 @@ vr::geometry import_model(const std::string& name)
 
 	{
 		geometry.attributes["vr_vertex_position"].components = 3;
+		geometry.attributes["vr_vertex_position"].type = vr::attribute::data_type::t_float;
 		const auto begin = reinterpret_cast<const uint8_t*>(mesh->mVertices);
 		const auto end = reinterpret_cast<const uint8_t*>(&mesh->mVertices[mesh->mNumVertices]);
 		std::copy(begin, end, std::back_inserter(geometry.attributes["vr_vertex_position"].data));
@@ -105,6 +108,7 @@ vr::geometry import_model(const std::string& name)
 	if (mesh->HasNormals())
 	{
 		geometry.attributes["vr_vertex_normal"].components = 3;
+		geometry.attributes["vr_vertex_normal"].type = vr::attribute::data_type::t_float;
 		const auto begin = reinterpret_cast<const uint8_t*>(mesh->mNormals);
 		std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)), std::back_inserter(geometry.attributes["vr_vertex_normal"].data));
 	}
@@ -112,12 +116,14 @@ vr::geometry import_model(const std::string& name)
 	if (mesh->HasVertexColors(0))
 	{
 		geometry.attributes["vr_vertex_color"].components = 4;
+		geometry.attributes["vr_vertex_color"].type = vr::attribute::data_type::t_float;
 		const auto begin = reinterpret_cast<const uint8_t*>(mesh->mColors);
 		std::copy(begin, begin + mesh->mNumVertices + sizeof(decltype(*mesh->mColors)), std::back_inserter(geometry.attributes["vr_vertex_color"].data));
 	}
 
 	if (mesh->HasTextureCoords(0))
 	{
+		geometry.attributes["vr_vertex_uv"].type = vr::attribute::data_type::t_float;
 		geometry.attributes["vr_vertex_uv"].components = 2;
 		for (auto i = 0u; i < mesh->mNumVertices; ++i)
 		{
@@ -132,10 +138,21 @@ vr::geometry import_model(const std::string& name)
 
 void main_loop::init()
 {
-	m_renderer_settings.clear_color = glm::vec3(66, 155, 245);
+	m_cube_texture = std::make_unique<vr::cube_texture>(std::unordered_map<std::string, std::string>{
+		{ vr::cube_texture::p_x, "data/skybox/right.jpg" },
+		{ vr::cube_texture::n_x, "data/skybox/left.jpg" },
+		{ vr::cube_texture::p_y, "data/skybox/top.jpg" },
+		{ vr::cube_texture::n_y, "data/skybox/bottom.jpg" },
+		{ vr::cube_texture::n_z, "data/skybox/back.jpg" },
+		{ vr::cube_texture::p_z, "data/skybox/front.jpg" }
+	});
+	m_skybox_material = std::make_unique<vr::gl::cube_texture_material>();
+
+	m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
+	//m_renderer_settings.clear_color = std::make_unique<glm::vec3>(66, 155, 245);
+	
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
-
 	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
 
 	initialize_controls();

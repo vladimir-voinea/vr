@@ -40,6 +40,7 @@ namespace vr::gl
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, value);
 
 		stbi_image_free(stb_result);
+		stbi_set_flip_vertically_on_load(false);
 
 		return texture;
 	}
@@ -136,15 +137,62 @@ namespace vr::gl
 		return textureID;
 	}
 
-	GLuint load_texture(const std::string& path)
+
+	GLuint load_texture(const cube_texture* texture)
+	{
+		int width = 0;
+		int height = 0;
+		int channels = 0;
+
+		stbi_set_flip_vertically_on_load(false);
+		auto px_data = stbi_load(texture->get_paths().find(cube_texture::p_x)->second.c_str(), &width, &height, &channels, STBI_rgb);
+		auto nx_data = stbi_load(texture->get_paths().find(cube_texture::n_x)->second.c_str(), &width, &height, &channels, STBI_rgb);
+		auto py_data = stbi_load(texture->get_paths().find(cube_texture::p_y)->second.c_str(), &width, &height, &channels, STBI_rgb);
+		auto ny_data = stbi_load(texture->get_paths().find(cube_texture::n_y)->second.c_str(), &width, &height, &channels, STBI_rgb);
+		auto pz_data = stbi_load(texture->get_paths().find(cube_texture::p_z)->second.c_str(), &width, &height, &channels, STBI_rgb);
+		auto nz_data = stbi_load(texture->get_paths().find(cube_texture::n_z)->second.c_str(), &width, &height, &channels, STBI_rgb);
+
+		GLuint texture_id;
+		glGenTextures(1, &texture_id);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
+
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, px_data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nx_data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, py_data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ny_data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pz_data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nz_data);
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+		GLfloat value;
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &value);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, value);
+
+		stbi_image_free(px_data);
+		stbi_image_free(nx_data);
+		stbi_image_free(py_data);
+		stbi_image_free(ny_data);
+		stbi_image_free(pz_data);
+		stbi_image_free(nz_data);
+
+		return texture_id;
+	}
+
+	GLuint load_texture(const texture* texture)
 	{
 		std::regex e("(.*)(\\.DDS)", std::regex::ECMAScript | std::regex::icase);
-		if (std::regex_match(path, e)) {
-			return load_dds(path);
+		if (std::regex_match(texture->get_path(), e)) {
+			return load_dds(texture->get_path());
 		}
 		else
 		{
-			return load_stb(path);
+			return load_stb(texture->get_path());
 		}
 	}
 }

@@ -42,8 +42,13 @@ private:
 	std::unique_ptr<vr::camera> m_camera;
 
 	vr::scene m_scene;
+
+	std::unique_ptr<vr::cube_texture> m_cube_texture;
+	std::unique_ptr<vr::shader_material> m_skybox_material;
+
 	vr::gl::renderer_settings m_renderer_settings;
 	std::unique_ptr<vr::gl::renderer> m_renderer;
+	
 	std::unique_ptr<fps_counter> m_fps_counter;
 
 	user_controls m_controls;
