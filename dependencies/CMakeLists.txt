@@ -12,3 +12,5 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory ("gtest")
 
 add_subdirectory ("assimp")
+
+add_subdirectory ("spdlog")
