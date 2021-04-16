@@ -8,6 +8,8 @@
 
 #include <map>
 #include <iostream>
+#include <algorithm>
+#include <numeric>
 
 namespace
 {
@@ -34,6 +36,12 @@ namespace
 			case ut::mat4fv:
 			{
 				glUniformMatrix4fv(location, 1, GL_FALSE, &uniform.value.mat4fv[0][0]);
+				break;
+			}
+			case ut::vec4f:
+			{
+				const glm::vec4& value = uniform.value.vec4f;
+				glUniform4f(location, value.x, value.y, value.z, value.w);
 				break;
 			}
 			case ut::vec3f:
@@ -96,13 +104,34 @@ namespace
 		glGenVertexArrays(1, &vao.id);
 		glBindVertexArray(vao.id);
 
+		GLsizeiptr buffer_size = 0;
+		for (const auto& attribute : geometry->attributes)
+		{
+			buffer_size += attribute.second.data.size();
+		}
+
 		glGenBuffers(1, &vao.buffer.id);
 		glBindBuffer(GL_ARRAY_BUFFER, vao.buffer.id);
-		glBufferData(GL_ARRAY_BUFFER, geometry->vertices.size() * sizeof(vr::geometry::vertex_type), geometry->vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
+
+		uint64_t accumulated_offset = 0;
+		for (const auto& attribute : geometry->attributes)
+		{
+			glBufferSubData(GL_ARRAY_BUFFER, accumulated_offset, attribute.second.data.size(), attribute.second.data.data());
+
+			vr::gl::vertex_buffer::attribute_layout layout;
+			layout.start = accumulated_offset;
+			layout.size = attribute.second.data.size();
+			layout.type = attribute.second.type;
+			layout.components = attribute.second.components;
+			vao.buffer.loaded_attributes[attribute.first] = layout;
+
+			accumulated_offset += attribute.second.data.size();
+		}
 
 		glGenBuffers(1, &vao.indices.id);
 		glBindBuffer(GL_ARRAY_BUFFER, vao.indices.id);
-		glBufferData(GL_ARRAY_BUFFER, geometry->indices.size() * sizeof(vr::geometry::index_type), geometry->indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, geometry->indices.size() * sizeof(decltype(geometry->indices)::value_type), geometry->indices.data(), GL_STATIC_DRAW);
 		vao.indices_size = geometry->indices.size();
 
 		loaded_geometry.vao = vao;
@@ -123,6 +152,25 @@ namespace
 	vr::gl::loaded_texture load_texture(const vr::texture* texture)
 	{
 		return { vr::gl::load_texture(texture->get_path()) };
+	}
+
+	int convert_to_gl_enum(const vr::attribute::data_type& type)
+	{
+		int result = 0;
+		switch (type)
+		{
+		case vr::attribute::data_type::t_float:
+		{
+			result = GL_FLOAT;
+			break;
+		}
+		default:
+		{
+			assert(false);
+		}
+		}
+
+		return result;
 	}
 
 	void initialize_glew()
@@ -150,7 +198,7 @@ namespace vr::gl
 		glDebugMessageCallback(opengl_debug_callback, nullptr);
 
 		const auto clear_color = glm::normalize(glm::vec3(m_settings.clear_color.x, m_settings.clear_color.y, m_settings.clear_color.z));
-		glClearColor(clear_color.r, clear_color.g, clear_color.b , 0.0f);
+		glClearColor(clear_color.r, clear_color.g, clear_color.b, 0.0f);
 
 		if (m_settings.cull_faces)
 		{
@@ -248,42 +296,32 @@ namespace vr::gl
 			glBindVertexArray(geometry->vao.id);
 			glBindBuffer(GL_ARRAY_BUFFER, geometry->vao.buffer.id);
 
-			const auto& attributes = shader->program.get_attribute_names();
-			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_position_attribute_name) != attributes.end())
+			ptrdiff_t accumulated_offset = 0;
+			std::vector<GLint> bound_attributes;
+			const auto& shader_attributes = shader->program.get_attribute_names();
+			for (const auto& attribute : mesh->get_geometry()->attributes)
 			{
-				const auto position_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_position_attribute_name);
-				glEnableVertexAttribArray(position_attribute_location);
-				const auto position_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::position);
-				glVertexAttribPointer(position_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(position_offset));
-			}
-
-			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_normal_attribute_name) != attributes.end())
-			{
-				const auto normal_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_normal_attribute_name);
-				glEnableVertexAttribArray(normal_attribute_location);
-				const auto normal_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::normal);
-				glVertexAttribPointer(normal_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(normal_offset));
-			}
-
-			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_color_attribute_name) != attributes.end())
-			{
-				const auto color_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_color_attribute_name);
-				glEnableVertexAttribArray(color_attribute_location);
-				const auto color_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::color);
-				glVertexAttribPointer(color_attribute_location, 3, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(color_offset));
-			}
-
-			if (std::find(attributes.begin(), attributes.end(), builtin_vertex_uv_attribute_name) != attributes.end())
-			{
-				const auto uv_attribute_location = glGetAttribLocation(shader->program.get_id(), builtin_vertex_uv_attribute_name);
-				glEnableVertexAttribArray(uv_attribute_location);
-				const auto uv_offset = offsetof(vr::mesh::geometry_type::vertex_type, vr::mesh::geometry_type::vertex_type::texcoords);
-				glVertexAttribPointer(uv_attribute_location, 2, GL_FLOAT, GL_FALSE, sizeof(vr::mesh::geometry_type::vertex_type), reinterpret_cast<const void*>(uv_offset));
+				const auto& name = attribute.first;
+				if (std::find(shader_attributes.begin(), shader_attributes.end(), name) != shader_attributes.end())
+				{
+					const auto attribute_location = glGetAttribLocation(shader->program.get_id(), name.c_str());
+					glEnableVertexAttribArray(attribute_location);
+					glVertexAttribPointer(attribute_location, geometry->vao.buffer.loaded_attributes[name].components,
+						::convert_to_gl_enum(geometry->vao.buffer.loaded_attributes[name].type), GL_FALSE, 0,
+						static_cast<const void*>(static_cast<const uint8_t*>(nullptr) + geometry->vao.buffer.loaded_attributes[name].start));
+					accumulated_offset += attribute.second.data.size();
+					bound_attributes.push_back(attribute_location);
+				}
 			}
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->vao.indices.id);
 
 			glDrawElements(GL_TRIANGLES, geometry->vao.indices_size, GL_UNSIGNED_SHORT, nullptr);
+
+			for (const auto& bound_attribute : bound_attributes)
+			{
+				glDisableVertexAttribArray(bound_attribute);
+			}
 		}
 
 		for (const auto child : object->get_children())

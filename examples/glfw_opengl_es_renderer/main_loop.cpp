@@ -96,22 +96,12 @@ vr::geometry import_model(const std::string& name)
 	const aiMesh* mesh = scene->mMeshes[0];
 
 	vr::geometry geometry;
-	for (auto i = 0u; i < mesh->mNumVertices; ++i)
+
 	{
-		vr::vertex vertex;
-		vertex.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-
-		if (mesh->HasTextureCoords(0))
-		{
-			vertex.texcoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-		}
-
-		if (mesh->HasNormals())
-		{
-			vertex.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-		}
-
-		geometry.vertices.push_back(vertex);
+		geometry.attributes["vr_vertex_position"].components = 3;
+		const auto begin = reinterpret_cast<const uint8_t*>(mesh->mVertices);
+		const auto end = reinterpret_cast<const uint8_t*>(&mesh->mVertices[mesh->mNumVertices]);
+		std::copy(begin, end, std::back_inserter(geometry.attributes["vr_vertex_position"].data));
 	}
 
 	for (auto i = 0u; i < mesh->mNumFaces; ++i)
@@ -119,6 +109,31 @@ vr::geometry import_model(const std::string& name)
 		geometry.indices.push_back(mesh->mFaces[i].mIndices[0]);
 		geometry.indices.push_back(mesh->mFaces[i].mIndices[1]);
 		geometry.indices.push_back(mesh->mFaces[i].mIndices[2]);
+	}
+
+	if (mesh->HasNormals())
+	{
+		geometry.attributes["vr_vertex_normal"].components = 3;
+		const auto begin = reinterpret_cast<const uint8_t*>(mesh->mNormals);
+		std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)), std::back_inserter(geometry.attributes["vr_vertex_normal"].data));
+	}
+
+	if (mesh->HasVertexColors(0))
+	{
+		geometry.attributes["vr_vertex_color"].components = 4;
+		const auto begin = reinterpret_cast<const uint8_t*>(mesh->mColors);
+		std::copy(begin, begin + mesh->mNumVertices + sizeof(decltype(*mesh->mColors)), std::back_inserter(geometry.attributes["vr_vertex_color"].data));
+	}
+
+	if (mesh->HasTextureCoords(0))
+	{
+		geometry.attributes["vr_vertex_uv"].components = 2;
+		for (auto i = 0u; i < mesh->mNumVertices; ++i)
+		{
+			const auto uv = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+			const auto begin = reinterpret_cast<const uint8_t*>(&uv);
+			std::copy(begin, begin + sizeof(uv), std::back_inserter(geometry.attributes["vr_vertex_uv"].data));
+		}
 	}
 
 	return geometry;
@@ -131,7 +146,7 @@ void main_loop::init()
 	m_renderer_settings.wireframe_mode = false;
 
 	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
-	
+
 	initialize_controls();
 	initialize_position();
 
@@ -143,7 +158,7 @@ void main_loop::init()
 		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
 		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.DDS");
 		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");
-		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec3{ 255, 0, 0 });
+		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec4{ 255, 0, 0, 0 });
 	}
 
 	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
@@ -229,12 +244,12 @@ void main_loop::render_scene()
 		return glm::normalize(glm::vec3(zero_one_rand(m_random_engine), zero_one_rand(m_random_engine), zero_one_rand(m_random_engine)));
 	};
 
-//	m_monkeys.front().obj->rotate(vr::z_axis, 2.f * m_delta_time);
+	//	m_monkeys.front().obj->rotate(vr::z_axis, 2.f * m_delta_time);
 
 	for (auto i = 0; i < m_monkeys.size(); ++i)
 	{
 		auto& monkey = m_monkeys[i];
-		
+
 		if (!i) {
 			const auto rotation_angle = 2.f;
 			monkey.obj->rotate(vr::z_axis, rotation_angle * m_delta_time);

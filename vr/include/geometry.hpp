@@ -3,6 +3,8 @@
 #include "vertex.hpp"
 
 #include <vector>
+#include <unordered_map>
+#include <string>
 
 namespace vr
 {
@@ -13,16 +15,16 @@ namespace vr
 			t_float
 		};
 
-		std::vector<unsigned char> data;
+		std::string name;
 		uint8_t components;
+		data_type type;
+		std::vector<uint8_t> data;
 	};
 
 	struct geometry
 	{
-		typedef vertex vertex_type;
-		typedef uint16_t index_type;
-
-		std::vector<vertex_type> vertices;
-		std::vector<index_type> indices;
+		std::unordered_map<std::string, attribute> attributes;
+		std::vector<attribute> m_attributes;
+		std::vector<uint16_t> indices;
 	};
 }

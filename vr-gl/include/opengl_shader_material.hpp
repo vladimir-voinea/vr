@@ -14,6 +14,7 @@ namespace vr::gl
 	{
 		mat4fv,
 		vec3f,
+		vec4f,
 		vec1i
 	};
 
@@ -25,6 +26,7 @@ namespace vr::gl
 		{
 			glm::mat4 mat4fv;
 			glm::vec3 vec3f;
+			glm::vec4 vec4f;
 			int vec1i;
 		} value;
 	};

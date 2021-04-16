@@ -3,7 +3,7 @@
 #include "vr-opengl.h"
 #include "vr-gl.hpp"
 
-#include <renderer_object.hpp>
+#include <geometry.hpp>
 
 #include <map>
 #include <vector>
@@ -27,7 +27,16 @@ namespace vr::gl
 
 	struct vertex_buffer 
 	{
+		struct attribute_layout
+		{
+			uint64_t start;
+			uint64_t size;
+			uint8_t components;
+			vr::attribute::data_type type;
+		};
+
 		GLuint id;
+		std::unordered_map<std::string, attribute_layout> loaded_attributes;
 	};
 
 	// geometry instance
