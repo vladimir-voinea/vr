@@ -15,6 +15,7 @@ namespace vr::gl
 	struct loaded_texture
 	{
 		GLuint id;
+		GLenum target;
 	};
 	
 	// shader instance
