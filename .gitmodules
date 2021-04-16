@@ -14,3 +14,8 @@
 	path = dependencies/assimp
 	url = https://github.com/assimp/assimp.git
 	branch = assimp_5.0_release
+[submodule "boost"]
+	path = dependencies/boost
+	url = https://github.com/boostorg/boost.git
+	branch = tags/boost-1.75.0
+	fetchRecurseSubmodules = true
