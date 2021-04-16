@@ -35,6 +35,7 @@ namespace vr::glfw
 	{
 		int width = 800;
 		int height = 600;
+		bool full_screen = false;
 		std::string name = "Unnamed window";
 		std::optional<opengl_context> opengl_context = {};
 		bool resizable = false;

@@ -109,7 +109,7 @@ namespace vr::glfw
 
 	bool window::create()
 	{
-		m_window = glfwCreateWindow(m_settings.width, m_settings.height, m_settings.name.c_str(), nullptr, nullptr);
+		m_window = glfwCreateWindow(m_settings.width, m_settings.height, m_settings.name.c_str(), m_settings.full_screen ? glfwGetPrimaryMonitor() : nullptr, nullptr);
 
 		return m_window != nullptr;
 	}
