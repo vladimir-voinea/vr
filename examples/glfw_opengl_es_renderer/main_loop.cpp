@@ -7,8 +7,6 @@
 
 #include <glfw_util.hpp>
 
-#include <vr-opengl.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -19,15 +17,6 @@
 #include <stdexcept>
 #include <iostream>
 
-void initialize_glew()
-{
-	glewExperimental = GL_TRUE;
-	const auto glew_initialization = glewInit();
-	if (glew_initialization != GLEW_OK)
-	{
-		throw std::runtime_error("Could not initialize glew");
-	}
-}
 
 main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
@@ -137,34 +126,17 @@ vr::geometry import_model(const std::string& name)
 
 void main_loop::init()
 {
-	initialize_glew();
+	m_renderer_settings.clear_color = glm::vec3(66, 155, 245);
+	m_renderer_settings.cull_faces = true;
+	m_renderer_settings.wireframe_mode = false;
+
+	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
+	
 	initialize_controls();
 	initialize_position();
 
 	std::random_device dev;
 	m_random_engine = std::default_random_engine(dev());
-
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(opengl_debug_callback, nullptr);
-
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
-	if (!m_wireframe_mode)
-	{
-		glEnable(GL_CULL_FACE);
-	}
-	
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS); 
-
-	if (m_wireframe_mode)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	else
-	{
-	}
-
 
 	{
 		m_monkey_data.geometry = ::import_model("textured_cube");
@@ -206,7 +178,7 @@ void main_loop::init()
 
 	}
 
-	m_last_timestamp = vr::glfw::get_time();
+	m_last_timestamp = static_cast<float>(vr::glfw::get_time());
 	m_fps_counter = std::make_unique<fps_counter>(m_last_timestamp);
 }
 
@@ -273,7 +245,7 @@ void main_loop::render_scene()
 		//}
 	//}
 
-	m_renderer.render(m_scene, *m_camera);
+	m_renderer->render(m_scene, *m_camera);
 
 	m_window.swap_buffers();
 }

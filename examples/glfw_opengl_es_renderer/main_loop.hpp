@@ -38,8 +38,13 @@ private:
 	vr::glfw::window& m_window;
 	vr::glfw::keyboard m_kb;
 	vr::glfw::mouse m_mouse;
-
 	std::unique_ptr<vr::camera> m_camera;
+
+	vr::scene m_scene;
+	vr::gl::renderer_settings m_renderer_settings;
+	std::unique_ptr<vr::gl::renderer> m_renderer;
+	std::unique_ptr<fps_counter> m_fps_counter;
+
 	user_controls m_controls;
 	const bool m_wireframe_mode = false;
 	
@@ -92,7 +97,4 @@ private:
 	const size_t n_monkeys = 2;
 	std::vector<monkey_instance> m_monkeys;
 
-	vr::scene m_scene;
-	vr::gl::renderer m_renderer;
-	std::unique_ptr<fps_counter> m_fps_counter;
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "renderer_settings.hpp"
+
 #include <renderer_base.hpp>
 #include <camera.hpp>
 #include <scene.hpp>
@@ -15,7 +17,7 @@ namespace vr::gl
 	class renderer : renderer_base
 	{
 	public:
-		renderer();
+		renderer(const renderer_settings& settings);
 		~renderer();
 
 		void render(vr::scene& scene, const vr::camera& camera) override;
@@ -27,8 +29,9 @@ namespace vr::gl
 		void render_object(const vr::object3d* object, const vr::camera& camera);
 
 	private:
+		const renderer_settings& m_settings;
+		std::unique_ptr<renderer_cache> m_cache;
 		GLuint m_last_shader_id = 0;
 		GLuint m_last_texture_id = 0;
-		std::unique_ptr<renderer_cache> m_cache;
 	};
 }

@@ -3,6 +3,7 @@
 #include "gpu_objects.hpp"
 #include "renderer_cache.hpp"
 #include "texture_loader.hpp"
+#include "opengl_debug_callback.hpp"
 #include <shader_material.hpp>
 
 #include <map>
@@ -86,6 +87,16 @@ namespace
 		mvp_uniform.value.vec1i = 0;
 		load_uniform(shader->program, texture_sampler_uniform);
 	}
+
+	void initialize_glew()
+	{
+		glewExperimental = GL_TRUE;
+		const auto glew_initialization = glewInit();
+		if (glew_initialization != GLEW_OK)
+		{
+			throw std::runtime_error("Could not initialize glew");
+		}
+	}
 }
 
 namespace vr::gl
@@ -127,9 +138,31 @@ namespace vr::gl
 		return { load_texture(texture->get_path()) };
 	}
 
-	renderer::renderer()
-		: m_cache(std::make_unique<renderer_cache>())
-	{}
+	renderer::renderer(const renderer_settings& settings)
+		: m_settings(settings)
+		, m_cache(std::make_unique<renderer_cache>())
+	{
+		initialize_glew();
+
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback(opengl_debug_callback, nullptr);
+
+		const auto clear_color = glm::normalize(glm::vec3(m_settings.clear_color.x, m_settings.clear_color.y, m_settings.clear_color.z));
+		glClearColor(clear_color.r, clear_color.g, clear_color.b , 0.0f);
+
+		if (m_settings.cull_faces)
+		{
+			glEnable(GL_CULL_FACE);
+		}
+
+		if (m_settings.wireframe_mode)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+	}
 
 	renderer::~renderer()
 	{}
