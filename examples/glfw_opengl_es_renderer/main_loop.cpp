@@ -187,44 +187,38 @@ void main_loop::init()
 		inst.y_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
 		inst.z_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
 
-		vr::object3d* previous_monkey = !m_monkeys.empty() ? m_monkeys.back().obj.get() : nullptr;
 		m_monkeys.push_back(std::move(inst));
-		vr::object3d* last_added_monkey = m_monkeys.back().obj.get();
-		if (!i)
-		{
-			m_scene.add(m_monkeys.back().obj.get());
-		}
 	}
-
+	m_scene.add(m_monkeys[0].obj.get());
 	m_monkeys[0].obj->translate(glm::vec3(0.f, 10.f, -10.f));
+	
 	float offset = 5.f;
-
 	auto mid = m_monkeys.size() / 2;
 
 	for (auto i = 1u; i <= mid; ++i)
 	{
-		auto prev = i - 1;
-		m_monkeys[prev].obj->add_child(m_monkeys[i].obj.get());
-		m_monkeys[i].obj->set_parent(m_monkeys[prev].obj.get());
+		const auto previous = i - 1;
+		m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
+		m_monkeys[i].obj->set_parent(m_monkeys[previous].obj.get());
 		m_monkeys[i].obj->translate(glm::vec3(-offset, -offset, 0.f));
 	}
-	for (auto i = mid + 1; i <= 2 * mid; ++i)
-	{
-		auto prev = i - 1;
-		if (i == mid + 1)
-		{
-			prev = 0;
-		}
 
-		m_monkeys[prev].obj->add_child(m_monkeys[i].obj.get());
-		m_monkeys[i].obj->set_parent(m_monkeys[prev].obj.get());
+	m_monkeys[0].obj->add_child(m_monkeys[mid + 1].obj.get());
+	m_monkeys[mid + 1].obj->set_parent(m_monkeys[0].obj.get());
+	m_monkeys[mid + 1].obj->translate(glm::vec3(offset, -offset, 0.f));
+
+	for (auto i = mid + 2; i <= 2 * mid; ++i)
+	{
+		const auto previous = i - 1;
+
+		m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
+		m_monkeys[i].obj->set_parent(m_monkeys[previous].obj.get());
 		m_monkeys[i].obj->translate(glm::vec3(offset, -offset, 0.f));
 	}
 
 	m_last_timestamp = static_cast<float>(vr::glfw::get_time());
 	m_fps_counter = std::make_unique<fps_counter>(m_last_timestamp);
 }
-
 
 void main_loop::render_scene()
 {
