@@ -4,7 +4,7 @@
 #include <vr-glfw.hpp>
 #include <vr-gl.hpp>
 
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 void glfw_opengl_es_renderer_app::run()
 {
@@ -19,7 +19,7 @@ void glfw_opengl_es_renderer_app::run()
 		vr::glfw::window_settings settings;
 		settings.width = 1024;
 		settings.height = 768;
-		settings.name = "GLFW OpenGL ES 2.0 Cube";
+		settings.name = "GLFW OpenGL ES 2.0 Renderer";
 		settings.opengl_context = opengl_context_settings;
 		settings.resizable = false;
 		settings.msaa_samples = 4;
@@ -27,21 +27,19 @@ void glfw_opengl_es_renderer_app::run()
 		vr::glfw::window window(settings);
 		if (window.init())
 		{
-			std::cout << "Window created successfully\n";
+			spdlog::info("Window created successfully");
 
 			main_loop loop(window);
 			loop.run();
 		}
 		else
 		{
-			std::cout << "Window could not be created\n";
+			spdlog::error("Window could not be created");
 		}
 
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		spdlog::error("Exception: {0}", e.what());
 	}
-
-	std::cout << std::endl;
 }

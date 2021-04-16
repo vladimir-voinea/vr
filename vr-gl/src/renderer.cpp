@@ -6,8 +6,9 @@
 #include "opengl_debug_callback.hpp"
 #include <shader_material.hpp>
 
+#include <spdlog/spdlog.h>
+
 #include <map>
-#include <iostream>
 #include <algorithm>
 #include <numeric>
 
@@ -62,7 +63,7 @@ namespace
 			if (uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_view_uniform_name &&
 				uniform.name != builtin_model_uniform_name && uniform.name != builtin_texture_sampler_uniform_name)
 			{
-				std::cout << "Uniform " << uniform.name << " not found\n";
+				spdlog::error("Uniform {0} not found");
 			}
 		}
 	}

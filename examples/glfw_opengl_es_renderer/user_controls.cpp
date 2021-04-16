@@ -5,8 +5,6 @@
 
 #include <glfw_util.hpp>
 
-#include <iostream>
-
 user_controls::user_controls(vr::glfw::window& window, vr::camera& camera,
 	vr::glfw::mouse& mouse, vr::glfw::keyboard& keyboard)
 	: m_window(window)

@@ -1,5 +1,7 @@
 #include "texture_loader.hpp"
 
+#include <spdlog/spdlog.h>
+
 #define STB_IMAGE_IMPLEMENTATION 
 #include "stb_image.h"
 
@@ -52,7 +54,7 @@ namespace vr::gl
 		/* try to open the file */
 		fp = fopen(path.c_str(), "rb");
 		if (fp == NULL) {
-			printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", path); getchar();
+			spdlog::error("{0} could not be opened", path);
 			return 0;
 		}
 

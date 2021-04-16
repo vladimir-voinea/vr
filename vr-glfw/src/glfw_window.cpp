@@ -2,8 +2,8 @@
 #include "glfw_initialization.hpp";
 
 #include <GLFW/glfw3.h>
+#include <spdlog/spdlog.h>
 
-#include <iostream>
 #include <stdexcept>
 
 namespace
@@ -50,7 +50,7 @@ namespace
 
 	void glfw_error_callback(int, const char* err)
 	{
-		std::cerr << "GLFW error: " << err << '\n';
+		spdlog::error("GLFW error: {0}");
 	}
 }
 
@@ -159,12 +159,12 @@ namespace vr::glfw
 		if (window_instance != nullptr)
 		{
 			const bool status = focused;
-			std::cout << "Focus: " << std::boolalpha << status << '\n';;
+			spdlog::info("Got focus: {0}", status);
 			window_instance->window_focus_callback(status);
 		}
 		else
 		{
-			std::cerr << "User pointer is null" << '\n';
+			spdlog::error("User pointer is null");
 		}
 	}
 }

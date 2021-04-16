@@ -1,7 +1,6 @@
 #include "main_loop.hpp"
 #include <perspective_camera.hpp>
 #include "cube_data.hpp"
-#include "opengl_debug_callback.hpp"
 #include "shader_loader.hpp"
 #include "texture_loader.hpp"
 
@@ -14,9 +13,9 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-#include <stdexcept>
-#include <iostream>
+#include <spdlog/spdlog.h>
 
+#include <stdexcept>
 
 main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
@@ -60,18 +59,10 @@ void main_loop::process_input()
 
 void main_loop::print_state()
 {
-	//std::cout << "Position: "
-	//	<< m_camera->get_position().x << ", "
-	//	<< m_camera->get_position().y << ", "
-	//	<< m_camera->get_position().z << '\n';
+	spdlog::info("Position: {0}, {1}, {2}", m_camera->get_position().x, m_camera->get_position().y, m_camera->get_position().z);
+	spdlog::info("Direction: {0}, {1}, {2}", m_camera->get_direction().x, m_camera->get_direction().y, m_camera->get_direction().z);
+	spdlog::info("FPS: {0}", m_fps_counter->get_fps());
 
-	//std::cout << "Direction: " <<
-	//	m_camera->get_direction().x << ", "
-	//	<< m_camera->get_direction().y << ", "
-	//	<< m_camera->get_direction().z << '\n';
-
-	std::cout << "FPS: " << m_fps_counter->get_fps() << '\n';
-	//
 	//for (auto i = 0u; i < m_monkeys.size(); ++i)
 	//{
 	//	std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_translation().x << ' ' << m_monkeys[i].obj->get_translation().y << ' ' << m_monkeys[i].obj->get_translation().z << '\n';

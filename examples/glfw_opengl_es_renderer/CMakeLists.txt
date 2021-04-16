@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 
 set(APP_NAME "glfw_opengl_es_renderer_app")
 
-set(SOURCES "main.cpp" "glfw_opengl_es_renderer_app.cpp" "main_loop.cpp" "opengl_debug_callback.cpp" "shader_loader.cpp" "user_controls.cpp" "user_controls.hpp" "texture_loader.cpp" "fps_counter.cpp")
+set(SOURCES "main.cpp" "glfw_opengl_es_renderer_app.cpp" "main_loop.cpp"  "shader_loader.cpp" "user_controls.cpp" "user_controls.hpp" "texture_loader.cpp" "fps_counter.cpp")
 
 add_executable(${APP_NAME} ${SOURCES})
 target_compile_features(${APP_NAME} PRIVATE cxx_std_20)
