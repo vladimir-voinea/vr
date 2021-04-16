@@ -143,6 +143,7 @@ void main_loop::init()
 		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
 		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.DDS");
 		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");
+		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec3{ 255, 0, 0 });
 	}
 
 	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
@@ -153,8 +154,8 @@ void main_loop::init()
 		monkey_instance inst;
 		inst.obj = std::make_unique<vr::object3d>();
 
-		inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, inst.uniforms.get());
-		inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, inst.material.get(), i ? m_monkey_data.texture_uvmap.get() : m_monkey_data.texture_cobblestone.get());
+		//inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, inst.uniforms.get());
+		inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, m_monkey_data.material.get(), nullptr /*i ? m_monkey_data.texture_uvmap.get() : m_monkey_data.texture_cobblestone.get()*/);
 
 		inst.obj->add_mesh(inst.mesh.get());
 
@@ -222,28 +223,28 @@ void main_loop::render_scene()
 		}
 	};
 
-	std::uniform_real_distribution axis_rand(0.f, 1.f);
-	auto random_axis = [&, axis_rand, this]()
+	std::uniform_real_distribution zero_one_rand(0.f, 1.f);
+	auto zero_one_vec = [&, zero_one_rand, this]()
 	{
-		return glm::normalize(glm::vec3(axis_rand(m_random_engine), axis_rand(m_random_engine), axis_rand(m_random_engine)));
+		return glm::normalize(glm::vec3(zero_one_rand(m_random_engine), zero_one_rand(m_random_engine), zero_one_rand(m_random_engine)));
 	};
 
 //	m_monkeys.front().obj->rotate(vr::z_axis, 2.f * m_delta_time);
 
-	//for (auto i = 0; i < m_monkeys.size(); ++i)
-	//{
-	//	auto& monkey = m_monkeys[i];
-	//	
-	//	if (!i) {
-	//		const auto rotation_angle = p_or_n() * 2.f;
-	//		monkey.obj->rotate(vr::z_axis, rotation_angle * m_delta_time);
-	//	}
+	for (auto i = 0; i < m_monkeys.size(); ++i)
+	{
+		auto& monkey = m_monkeys[i];
+		
+		if (!i) {
+			const auto rotation_angle = 2.f;
+			monkey.obj->rotate(vr::z_axis, rotation_angle * m_delta_time);
+		}
 
 		//if (i) {
 		//	auto new_position = glm::vec3(monkey.x_rand(m_random_engine), monkey.y_rand(m_random_engine), monkey.z_rand(m_random_engine));
 		//	monkey.obj->translate(monkey.obj->get_translation() + new_position * m_delta_time);
 		//}
-	//}
+	}
 
 	m_renderer->render(m_scene, *m_camera);
 

@@ -198,7 +198,7 @@ namespace vr::gl
 			{
 				shader = m_cache->set(opengl_shader, load_shader(*opengl_shader));
 			}
-			if (!m_cache->get(mesh->get_texture()))
+			if (mesh->get_texture() && !m_cache->get(mesh->get_texture()))
 			{
 				texture = m_cache->set(mesh->get_texture(), ::load_texture(mesh->get_texture()));
 			}
@@ -216,13 +216,16 @@ namespace vr::gl
 		{
 			const auto geometry = m_cache->get(mesh->get_geometry());
 			const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
-			const auto texture = m_cache->get(mesh->get_texture());
 
-			if (texture->id != m_last_shader_id)
+			if (mesh->get_texture())
 			{
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, texture->id);
-				m_last_texture_id = texture->id;
+				const auto texture = m_cache->get(mesh->get_texture());
+				if (texture->id != m_last_shader_id)
+				{
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, texture->id);
+					m_last_texture_id = texture->id;
+				}
 			}
 
 			if (shader->program.get_id() != m_last_shader_id)
