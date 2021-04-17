@@ -11,8 +11,8 @@ user_controls::user_controls(vr::glfw::window& window, vr::camera& camera,
 	, m_camera(camera)
 	, m_mouse(mouse)
 	, m_kb(keyboard)
-	, m_horizontal_angle(glm::pi<float>())
-	, m_vertical_angle(0.0f)
+	, m_yaw(glm::pi<float>())
+	, m_pitch(0.f)
 	, m_mode(mode::stationary)
 {
 	const auto mouse_pos = m_mouse.get_position();
@@ -29,7 +29,7 @@ void user_controls::enter_moving_mode()
 {
 	m_mode = mode::moving;
 	m_mouse.set_position(m_last_moving_position);
-	m_mouse.set_mode(vr::glfw::mouse::mode::hidden);
+	m_mouse.set_mode(vr::glfw::mouse::mode::disabled);
 }
 
 void user_controls::enter_stationary_mode()
@@ -80,16 +80,17 @@ void user_controls::moving_process_events(float time_difference)
 	const auto window_size = m_window.get_size();
 	m_mouse.set_position({ static_cast<double>(window_size.width) / 2,
 		static_cast<double>(window_size.height) / 2 });
-
-	m_horizontal_angle += mouse_speed *
+	
+	m_yaw += mouse_speed *
 		time_difference * static_cast<float>(window_size.width / 2 - mouse_pos.x);
-	m_vertical_angle += mouse_speed *
+	m_pitch += mouse_speed *
 		time_difference * static_cast<float>(window_size.height / 2 - mouse_pos.y);
 
-	const glm::vec3 direction(
-		std::cos(m_vertical_angle) * std::sin(m_horizontal_angle),
-		std::sin(m_vertical_angle),
-		std::cos(m_vertical_angle) * std::cos(m_horizontal_angle));
+	glm::vec3 direction(
+		std::cos(m_pitch) * std::sin(m_yaw),
+		std::sin(m_pitch),
+		std::cos(m_pitch) * std::cos(m_yaw));
+	direction = glm::normalize(direction);
 
 	m_camera.set_direction(direction);
 
@@ -136,9 +137,9 @@ glm::vec3 user_controls::get_right_vector() const
 {
 	constexpr auto pi_2 = glm::pi<float>() / 2;
 
-	const glm::vec3 right(std::sin(m_horizontal_angle - pi_2),
+	const glm::vec3 right(std::sin(m_yaw - pi_2),
 		0,
-		std::cos(m_horizontal_angle - pi_2));
+		std::cos(m_yaw - pi_2));
 
 	return right;
 }

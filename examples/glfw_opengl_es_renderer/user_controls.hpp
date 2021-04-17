@@ -33,6 +33,6 @@ private:
 	mode m_mode;
 	vr::glfw::mouse::position m_last_moving_position;
 
-	float m_horizontal_angle;
-	float m_vertical_angle;
+	float m_yaw;
+	float m_pitch;
 };

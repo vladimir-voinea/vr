@@ -37,13 +37,12 @@ void main_loop::initialize_controls()
 {
 	m_kb.set_sticky_keys(true);
 	m_mouse.set_sticky_buttons(true);
-	m_mouse.set_mode(vr::glfw::mouse::mode::disabled);
 }
 
 void main_loop::initialize_position()
 {
 	m_camera->set_position({ -2.7872, 1.74459, 9.47206 });
-	m_camera->set_direction({ 0.f, -0.231316, 0.f });
+	m_camera->set_direction({ 0.115009114, 0.016061125, -0.9932346 });
 }
 
 void main_loop::process_input()

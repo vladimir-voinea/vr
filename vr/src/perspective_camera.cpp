@@ -11,16 +11,6 @@ namespace vr
 		update_projection_matrix();
 	}
 
-	void perspective_camera::set_position(const glm::vec3& position)
-	{
-		m_position = position;
-	}
-
-	void perspective_camera::set_direction(const glm::vec3& direction)
-	{
-		m_position = direction;
-	}
-
 	void perspective_camera::update_projection_matrix()
 	{
 		m_projection = glm::perspective(

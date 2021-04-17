@@ -18,8 +18,8 @@ namespace vr
 	public:
 		perspective_camera(const settings& settings);
 
-		void set_position(const glm::vec3& position);
-		void set_direction(const glm::vec3& direction);
+		//void set_position(const glm::vec3& position);
+		//void set_direction(const glm::vec3& direction);
 
 		void update_projection_matrix();
 		const glm::mat4& get_projection_matrix() const override;
@@ -27,7 +27,7 @@ namespace vr
 	private:
 		const settings& m_settings;
 		glm::mat4 m_projection;
-		glm::vec3 m_position;
-		glm::vec3 m_direction;
+		//glm::vec3 m_position;
+		//glm::vec3 m_direction;
 	};
 }
