@@ -21,6 +21,6 @@ namespace vr::glfw
 
 	private:
 		window& m_window;
-		keyboard_listener* m_listener;
+		keyboard_listener* m_listener = nullptr;
 	};
 }

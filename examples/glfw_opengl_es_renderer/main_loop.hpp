@@ -3,7 +3,7 @@
 #include "shaders.hpp"
 #include "user_controls.hpp"
 #include "fps_counter.hpp"
-#include "keyboard_listener.hpp"
+#include "input_listener.hpp"
 
 #include <glfw_window.hpp>
 #include <glfw_keyboard.hpp>
@@ -39,8 +39,8 @@ private:
 private:
 	vr::glfw::window& m_window;
 	vr::glfw::keyboard m_kb;
-	keyboard_listener m_kb_listener;
 	vr::glfw::mouse m_mouse;
+	input_listener m_input_listener;
 	vr::perspective_camera::settings m_camera_settings;
 	std::unique_ptr<vr::perspective_camera> m_camera;
 

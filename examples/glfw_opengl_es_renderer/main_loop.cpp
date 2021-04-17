@@ -35,7 +35,9 @@ main_loop::~main_loop()
 
 void main_loop::initialize_controls()
 {
-	m_kb.set_listener(&m_kb_listener);
+	m_kb.set_listener(&m_input_listener);
+	m_mouse.set_listener(&m_input_listener);
+
 	m_kb.set_sticky_keys(true);
 	m_mouse.set_sticky_buttons(true);
 }
