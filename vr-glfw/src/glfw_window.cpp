@@ -1,5 +1,6 @@
 #include "glfw_window.hpp";
 #include "glfw_initialization.hpp";
+#include "glfw_user_pointer.hpp"
 
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
@@ -59,8 +60,9 @@ namespace vr::glfw
 	window::window(window_settings settings)
 		: m_settings(settings)
 		, m_has_focus(false)
+		, m_user_pointer(std::make_unique<user_pointer>())
 	{
-
+		m_user_pointer->window = this;
 	}
 
 	window::~window()
@@ -100,7 +102,7 @@ namespace vr::glfw
 			glfwMakeContextCurrent(m_window);
 			m_has_focus = true;
 
-			glfwSetWindowUserPointer(m_window, this);
+			glfwSetWindowUserPointer(m_window, m_user_pointer.get());
 			glfwSetWindowFocusCallback(m_window, glfw_window_focus_callback);
 			glfwSetFramebufferSizeCallback(m_window, glfw_framebuffer_resize_callback);
 		}
@@ -177,7 +179,7 @@ namespace vr::glfw
 	void glfw_window_focus_callback(GLFWwindow* window, int focused)
 	{
 		void* window_user_ptr = glfwGetWindowUserPointer(window);
-		auto window_instance = static_cast<vr::glfw::window*>(window_user_ptr);
+		auto window_instance = static_cast<vr::glfw::window*>(static_cast<user_pointer*>(window_user_ptr)->window);
 		if (window_instance != nullptr)
 		{
 			const bool status = focused;
@@ -193,7 +195,7 @@ namespace vr::glfw
 	void glfw_framebuffer_resize_callback(GLFWwindow* window, int width, int height)
 	{
 		void* window_user_ptr = glfwGetWindowUserPointer(window);
-		auto window_instance = static_cast<vr::glfw::window*>(window_user_ptr);
+		auto window_instance = static_cast<vr::glfw::window*>(static_cast<user_pointer*>(window_user_ptr)->window);
 		if (window_instance != nullptr)
 		{
 			window_instance->window_framebuffer_callback(width, height);

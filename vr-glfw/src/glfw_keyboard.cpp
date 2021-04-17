@@ -1,4 +1,5 @@
 #include "glfw_keyboard.hpp"
+#include "glfw_user_pointer.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -8,8 +9,8 @@
 
 namespace
 {
-	using k = vr::glfw::keyboard::key;
-	const std::unordered_map<vr::glfw::keyboard::key, int> key_mapping = {
+	using k = vr::glfw::key;
+	const std::unordered_map<k, int> key_mapping = {
 		{ k::a, GLFW_KEY_A },
 		{ k::b, GLFW_KEY_B },
 		{ k::c, GLFW_KEY_C },
@@ -42,7 +43,7 @@ namespace
 		{ k::escape, GLFW_KEY_ESCAPE }
 	};
 
-	int enum_to_glfw_key(const vr::glfw::keyboard::key& key)
+	int enum_to_glfw_key(const k& key)
 	{
 		auto it = key_mapping.find(key);
 		if (it == key_mapping.end())
@@ -55,12 +56,12 @@ namespace
 		return it->second;
 	}
 
-	vr::glfw::keyboard::key char_to_enum(const char c)
+	k char_to_enum(const char c)
 	{
-		if (c >= static_cast<char>(vr::glfw::keyboard::key::a) &&
-			c <= static_cast<char>(vr::glfw::keyboard::key::z))
+		if (c >= static_cast<char>(k::a) &&
+			c <= static_cast<char>(k::z))
 		{
-			return static_cast<vr::glfw::keyboard::key>(c);
+			return static_cast<k>(c);
 		}
 		else
 		{
@@ -75,6 +76,13 @@ namespace vr::glfw
 	keyboard::keyboard(window& window)
 		: m_window(window)
 	{
+		static_cast<user_pointer*>(glfwGetWindowUserPointer(window.get_handle()))->keyboard = this;
+		glfwSetKeyCallback(window.get_handle(), glfw_key_callback);
+	}
+
+	void keyboard::set_listener(keyboard_listener* listener)
+	{
+		m_listener = listener;
 	}
 
 	void keyboard::set_sticky_keys(bool value)
@@ -82,17 +90,82 @@ namespace vr::glfw
 		glfwSetInputMode(m_window.get_handle(), GLFW_STICKY_KEYS, value ? GL_TRUE : GL_FALSE);
 	}
 
-	keyboard::state keyboard::get_key_state(const keyboard::key& key)
+	key_action keyboard::get_key_state(const key& key)
 	{
 		const auto glfw_key = enum_to_glfw_key(key);
 		const auto state = glfwGetKey(m_window.get_handle(), glfw_key);
 		if (state == GLFW_PRESS)
 		{
-			return keyboard::state::press;
+			return key_action::press;
 		}
 		if (state == GLFW_RELEASE)
 		{
-			return keyboard::state::release;
+			return key_action::release;
 		}
 	}
+
+	void keyboard::key_callback(int which_key, int scancode, int action, int mods)
+	{
+		if (m_listener)
+		{
+			key k = static_cast<key>(which_key);
+			key_action k_action = key_action::press;
+
+			switch (action)
+			{
+			case GLFW_PRESS:
+			{
+				k_action = key_action::press;
+				break;
+			}
+			case GLFW_REPEAT:
+			{
+				k_action = key_action::repeat;
+				break;
+			}
+			case GLFW_RELEASE:
+			{
+				k_action = key_action::release;
+				break;
+			}
+			}
+
+			uint16_t mod = 0;
+			if (mods & GLFW_MOD_SHIFT)
+			{
+				mod = mod | static_cast<decltype(mod)>(modifiers::shift);
+			}
+			if (mods & GLFW_MOD_CONTROL)
+			{
+				mod = mod | static_cast<decltype(mod)>(modifiers::control);
+			}
+			if (mods & GLFW_MOD_ALT)
+			{
+				mod = mod | static_cast<decltype(mod)>(modifiers::alt);
+			}
+			if (mods & GLFW_MOD_SUPER)
+			{
+				mod = mod | static_cast<decltype(mod)>(modifiers::super);
+			}
+			if (mods & GLFW_MOD_CAPS_LOCK)
+			{
+				mod = mod | static_cast<decltype(mod)>(modifiers::caps_lock);
+			}
+			if (mods & GLFW_MOD_NUM_LOCK)
+			{
+				mod = mod | static_cast<decltype(mod)>(modifiers::num_lock);
+			}
+
+			modifiers converted_modifiers = static_cast<modifiers>(mod);
+
+			m_listener->on_key_event(k, k_action, converted_modifiers);
+		}
+	}
+	
+	void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard;
+		kb->key_callback(key, scancode, action, mods);
+	}
+
 }

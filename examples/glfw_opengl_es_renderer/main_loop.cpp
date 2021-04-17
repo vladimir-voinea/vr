@@ -35,6 +35,7 @@ main_loop::~main_loop()
 
 void main_loop::initialize_controls()
 {
+	m_kb.set_listener(&m_kb_listener);
 	m_kb.set_sticky_keys(true);
 	m_mouse.set_sticky_buttons(true);
 }
@@ -49,7 +50,7 @@ void main_loop::process_input()
 {
 	m_controls.process_events(m_delta_time);
 
-	if (m_kb.get_key_state(vr::glfw::keyboard::key::escape) == vr::glfw::keyboard::state::press)
+	if (m_kb.get_key_state(vr::glfw::key::escape) == vr::glfw::key_action::press)
 	{
 		m_window.request_close();
 	}
@@ -58,9 +59,9 @@ void main_loop::process_input()
 
 void main_loop::print_state()
 {
-	spdlog::info("Position: {0}, {1}, {2}", m_camera->get_position().x, m_camera->get_position().y, m_camera->get_position().z);
-	spdlog::info("Direction: {0}, {1}, {2}", m_camera->get_direction().x, m_camera->get_direction().y, m_camera->get_direction().z);
-	spdlog::info("FPS: {0}", m_fps_counter->get_fps());
+	//spdlog::info("Position: {0}, {1}, {2}", m_camera->get_position().x, m_camera->get_position().y, m_camera->get_position().z);
+	//spdlog::info("Direction: {0}, {1}, {2}", m_camera->get_direction().x, m_camera->get_direction().y, m_camera->get_direction().z);
+	//spdlog::info("FPS: {0}", m_fps_counter->get_fps());
 
 	//for (auto i = 0u; i < m_monkeys.size(); ++i)
 	//{

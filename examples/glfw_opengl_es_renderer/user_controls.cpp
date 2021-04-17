@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <glfw_keyboard_data.hpp>
 #include <glfw_util.hpp>
 
 user_controls::user_controls(vr::glfw::window& window, vr::camera& camera,
@@ -59,7 +60,7 @@ void user_controls::process_events(float time_difference)
 		moving_process_events(time_difference);
 	}
 
-	if (m_kb.get_key_state(vr::glfw::keyboard::key::left_shift) == vr::glfw::keyboard::state::press)
+	if (m_kb.get_key_state(vr::glfw::key::left_shift) == vr::glfw::key_action::press)
 	{
 		mode_switch();
 	}
@@ -98,8 +99,8 @@ void user_controls::moving_process_events(float time_difference)
 	const auto up = glm::cross(right, direction);
 
 	glm::vec3 current_position = m_camera.get_position();
-	using k = vr::glfw::keyboard::key;
-	using s = vr::glfw::keyboard::state;
+	using k = vr::glfw::key;
+	using s = vr::glfw::key_action;
 	if (m_kb.get_key_state(k::w) == s::press)
 	{
 		current_position += direction * time_difference * speed;

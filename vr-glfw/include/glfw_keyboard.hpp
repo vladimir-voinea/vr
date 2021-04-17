@@ -1,59 +1,26 @@
 #pragma once
 
 #include "glfw_window.hpp"
+#include "glfw_keyboard_data.hpp"
+#include "glfw_keyboard_listener.hpp"
 
 namespace vr::glfw
 {
 	class keyboard
 	{
 	public:
-		enum class state
-		{
-			press,
-			release
-		};
-
-		enum class key : uint16_t
-		{
-			a = 97,
-			b,
-			c,
-			d,
-			e,
-			f,
-			g,
-			h,
-			i,
-			j,
-			k,
-			l,
-			m,
-			n,
-			o,
-			p,
-			q,
-			r,
-			s,
-			t,
-			u,
-			v,
-			w,
-			x,
-			y,
-			z,
-			space,
-			left_ctrl,
-			left_shift,
-			escape
-		};
-
-	public:
 		keyboard(window& window);
 
+		void set_listener(keyboard_listener* listener);
 		void set_sticky_keys(bool value);
-		state get_key_state(const key& key);
+		key_action get_key_state(const key& key);
+
+	private:
+		friend void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		void key_callback(int key, int scancode, int action, int mods);
 
 	private:
 		window& m_window;
+		keyboard_listener* m_listener;
 	};
 }

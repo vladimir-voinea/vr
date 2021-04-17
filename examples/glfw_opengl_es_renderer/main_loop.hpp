@@ -3,6 +3,7 @@
 #include "shaders.hpp"
 #include "user_controls.hpp"
 #include "fps_counter.hpp"
+#include "keyboard_listener.hpp"
 
 #include <glfw_window.hpp>
 #include <glfw_keyboard.hpp>
@@ -38,19 +39,19 @@ private:
 private:
 	vr::glfw::window& m_window;
 	vr::glfw::keyboard m_kb;
+	keyboard_listener m_kb_listener;
 	vr::glfw::mouse m_mouse;
 	vr::perspective_camera::settings m_camera_settings;
 	std::unique_ptr<vr::perspective_camera> m_camera;
+
+	vr::gl::renderer_settings m_renderer_settings;
+	std::unique_ptr<vr::gl::renderer> m_renderer;
+	std::unique_ptr<fps_counter> m_fps_counter;
 
 	vr::scene m_scene;
 
 	std::unique_ptr<vr::cube_texture> m_cube_texture;
 	std::unique_ptr<vr::shader_material> m_skybox_material;
-
-	vr::gl::renderer_settings m_renderer_settings;
-	std::unique_ptr<vr::gl::renderer> m_renderer;
-	
-	std::unique_ptr<fps_counter> m_fps_counter;
 
 	user_controls m_controls;
 	const bool m_wireframe_mode = false;

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "glfw_window_settings.hpp"
-
 #include <functional>
 #include <string>
 
 struct GLFWwindow;
 
 namespace vr::glfw {
+	struct user_pointer;
 	struct window_size
 	{
 		int width;
@@ -47,6 +47,7 @@ namespace vr::glfw {
 	private:
 		GLFWwindow* m_window = nullptr;
 		const window_settings m_settings;
+		std::unique_ptr<user_pointer> m_user_pointer;
 		bool m_has_focus;
 		std::function<void(int, int)> m_framebuffer_resize_callback;
 	};
