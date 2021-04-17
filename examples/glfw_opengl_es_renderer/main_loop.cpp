@@ -18,13 +18,26 @@
 
 #include <stdexcept>
 
+static const auto start_position = glm::vec3{ -2.7872, 1.74459, 9.47206 };
+static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932346 };
+
+vr::perspective_camera::settings make_camera_settings(vr::glfw::window& window) 
+{
+	vr::perspective_camera::settings settings { 45.f, static_cast<float>(window.get_viewport_size().width) / static_cast<float>(window.get_viewport_size().height), 0.1f, 100.f,
+	start_position, start_direction };
+
+	return settings;
+}
+
 main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
 	, m_kb(window)
 	, m_mouse(window)
-	, m_camera_settings({ 45.f, static_cast<float>(window.get_viewport_size().width) / static_cast<float>(window.get_viewport_size().height), 0.1f,100.f })
+	, m_camera_settings(make_camera_settings(m_window))
 	, m_camera(std::make_unique<vr::perspective_camera>(m_camera_settings))
-	, m_controls(m_window, *m_camera, m_mouse, m_kb)
+	, m_fps_counter(vr::glfw::get_time())
+	, m_input_listener(m_window, *m_camera, m_fps_counter)
+	//, m_controls(m_window, *m_camera, m_mouse, m_kb)
 {
 	init();
 }
@@ -37,6 +50,7 @@ void main_loop::initialize_controls()
 {
 	m_kb.set_listener(&m_input_listener);
 	m_mouse.set_listener(&m_input_listener);
+	m_mouse.set_mode(vr::glfw::mouse_mode::disabled);
 
 	m_kb.set_sticky_keys(true);
 	m_mouse.set_sticky_buttons(true);
@@ -44,13 +58,13 @@ void main_loop::initialize_controls()
 
 void main_loop::initialize_position()
 {
-	m_camera->set_position({ -2.7872, 1.74459, 9.47206 });
-	m_camera->set_direction({ 0.115009114, 0.016061125, -0.9932346 });
+	//m_camera->set_position({ -2.7872, 1.74459, 9.47206 });
+	//m_camera->set_direction({ 0.115009114, 0.016061125, -0.9932346 });
 }
 
 void main_loop::process_input()
 {
-	m_controls.process_events(m_delta_time);
+	//m_controls.process_events(m_delta_time);
 
 	if (m_kb.get_key_state(vr::glfw::key::escape) == vr::glfw::key_action::press)
 	{
@@ -167,7 +181,6 @@ void main_loop::init()
 		{
 			spdlog::info("New framebuffer size: {0}, {1}", width, height);
 			m_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
-			m_camera->update_projection_matrix();
 			m_renderer_settings.size.width = width;
 			m_renderer_settings.size.height = height;
 		});
@@ -232,9 +245,7 @@ void main_loop::init()
 		m_monkeys[i].obj->set_parent(m_monkeys[previous].obj.get());
 		m_monkeys[i].obj->translate(glm::vec3(offset, -offset, 0.f));
 	}
-
-	m_last_timestamp = static_cast<float>(vr::glfw::get_time());
-	m_fps_counter = std::make_unique<fps_counter>(m_last_timestamp);
+	
 }
 
 void main_loop::render_scene()
@@ -243,7 +254,7 @@ void main_loop::render_scene()
 	m_delta_time = current_time - m_last_timestamp;
 	m_last_timestamp = current_time;
 
-	m_fps_counter->frame(current_time);
+	m_fps_counter.frame(current_time);
 
 	const auto projection_matrix = m_camera->get_projection_matrix();
 	const auto view_matrix = m_camera->get_view_matrix();

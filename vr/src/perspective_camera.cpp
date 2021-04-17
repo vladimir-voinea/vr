@@ -7,21 +7,26 @@ namespace vr
 	perspective_camera::perspective_camera(const perspective_camera::settings& settings)
 		: camera()
 		, m_settings(settings)
+		, Position(m_settings.position)
+		, Front(m_settings.direction)
+		, WorldUp(m_settings.up)
+		, Pitch(m_settings.pitch)
+		, Yaw(m_settings.yaw)
 	{
-		update_projection_matrix();
+		updateCameraVectors();
 	}
 
-	void perspective_camera::update_projection_matrix()
+	glm::mat4 perspective_camera::get_projection_matrix() const
 	{
-		m_projection = glm::perspective(
-			glm::radians(m_settings.fov), 
-			m_settings.aspect_ratio, 
-			m_settings.near, 
+		return glm::perspective(
+			glm::radians(m_settings.fov),
+			m_settings.aspect_ratio,
+			m_settings.near,
 			m_settings.far);
 	}
 
-	const glm::mat4& perspective_camera::get_projection_matrix() const
+	glm::mat4 perspective_camera::get_view_matrix() const
 	{
-		return m_projection;
+		return glm::lookAt(Position, Position + Front, Up);
 	}
 }

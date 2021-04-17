@@ -40,20 +40,20 @@ private:
 	vr::glfw::window& m_window;
 	vr::glfw::keyboard m_kb;
 	vr::glfw::mouse m_mouse;
-	input_listener m_input_listener;
 	vr::perspective_camera::settings m_camera_settings;
 	std::unique_ptr<vr::perspective_camera> m_camera;
+	fps_counter m_fps_counter;
+	input_listener m_input_listener;
 
 	vr::gl::renderer_settings m_renderer_settings;
 	std::unique_ptr<vr::gl::renderer> m_renderer;
-	std::unique_ptr<fps_counter> m_fps_counter;
 
 	vr::scene m_scene;
 
 	std::unique_ptr<vr::cube_texture> m_cube_texture;
 	std::unique_ptr<vr::shader_material> m_skybox_material;
 
-	user_controls m_controls;
+	//user_controls m_controls;
 	const bool m_wireframe_mode = false;
 	
 	float m_last_timestamp;

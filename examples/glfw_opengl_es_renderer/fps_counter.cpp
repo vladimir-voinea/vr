@@ -13,10 +13,10 @@ void fps_counter::frame(float timestamp)
 {
 	++m_n_frames;
 
-	const float diff = timestamp - m_first_timestamp;
-	if (diff > 0.25f)
+	m_delta_time = timestamp - m_first_timestamp;
+	if (m_delta_time > 0.25f)
 	{
-		m_fps = static_cast<uint16_t>(static_cast<float>(get_rendered_frames()) / (diff));
+		m_fps = static_cast<uint16_t>(static_cast<float>(get_rendered_frames()) / (m_delta_time));
 		m_first_timestamp = timestamp;
 		m_n_frames = 0;
 	}
@@ -25,4 +25,9 @@ void fps_counter::frame(float timestamp)
 uint16_t fps_counter::get_fps() const
 {
 	return m_fps;
+}
+
+float fps_counter::get_time_since_last_frame() const
+{
+	return m_delta_time;
 }

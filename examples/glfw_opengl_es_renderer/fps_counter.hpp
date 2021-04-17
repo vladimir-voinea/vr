@@ -9,6 +9,7 @@ public:
 
 	void frame(float delta_time);
 	uint16_t get_fps() const;
+	float get_time_since_last_frame() const;
 
 private:
 	uint64_t get_rendered_frames() const;
@@ -17,5 +18,6 @@ private:
 	uint64_t m_n_frames = 0;
 	float m_first_timestamp = 0.0f;
 	float m_current_timestamp = 0.0f;
+	float m_delta_time = 0.0f;
 	uint16_t m_fps;
 };
