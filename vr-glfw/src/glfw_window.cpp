@@ -102,6 +102,7 @@ namespace vr::glfw
 
 			glfwSetWindowUserPointer(m_window, this);
 			glfwSetWindowFocusCallback(m_window, glfw_window_focus_callback);
+			glfwSetFramebufferSizeCallback(m_window, glfw_framebuffer_resize_callback);
 		}
 
 		return created;
@@ -122,6 +123,14 @@ namespace vr::glfw
 	void window::window_focus_callback(bool status)
 	{
 		m_has_focus = status;
+	}
+
+	void window::window_framebuffer_callback(int width, int height)
+	{
+		if (m_framebuffer_resize_callback)
+		{
+			m_framebuffer_resize_callback(width, height);
+		}
 	}
 
 	void window::request_close()
@@ -147,6 +156,19 @@ namespace vr::glfw
 		return size;
 	}
 
+	window_size window::get_viewport_size()
+	{
+		window_size size;
+		glfwGetFramebufferSize(m_window, &size.width, &size.height);
+
+		return size;
+	}
+
+	void window::set_framebuffer_resize_callback(std::function<void(int, int)> callback)
+	{
+		m_framebuffer_resize_callback = callback;
+	}
+
 	void window::swap_buffers()
 	{
 		glfwSwapBuffers(m_window);
@@ -161,6 +183,20 @@ namespace vr::glfw
 			const bool status = focused;
 			spdlog::info("Got focus: {0}", status);
 			window_instance->window_focus_callback(status);
+		}
+		else
+		{
+			spdlog::error("User pointer is null");
+		}
+	}
+
+	void glfw_framebuffer_resize_callback(GLFWwindow* window, int width, int height)
+	{
+		void* window_user_ptr = glfwGetWindowUserPointer(window);
+		auto window_instance = static_cast<vr::glfw::window*>(window_user_ptr);
+		if (window_instance != nullptr)
+		{
+			window_instance->window_framebuffer_callback(width, height);
 		}
 		else
 		{

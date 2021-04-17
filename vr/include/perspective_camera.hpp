@@ -25,7 +25,7 @@ namespace vr
 		const glm::mat4& get_projection_matrix() const override;
 
 	private:
-		settings m_settings;
+		const settings& m_settings;
 		glm::mat4 m_projection;
 		glm::vec3 m_position;
 		glm::vec3 m_direction;

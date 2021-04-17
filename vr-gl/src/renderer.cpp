@@ -231,6 +231,8 @@ namespace vr::gl
 
 	void renderer::render(vr::scene& scene, const vr::camera& camera)
 	{
+		glViewport(0, 0, m_settings.size.width, m_settings.size.height);
+
 		if (m_settings.clear_color)
 		{
 			const auto clear_color = glm::normalize(glm::vec3(m_settings.clear_color->x, m_settings.clear_color->y, m_settings.clear_color->z));

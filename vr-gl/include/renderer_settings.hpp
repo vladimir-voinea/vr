@@ -8,8 +8,16 @@
 
 namespace vr::gl
 {
+	struct viewport_size
+	{
+		int width;
+		int height;
+	};
+
 	struct renderer_settings
 	{
+		viewport_size size;
+
 		std::unique_ptr<glm::vec3> clear_color;
 		std::unique_ptr<skybox> skybox;
 

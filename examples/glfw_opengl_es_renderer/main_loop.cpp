@@ -23,9 +23,8 @@ main_loop::main_loop(vr::glfw::window& window)
 	: m_window(window)
 	, m_kb(window)
 	, m_mouse(window)
-	, m_camera(std::make_unique<vr::perspective_camera>(vr::perspective_camera::settings{
-	45.f, static_cast<float>(window.get_size().width) / static_cast<float>(window.get_size().height),
-	0.1f,100.f }))
+	, m_camera_settings({ 45.f, static_cast<float>(window.get_viewport_size().width) / static_cast<float>(window.get_viewport_size().height), 0.1f,100.f })
+	, m_camera(std::make_unique<vr::perspective_camera>(m_camera_settings))
 	, m_controls(m_window, *m_camera, m_mouse, m_kb)
 {
 	init();
@@ -153,7 +152,18 @@ void main_loop::init()
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
+	m_renderer_settings.size.width = m_window.get_viewport_size().width;
+	m_renderer_settings.size.height = m_window.get_viewport_size().height;
+
 	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
+	m_window.set_framebuffer_resize_callback([this](int width, int height)
+		{
+			spdlog::info("New framebuffer size: {0}, {1}", width, height);
+			m_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+			m_camera->update_projection_matrix();
+			m_renderer_settings.size.width = width;
+			m_renderer_settings.size.height = height;
+		});
 
 	initialize_controls();
 	initialize_position();

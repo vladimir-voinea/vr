@@ -39,7 +39,8 @@ private:
 	vr::glfw::window& m_window;
 	vr::glfw::keyboard m_kb;
 	vr::glfw::mouse m_mouse;
-	std::unique_ptr<vr::camera> m_camera;
+	vr::perspective_camera::settings m_camera_settings;
+	std::unique_ptr<vr::perspective_camera> m_camera;
 
 	vr::scene m_scene;
 
