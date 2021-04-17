@@ -30,14 +30,14 @@ void user_controls::enter_moving_mode()
 {
 	m_mode = mode::moving;
 	m_mouse.set_position(m_last_moving_position);
-	m_mouse.set_mode(vr::glfw::mouse::mode::disabled);
+	m_mouse.set_mode(vr::glfw::mouse_mode::disabled);
 }
 
 void user_controls::enter_stationary_mode()
 {
 	m_mode = mode::stationary;
 	m_last_moving_position = m_mouse.get_position();
-	m_mouse.set_mode(vr::glfw::mouse::mode::normal);
+	m_mouse.set_mode(vr::glfw::mouse_mode::normal);
 }
 
 void user_controls::mode_switch()

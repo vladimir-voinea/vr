@@ -31,7 +31,7 @@ private:
 	vr::glfw::keyboard m_kb;
 
 	mode m_mode;
-	vr::glfw::mouse::position m_last_moving_position;
+	vr::glfw::mouse_position m_last_moving_position;
 
 	float m_yaw;
 	float m_pitch;
