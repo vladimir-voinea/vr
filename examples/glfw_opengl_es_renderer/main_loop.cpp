@@ -37,7 +37,6 @@ main_loop::main_loop(vr::glfw::window& window)
 	, m_camera(std::make_unique<vr::perspective_camera>(m_camera_settings))
 	, m_fps_counter(vr::glfw::get_time())
 	, m_input_listener(m_window, *m_camera, m_fps_counter)
-	//, m_controls(m_window, *m_camera, m_mouse, m_kb)
 {
 	init();
 }
@@ -62,8 +61,6 @@ void main_loop::initialize_controls()
 
 void main_loop::initialize_position()
 {
-	//m_camera->set_position({ -2.7872, 1.74459, 9.47206 });
-	//m_camera->set_direction({ 0.115009114, 0.016061125, -0.9932346 });
 }
 
 void main_loop::process_input()

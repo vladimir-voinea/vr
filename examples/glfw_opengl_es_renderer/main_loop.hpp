@@ -1,7 +1,6 @@
 #pragma once
 
 #include "shaders.hpp"
-#include "user_controls.hpp"
 #include "fps_counter.hpp"
 #include "input_listener.hpp"
 
@@ -53,7 +52,6 @@ private:
 	std::unique_ptr<vr::cube_texture> m_cube_texture;
 	std::unique_ptr<vr::shader_material> m_skybox_material;
 
-	//user_controls m_controls;
 	const bool m_wireframe_mode = false;
 	
 	float m_last_timestamp;
