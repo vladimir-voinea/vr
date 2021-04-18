@@ -2,6 +2,7 @@
 #include "glfw_user_pointer.hpp"
 
 #include <GLFW/glfw3.h>
+#include <spdlog/spdlog.h>
 
 #include <unordered_map>
 #include <string>
@@ -154,57 +155,64 @@ namespace vr::glfw
 	{
 		if (m_listener)
 		{
-			key k = glfw_key_to_enum(which_key);
-			key_action k_action = key_action::press;
+			try
+			{
+				key k = glfw_key_to_enum(which_key);
+				key_action k_action = key_action::press;
 
-			switch (action)
-			{
-			case GLFW_PRESS:
-			{
-				k_action = key_action::press;
-				break;
-			}
-			case GLFW_REPEAT:
-			{
-				k_action = key_action::repeat;
-				break;
-			}
-			case GLFW_RELEASE:
-			{
-				k_action = key_action::release;
-				break;
-			}
-			}
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					k_action = key_action::press;
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					k_action = key_action::repeat;
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					k_action = key_action::release;
+					break;
+				}
+				}
 
-			uint16_t mod = 0;
-			if (mods & GLFW_MOD_SHIFT)
-			{
-				mod = mod | static_cast<decltype(mod)>(modifiers::shift);
-			}
-			if (mods & GLFW_MOD_CONTROL)
-			{
-				mod = mod | static_cast<decltype(mod)>(modifiers::control);
-			}
-			if (mods & GLFW_MOD_ALT)
-			{
-				mod = mod | static_cast<decltype(mod)>(modifiers::alt);
-			}
-			if (mods & GLFW_MOD_SUPER)
-			{
-				mod = mod | static_cast<decltype(mod)>(modifiers::super);
-			}
-			if (mods & GLFW_MOD_CAPS_LOCK)
-			{
-				mod = mod | static_cast<decltype(mod)>(modifiers::caps_lock);
-			}
-			if (mods & GLFW_MOD_NUM_LOCK)
-			{
-				mod = mod | static_cast<decltype(mod)>(modifiers::num_lock);
-			}
+				uint16_t mod = 0;
+				if (mods & GLFW_MOD_SHIFT)
+				{
+					mod = mod | static_cast<decltype(mod)>(modifiers::shift);
+				}
+				if (mods & GLFW_MOD_CONTROL)
+				{
+					mod = mod | static_cast<decltype(mod)>(modifiers::control);
+				}
+				if (mods & GLFW_MOD_ALT)
+				{
+					mod = mod | static_cast<decltype(mod)>(modifiers::alt);
+				}
+				if (mods & GLFW_MOD_SUPER)
+				{
+					mod = mod | static_cast<decltype(mod)>(modifiers::super);
+				}
+				if (mods & GLFW_MOD_CAPS_LOCK)
+				{
+					mod = mod | static_cast<decltype(mod)>(modifiers::caps_lock);
+				}
+				if (mods & GLFW_MOD_NUM_LOCK)
+				{
+					mod = mod | static_cast<decltype(mod)>(modifiers::num_lock);
+				}
 
-			modifiers converted_modifiers = static_cast<modifiers>(mod);
+				modifiers converted_modifiers = static_cast<modifiers>(mod);
 
-			m_listener->on_key_event(k, k_action, converted_modifiers);
+				m_listener->on_key_event(k, k_action, converted_modifiers);
+			}
+			catch (const std::exception& ex)
+			{
+				spdlog::error("Exception when handling key callback: {0}", ex.what());
+			}
 		}
 	}
 
