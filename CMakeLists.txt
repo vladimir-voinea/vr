@@ -2,7 +2,7 @@
 # and include sub-projects here.
 #
 cmake_minimum_required (VERSION 3.8)
-project(vr VERSION 0.1 DESCRIPTION "Vulkan graphics library")
+project(vr VERSION 0.1 DESCRIPTION "Vladimir's graphics library")
 
 # CMake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
