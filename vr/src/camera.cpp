@@ -14,7 +14,6 @@ namespace vr
 		, m_world_up(up)
 		, m_pitch(pitch)
 		, m_yaw(yaw)
-		, m_movement_speed(SPEED)
 		, m_mouse_sensitivity(SENSITIVITY)
 		, m_zoom(zoom)
 	{
@@ -28,18 +27,9 @@ namespace vr
 		return glm::lookAt(m_position, m_position + m_front, m_up);
 	}
 
-	// processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-	void camera::process_keyboard(Camera_Movement direction, float delta_time)
+	void camera::translate(const glm::vec3& translation)
 	{
-		float velocity = m_movement_speed * delta_time;
-		if (direction == Camera_Movement::FORWARD)
-			m_position += m_front * velocity;
-		if (direction == Camera_Movement::BACKWARD)
-			m_position -= m_front * velocity;
-		if (direction == Camera_Movement::LEFT)
-			m_position -= m_right * velocity;
-		if (direction == Camera_Movement::RIGHT)
-			m_position += m_right * velocity;
+		m_position += translation;
 	}
 
 	// processes input received from a mouse input system. Expects the offset value in both the x and y direction.

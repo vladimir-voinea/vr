@@ -5,14 +5,6 @@
 
 namespace vr
 {
-	// Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-	enum class Camera_Movement {
-		FORWARD,
-		BACKWARD,
-		LEFT,
-		RIGHT
-	};
-
 	class camera
 	{
 	public:
@@ -22,11 +14,26 @@ namespace vr
 		virtual glm::mat4 get_projection_matrix() const = 0;
 		virtual glm::mat4 get_view_matrix() const;
 
-		void process_keyboard(Camera_Movement direction, float delta_time);
-
 		void process_mouse_movement(float xoffset, float yoffset, bool constrain_pitch = true);
 
 		void process_mouse_scroll(float yoffset);
+
+		void translate(const glm::vec3& translation);
+
+		const glm::vec3& get_front() const
+		{
+			return m_front;
+		}
+
+		const glm::vec3& get_right() const
+		{
+			return m_right;
+		}
+		
+		const glm::vec3& get_up() const
+		{
+			return m_up;
+		}
 
 	private:
 		void update_camera_vectors();

@@ -14,34 +14,37 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 
 	if (state == vr::glfw::key_action::press || state == vr::glfw::key_action::repeat)
 	{
-		using m = vr::Camera_Movement;
-		m movement = m::FORWARD;
+		glm::vec3 direction = m_camera.get_front();
+
 		using k = vr::glfw::key;
 		switch (key)
 		{
 		case k::w:
 		{
-			movement = m::FORWARD;
+			direction = m_camera.get_front();
 			break;
 		}
 		case k::a:
 		{
-			movement = m::LEFT;
+			direction = -m_camera.get_right();
 			break;
 		}
 		case k::s:
 		{
-			movement = m::BACKWARD;
+			direction = -m_camera.get_front();
 			break;
 		}
 		case k::d:
 		{
-			movement = m::RIGHT;
+			direction = m_camera.get_right();
 			break;
 		}
 		}
 
-		m_camera.process_keyboard(movement, m_timing.get_time_since_last_frame());
+		const auto speed = 2.5f;
+		const auto delta_time = m_timing.get_time_since_last_frame();
+		const auto velocity = speed * delta_time;
+		m_camera.translate(direction * velocity);
 	}
 }
 
