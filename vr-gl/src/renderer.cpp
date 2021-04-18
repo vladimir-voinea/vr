@@ -259,23 +259,26 @@ namespace vr::gl
 
 	void renderer::load_object(object3d* object)
 	{
-		for (const auto mesh : object->get_meshes())
+		if (object->has_geometry())
 		{
-			loaded_geometry* geometry = nullptr;
-			loaded_shader* shader = nullptr;
-			loaded_texture* texture = nullptr;
+			for (const auto mesh : object->get_meshes())
+			{
+				loaded_geometry* geometry = nullptr;
+				loaded_shader* shader = nullptr;
+				loaded_texture* texture = nullptr;
 
-			if (!m_cache->get(mesh->get_geometry()))
-			{
-				geometry = m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
-			}
-			if (const auto opengl_shader = &static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader(); !m_cache->get(opengl_shader))
-			{
-				shader = m_cache->set(opengl_shader, load_shader(*opengl_shader));
-			}
-			if (mesh->get_texture() && !m_cache->get(mesh->get_texture()))
-			{
-				texture = m_cache->set(mesh->get_texture(), ::load_texture(mesh->get_texture()));
+				if (!m_cache->get(mesh->get_geometry()))
+				{
+					geometry = m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
+				}
+				if (const auto opengl_shader = &static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader(); !m_cache->get(opengl_shader))
+				{
+					shader = m_cache->set(opengl_shader, load_shader(*opengl_shader));
+				}
+				if (mesh->get_texture() && !m_cache->get(mesh->get_texture()))
+				{
+					texture = m_cache->set(mesh->get_texture(), ::load_texture(mesh->get_texture()));
+				}
 			}
 		}
 
@@ -370,22 +373,25 @@ namespace vr::gl
 
 	void renderer::render_object(const object3d* object, const vr::camera& camera)
 	{
-		for (const auto* mesh : object->get_meshes())
+		if (object->has_geometry())
 		{
-			const auto geometry = m_cache->get(mesh->get_geometry());
-			const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
-
-			if (mesh->get_texture())
+			for (const auto* mesh : object->get_meshes())
 			{
-				const auto texture = m_cache->get(mesh->get_texture());
-				activate_texture(texture);
+				const auto geometry = m_cache->get(mesh->get_geometry());
+				const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
+
+				if (mesh->get_texture())
+				{
+					const auto texture = m_cache->get(mesh->get_texture());
+					activate_texture(texture);
+				}
+
+				activate_shader(shader);
+				load_builtin_uniforms(shader, object, camera);
+				load_shader_uniforms(static_cast<const opengl_shader_material*>(mesh->get_material()), shader);
+
+				render_geometry(mesh->get_geometry(), shader);
 			}
-
-			activate_shader(shader);
-			load_builtin_uniforms(shader, object, camera);
-			load_shader_uniforms(static_cast<const opengl_shader_material*>(mesh->get_material()), shader);
-
-			render_geometry(mesh->get_geometry(), shader);
 		}
 
 		for (const auto child : object->get_children())
