@@ -15,25 +15,11 @@ namespace vr
 		virtual glm::mat4 get_view_matrix() const;
 
 		void process_mouse_movement(float xoffset, float yoffset, bool constrain_pitch = true);
-
 		void process_mouse_scroll(float yoffset);
 
-		void translate(const glm::vec3& translation) override;
-
-		const glm::vec3& get_front() const
-		{
-			return m_front;
-		}
-
-		const glm::vec3& get_right() const
-		{
-			return m_right;
-		}
-		
-		const glm::vec3& get_up() const
-		{
-			return m_up;
-		}
+		const glm::vec3& get_front() const;
+		const glm::vec3& get_right() const;
+		const glm::vec3& get_up() const;
 
 		void rotate(const glm::vec3& axis, float angle) override;
 
@@ -51,7 +37,6 @@ namespace vr
 
 	private:
 		// camera Attributes
-		glm::vec3 m_position;
 		glm::vec3 m_front;
 		glm::vec3 m_up;
 		glm::vec3 m_right;

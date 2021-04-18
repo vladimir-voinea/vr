@@ -13,13 +13,13 @@ namespace vr
 	const float PITCH = 0.0f;
 
 	camera::camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch, float zoom)
-		: m_position(position)
-		, m_front(direction)
+		: m_front(direction)
 		, m_world_up(up)
 		, m_pitch(pitch)
 		, m_yaw(yaw)
 		, m_zoom(zoom)
 	{
+		transformable::m_position = position;
 		update_camera_vectors();
 	}
 
@@ -27,12 +27,7 @@ namespace vr
 	
 	glm::mat4 camera::get_view_matrix() const
 	{
-		return glm::lookAt(m_position, m_position + m_front, m_up);
-	}
-
-	void camera::translate(const glm::vec3& translation)
-	{
-		m_position += translation;
+		return glm::lookAt(transformable::m_position, transformable::m_position + m_front, m_up);
 	}
 
 	// processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -42,7 +37,7 @@ namespace vr
 		m_pitch += yoffset;
 
 		spdlog::info("Pitch: {0}, Yaw: {1} after mouse event", m_pitch, m_yaw);
-
+		 
 		// make sure that when pitch is out of bounds, screen doesn't get flipped
 		if (constrain_pitch)
 		{
@@ -57,16 +52,6 @@ namespace vr
 		update_transformable_quaternion();
 	}
 
-	void camera::rotate(const glm::vec3& axis, float angle)
-	{
-		update_front_from_angle_axis(axis, angle);
-		update_yaw_and_pitch_from_front();
-		update_right_and_up_vectors();
-		update_transformable_quaternion();
-
-		spdlog::info("Pitch: {0}, Yaw: {1} after rotate event", m_pitch, m_yaw);
-	}
-
 	// processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
 	void camera::process_mouse_scroll(float yoffset)
 	{
@@ -75,6 +60,31 @@ namespace vr
 			m_zoom = 1.0f;
 		if (m_zoom > 45.0f)
 			m_zoom = 45.0f;
+	}
+
+	const glm::vec3& camera::get_front() const
+	{
+		return m_front;
+	}
+
+	const glm::vec3& camera::get_right() const
+	{
+		return m_right;
+	}
+
+	const glm::vec3& camera::get_up() const
+	{
+		return m_up;
+	}
+
+	void camera::rotate(const glm::vec3& axis, float angle)
+	{
+		update_front_from_angle_axis(axis, angle);
+		update_yaw_and_pitch_from_front();
+		update_right_and_up_vectors();
+		update_transformable_quaternion();
+
+		spdlog::info("Pitch: {0}, Yaw: {1} after rotate event", m_pitch, m_yaw);
 	}
 
 	// calculates the front vector from the Camera's (updated) Euler Angles
