@@ -19,7 +19,7 @@ namespace vr
 			float near;
 			float far;
 			
-			glm::vec3 position;
+			glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 direction = glm::vec3(0.f, 0.f, -1.f);
 			glm::vec3 up = glm::vec3(0.f, 0.1f, 0.f);
 			float pitch = 0.f;

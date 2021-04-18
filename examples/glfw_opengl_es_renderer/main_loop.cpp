@@ -24,7 +24,7 @@ static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932
 vr::perspective_camera::settings make_camera_settings(vr::glfw::window& window) 
 {
 	vr::perspective_camera::settings settings { 45.f, static_cast<float>(window.get_viewport_size().width) / static_cast<float>(window.get_viewport_size().height), 0.1f, 100.f,
-	start_position, start_direction };
+	/*start_position, start_direction*/ };
 
 	return settings;
 }
@@ -51,6 +51,9 @@ void main_loop::initialize_controls()
 	m_kb.set_listener(&m_input_listener);
 	m_mouse.set_listener(&m_input_listener);
 	m_mouse.set_mode(vr::glfw::mouse_mode::disabled);
+	const auto viewport_size = m_window.get_viewport_size();
+	const auto mouse_position = vr::glfw::mouse_position{ static_cast<double>(viewport_size.width / 2), static_cast<double>(viewport_size.height / 2) };
+	m_mouse.set_position(mouse_position);
 
 	m_kb.set_sticky_keys(true);
 	m_mouse.set_sticky_buttons(true);
