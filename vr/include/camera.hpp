@@ -16,7 +16,7 @@ namespace vr
 	class camera
 	{
 	public:
-		camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch);
+		camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch, float zoom);
 
 		virtual ~camera();
 		virtual glm::mat4 get_projection_matrix() const = 0;
@@ -31,6 +31,9 @@ namespace vr
 	private:
 		void update_camera_vectors();
 
+	protected:
+		float m_zoom;
+
 	private:
 		// camera Attributes
 		glm::vec3 m_position;
@@ -44,6 +47,5 @@ namespace vr
 		// camera options
 		float m_movement_speed;
 		float m_mouse_sensitivity;
-		float m_zoom;
 	};
 }

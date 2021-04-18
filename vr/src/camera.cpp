@@ -8,7 +8,7 @@ namespace vr
 	const float YAW = -90.0f;
 	const float PITCH = 0.0f;
 
-	camera::camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch)
+	camera::camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch, float zoom)
 		: m_position(position)
 		, m_front(direction)
 		, m_world_up(up)
@@ -16,7 +16,7 @@ namespace vr
 		, m_yaw(yaw)
 		, m_movement_speed(SPEED)
 		, m_mouse_sensitivity(SENSITIVITY)
-		, m_zoom(ZOOM)
+		, m_zoom(zoom)
 	{
 		update_camera_vectors();
 	}
