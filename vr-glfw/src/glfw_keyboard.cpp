@@ -10,7 +10,7 @@
 namespace
 {
 	using k = vr::glfw::key;
-	const std::unordered_map<k, int> key_mapping = {
+	const std::unordered_map<k, int> key_to_glfw_mapping = {
 		{ k::a, GLFW_KEY_A },
 		{ k::b, GLFW_KEY_B },
 		{ k::c, GLFW_KEY_C },
@@ -43,13 +43,59 @@ namespace
 		{ k::escape, GLFW_KEY_ESCAPE }
 	};
 
+	const std::unordered_map<int, k> glfw_to_key_mapping = {
+	{ GLFW_KEY_A, k::a },
+	{ GLFW_KEY_B, k::b },
+	{ GLFW_KEY_C, k::c },
+	{ GLFW_KEY_D, k::d },
+	{ GLFW_KEY_E, k::e },
+	{ GLFW_KEY_F, k::f },
+	{ GLFW_KEY_G, k::g },
+	{ GLFW_KEY_H, k::h },
+	{ GLFW_KEY_I, k::i },
+	{ GLFW_KEY_J, k::j },
+	{ GLFW_KEY_K, k::k },
+	{ GLFW_KEY_L, k::l },
+	{ GLFW_KEY_M, k::m },
+	{ GLFW_KEY_N, k::n },
+	{ GLFW_KEY_O, k::o },
+	{ GLFW_KEY_P, k::p },
+	{ GLFW_KEY_Q, k::q },
+	{ GLFW_KEY_R, k::r },
+	{ GLFW_KEY_S, k::s },
+	{ GLFW_KEY_T, k::t },
+	{ GLFW_KEY_U, k::u },
+	{ GLFW_KEY_V, k::v },
+	{ GLFW_KEY_W, k::w },
+	{ GLFW_KEY_X, k::x },
+	{ GLFW_KEY_Y, k::y },
+	{ GLFW_KEY_Z, k::z },
+	{ GLFW_KEY_SPACE, k::space },
+	{ GLFW_KEY_LEFT_CONTROL, k::left_ctrl },
+	{ GLFW_KEY_LEFT_SHIFT, k::left_shift },
+	{ GLFW_KEY_ESCAPE, k::escape }
+	};
+
 	int enum_to_glfw_key(const k& key)
 	{
-		auto it = key_mapping.find(key);
-		if (it == key_mapping.end())
+		auto it = key_to_glfw_mapping.find(key);
+		if (it == key_to_glfw_mapping.end())
 		{
 			std::string message = "Keyboard key  enum value " +
 				std::to_string(static_cast<uint16_t>(key)) + " has no mapping";
+			throw std::runtime_error(message);
+		}
+
+		return it->second;
+	}
+
+	k glfw_key_to_enum(const int glfw_key)
+	{
+		auto it = glfw_to_key_mapping.find(glfw_key);
+		if (it == glfw_to_key_mapping.end())
+		{
+			std::string message = "Keyboard key  enum value " +
+				std::to_string(glfw_key) + " has no mapping";
 			throw std::runtime_error(message);
 		}
 
@@ -108,7 +154,7 @@ namespace vr::glfw
 	{
 		if (m_listener)
 		{
-			key k = static_cast<key>(which_key);
+			key k = glfw_key_to_enum(which_key);
 			key_action k_action = key_action::press;
 
 			switch (action)
@@ -161,7 +207,7 @@ namespace vr::glfw
 			m_listener->on_key_event(k, k_action, converted_modifiers);
 		}
 	}
-	
+
 	void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard;

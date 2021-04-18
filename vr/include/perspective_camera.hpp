@@ -5,7 +5,7 @@
 
 namespace vr
 {
-	const float SPEED = 22.5f;
+	const float SPEED = 2.5f;
 	const float SENSITIVITY = 0.1f;
 	const float ZOOM = 45.0f;
 
