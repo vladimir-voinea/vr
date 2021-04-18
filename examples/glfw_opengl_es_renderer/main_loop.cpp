@@ -21,6 +21,16 @@
 static const auto start_position = glm::vec3{ -2.7872, 1.74459, 9.47206 };
 static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932346 };
 
+void initialize_glew()
+{
+	glewExperimental = GL_TRUE;
+	const auto glew_initialization = glewInit();
+	if (glew_initialization != GLEW_OK)
+	{
+		throw std::runtime_error("Could not initialize glew");
+	}
+}
+
 vr::perspective_camera::settings make_camera_settings(vr::glfw::window& window) 
 {
 	vr::perspective_camera::settings settings { 45.f, static_cast<float>(window.get_viewport_size().width) / static_cast<float>(window.get_viewport_size().height), 0.1f, 100.f,
@@ -153,6 +163,8 @@ vr::geometry import_model(const std::string& name)
 
 void main_loop::init()
 {
+	initialize_glew();
+
 	m_cube_texture = std::make_unique<vr::cube_texture>(std::unordered_map<std::string, std::string>{
 		//{ vr::cube_texture::p_x, "data/skybox/right.jpg" },
 		//{ vr::cube_texture::n_x, "data/skybox/left.jpg" },

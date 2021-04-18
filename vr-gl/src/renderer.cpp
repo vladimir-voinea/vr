@@ -188,15 +188,6 @@ namespace
 		return result;
 	}
 
-	void initialize_glew()
-	{
-		glewExperimental = GL_TRUE;
-		const auto glew_initialization = glewInit();
-		if (glew_initialization != GLEW_OK)
-		{
-			throw std::runtime_error("Could not initialize glew");
-		}
-	}
 }
 
 namespace vr::gl
@@ -207,8 +198,6 @@ namespace vr::gl
 		: m_settings(settings)
 		, m_cache(std::make_unique<renderer_cache>())
 	{
-		initialize_glew();
-
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(opengl_debug_callback, nullptr);
 
