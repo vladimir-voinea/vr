@@ -22,9 +22,9 @@ namespace vr
 	class camera
 	{
 	public:
-		camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
+		camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 direction = glm::vec3(0.f, 0.f, -1.f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
 			: Position(position)
-			, Front(glm::vec3(0.0f, 0.0f, -1.0f))
+			, Front(direction)
 			, WorldUp(up)
 			, Pitch(pitch)
 			, Yaw(yaw)

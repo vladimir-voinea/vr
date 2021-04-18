@@ -15,6 +15,7 @@ namespace vr::glfw
 
 		void set_listener(mouse_listener* listener);
 		void set_sticky_buttons(bool value);
+		void set_raw_motion(bool value);
 
 		mouse_position get_position();
 		void set_position(const mouse_position& position);

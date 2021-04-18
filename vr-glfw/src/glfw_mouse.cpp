@@ -26,6 +26,14 @@ namespace vr::glfw
 			GLFW_STICKY_MOUSE_BUTTONS, value ? GLFW_TRUE : GLFW_FALSE);
 	}
 
+	void mouse::set_raw_motion(bool value)
+	{
+		if (glfwRawMouseMotionSupported())
+		{
+			glfwSetInputMode(m_window.get_handle(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		}
+	}
+
 	mouse_position mouse::get_position()
 	{
 		mouse_position position;
