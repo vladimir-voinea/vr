@@ -41,7 +41,7 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 		}
 		}
 
-		m_camera.ProcessKeyboard(movement, m_timing.get_time_since_last_frame());
+		m_camera.process_keyboard(movement, m_timing.get_time_since_last_frame());
 	}
 }
 
@@ -61,7 +61,7 @@ void input_listener::on_position_event(const vr::glfw::mouse_position& position)
 
 	m_last_mouse_position = position;
 
-	m_camera.ProcessMouseMovement(xoffset, yoffset);
+	m_camera.process_mouse_movement(xoffset, yoffset);
 }
 
 void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mouse_action action)
@@ -73,7 +73,7 @@ void input_listener::on_scroll_event(const vr::glfw::mouse_scroll& scroll)
 {
 	spdlog::info("Mouse scroll event: x offset: {0}, y offset: {1}", scroll.xoffset, scroll.yoffset);
 
-	m_camera.ProcessMouseScroll(scroll.yoffset);
+	m_camera.process_mouse_scroll(scroll.yoffset);
 }
 
 void input_listener::on_enter_event(bool entered)
