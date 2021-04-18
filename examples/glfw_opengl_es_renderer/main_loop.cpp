@@ -24,7 +24,7 @@ static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932
 vr::perspective_camera::settings make_camera_settings(vr::glfw::window& window) 
 {
 	vr::perspective_camera::settings settings { 45.f, static_cast<float>(window.get_viewport_size().width) / static_cast<float>(window.get_viewport_size().height), 0.1f, 100.f,
-	start_position, start_direction };
+	/*start_position, start_direction */};
 
 	return settings;
 }
@@ -292,8 +292,15 @@ void main_loop::render_scene()
 		return glm::normalize(glm::vec3(zero_one_rand(m_monkey_data.m_random_engine), zero_one_rand(m_monkey_data.m_random_engine), zero_one_rand(m_monkey_data.m_random_engine)));
 	};
 
-	const auto rotation_angle = 2.f;
+	const auto rotation_angle = -2.f;
 	m_monkeys.front().obj->rotate(vr::y_axis, rotation_angle * m_delta_time);
+	
+	//auto frames = ++total_frames;
+	//if (frames < 500)
+	//{
+	//	spdlog::info("Frames: {0}", frames);
+	//	m_camera->rotate(vr::z_axis, rotation_angle * m_delta_time);
+	//}
 
 	m_renderer->render(m_scene, *m_camera);
 

@@ -58,11 +58,11 @@ void input_listener::on_position_event(const vr::glfw::mouse_position& position)
 		m_last_mouse_position = vr::glfw::mouse_position{ static_cast<double>(viewport_size.width / 2), static_cast<double>(viewport_size.height / 2) };
 
 	}
-
-	const float xoffset = position.x - m_last_mouse_position->x;
-	const float yoffset = m_last_mouse_position->y - position.y;
-
+	const float sensitivity = 0.1f;
+	const float xoffset = (position.x - m_last_mouse_position->x) * sensitivity;
+	const float yoffset = (m_last_mouse_position->y - position.y) * sensitivity;
 	m_last_mouse_position = position;
+	spdlog::info("Mouse offsets: x = {0}, y = {1}", xoffset, yoffset);
 
 	m_camera.process_mouse_movement(xoffset, yoffset);
 }

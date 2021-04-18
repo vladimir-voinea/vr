@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace vr
 {
@@ -35,8 +34,15 @@ namespace vr
 			return m_up;
 		}
 
+		void rotate(const glm::vec3& axis, float angle);
+
 	private:
 		void update_camera_vectors();
+		void update_front_from_angle_axis(const glm::vec3& axis, float angle);
+		void update_front_from_yaw_and_pitch();
+		void update_right_and_up_vectors();
+
+		void update_yaw_and_pitch_from_front();
 
 	protected:
 		float m_zoom;

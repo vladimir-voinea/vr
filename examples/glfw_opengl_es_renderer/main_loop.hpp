@@ -66,4 +66,6 @@ private:
 	} m_monkey_data;
 	const size_t n_monkeys = 5;
 	std::vector<monkey> m_monkeys;
+
+	int total_frames = 0;
 };
