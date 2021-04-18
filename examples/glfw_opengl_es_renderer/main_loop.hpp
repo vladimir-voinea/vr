@@ -3,6 +3,7 @@
 #include "shaders.hpp"
 #include "fps_counter.hpp"
 #include "input_listener.hpp"
+#include "monkey.hpp"
 
 #include <glfw_window.hpp>
 #include <glfw_keyboard.hpp>
@@ -52,56 +53,17 @@ private:
 	std::unique_ptr<vr::cube_texture> m_cube_texture;
 	std::unique_ptr<vr::shader_material> m_skybox_material;
 
-	const bool m_wireframe_mode = false;
-	
 	float m_last_timestamp;
 	float m_delta_time;
 
-	struct monkey_data {
+	struct {
 		vr::geometry geometry;
 		std::unique_ptr<vr::gl::opengl_shader> shader;
 		std::unique_ptr<vr::texture> texture_uvmap;
 		std::unique_ptr<vr::texture> texture_cobblestone;
 		std::unique_ptr<vr::gl::color_material> material;
-	};
-	monkey_data m_monkey_data;
-
-	struct monkey_instance {
-		std::unique_ptr<vr::object3d> obj;
-		std::unique_ptr<std::vector<vr::gl::uniform>> uniforms;
-		std::unique_ptr<vr::shader_material> material;
-		std::unique_ptr<vr::mesh> mesh;
-
-		std::uniform_real_distribution<> x_rand;
-		std::uniform_real_distribution<> y_rand;
-		std::uniform_real_distribution<> z_rand;
-
-		monkey_instance() = default;
-
-		monkey_instance(monkey_instance&& other)
-		{
-			*this = std::move(other);
-		}
-
-		monkey_instance& operator=(monkey_instance&& other)
-		{
-			if (this != &other)
-			{
-				std::swap(obj, other.obj);
-				std::swap(uniforms, other.uniforms);
-				std::swap(material, other.material);
-				std::swap(mesh, other.mesh);
-				std::swap(x_rand, other.x_rand);
-				std::swap(y_rand, other.y_rand);
-				std::swap(z_rand, other.z_rand);
-			}
-			return *this;
-		}
-	};
-
-	std::default_random_engine m_random_engine;
-
+		std::default_random_engine m_random_engine;
+	} m_monkey_data;
 	const size_t n_monkeys = 5;
-	std::vector<monkey_instance> m_monkeys;
-
+	std::vector<monkey> m_monkeys;
 };

@@ -232,6 +232,7 @@ namespace vr::gl
 	void renderer::render(vr::scene& scene, const vr::camera& camera)
 	{
 		glViewport(0, 0, m_settings.size.width, m_settings.size.height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (m_settings.clear_color)
 		{

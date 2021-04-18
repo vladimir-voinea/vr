@@ -190,7 +190,6 @@ void main_loop::init()
 	initialize_position();
 
 	std::random_device dev;
-	m_random_engine = std::default_random_engine(dev());
 
 	{
 		m_monkey_data.geometry = ::import_model("suzanne");
@@ -198,6 +197,7 @@ void main_loop::init()
 		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.DDS");
 		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");
 		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec4{ 255, 0, 0, 0 });
+		m_monkey_data.m_random_engine = std::default_random_engine(dev());
 	}
 
 	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
@@ -205,7 +205,7 @@ void main_loop::init()
 
 	for (auto i = 0u; i < n_monkeys; ++i)
 	{
-		monkey_instance inst;
+		monkey inst;
 		inst.obj = std::make_unique<vr::object3d>();
 
 		inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, inst.uniforms.get());
@@ -214,9 +214,9 @@ void main_loop::init()
 
 		inst.obj->add_mesh(inst.mesh.get());
 
-		inst.x_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
-		inst.y_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
-		inst.z_rand = std::uniform_real_distribution<>(limits_n(m_random_engine), limits_p(m_random_engine));
+		inst.x_rand = std::uniform_real_distribution<>(limits_n(m_monkey_data.m_random_engine), limits_p(m_monkey_data.m_random_engine));
+		inst.y_rand = std::uniform_real_distribution<>(limits_n(m_monkey_data.m_random_engine), limits_p(m_monkey_data.m_random_engine));
+		inst.z_rand = std::uniform_real_distribution<>(limits_n(m_monkey_data.m_random_engine), limits_p(m_monkey_data.m_random_engine));
 
 		m_monkeys.push_back(std::move(inst));
 	}
@@ -260,19 +260,17 @@ void main_loop::render_scene()
 	const auto projection_matrix = m_camera->get_projection_matrix();
 	const auto view_matrix = m_camera->get_view_matrix();
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	std::bernoulli_distribution true_or_false;
-	auto p_or_n = [&, true_or_false, this]() -> int { return  true_or_false(m_random_engine) ? 1 : -1; };
+	auto p_or_n = [&, true_or_false, this]() -> int { return  true_or_false(m_monkey_data.m_random_engine) ? 1 : -1; };
 
 	std::uniform_int_distribution distance_rand(1, 20);
-	int light_distance_from_object = distance_rand(m_random_engine);
+	int light_distance_from_object = distance_rand(m_monkey_data.m_random_engine);
 	auto light_direction_from_object = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
 
 	std::uniform_int_distribution axis_picker_rand(1, 3);
 	auto pick_axis = [&, axis_picker_rand, this]()
 	{
-		const auto random = axis_picker_rand(m_random_engine);
+		const auto random = axis_picker_rand(m_monkey_data.m_random_engine);
 		switch (random)
 		{
 		case 1:
@@ -291,7 +289,7 @@ void main_loop::render_scene()
 	std::uniform_real_distribution zero_one_rand(0.f, 1.f);
 	auto zero_one_vec = [&, zero_one_rand, this]()
 	{
-		return glm::normalize(glm::vec3(zero_one_rand(m_random_engine), zero_one_rand(m_random_engine), zero_one_rand(m_random_engine)));
+		return glm::normalize(glm::vec3(zero_one_rand(m_monkey_data.m_random_engine), zero_one_rand(m_monkey_data.m_random_engine), zero_one_rand(m_monkey_data.m_random_engine)));
 	};
 
 	const auto rotation_angle = 2.f;
