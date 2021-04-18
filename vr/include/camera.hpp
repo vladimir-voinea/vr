@@ -1,10 +1,11 @@
 #pragma once
 
+#include <object3d.hpp>
 #include <glm/glm.hpp>
 
 namespace vr
 {
-	class camera
+	class camera : public object3d
 	{
 	public:
 		camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch, float zoom);
@@ -17,7 +18,7 @@ namespace vr
 
 		void process_mouse_scroll(float yoffset);
 
-		void translate(const glm::vec3& translation);
+		void translate(const glm::vec3& translation) override;
 
 		const glm::vec3& get_front() const
 		{
@@ -34,7 +35,7 @@ namespace vr
 			return m_up;
 		}
 
-		void rotate(const glm::vec3& axis, float angle);
+		void rotate(const glm::vec3& axis, float angle) override;
 
 	private:
 		void update_camera_vectors();
@@ -43,6 +44,7 @@ namespace vr
 		void update_right_and_up_vectors();
 
 		void update_yaw_and_pitch_from_front();
+		void update_transformable_quaternion();
 
 	protected:
 		float m_zoom;

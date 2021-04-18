@@ -2,7 +2,6 @@
 
 namespace vr
 {
-
 	glm::mat4 transformable::get_transformation_matrix() const
 	{
 		const auto translation = glm::translate(glm::mat4(1.f), m_position);
@@ -16,9 +15,9 @@ namespace vr
 		return glm::eulerAngles(m_quaternion);
 	}
 
-	void transformable::rotate(const glm::vec3& angles_radians, float angle)
+	void transformable::rotate(const glm::vec3& axis, float angle)
 	{
-		m_quaternion *= glm::quat(glm::angleAxis(angle, angles_radians));
+		m_quaternion *= glm::quat(glm::angleAxis(angle, axis));
 	}
 
 	const glm::vec3& transformable::get_translation() const

@@ -54,6 +54,7 @@ namespace vr
 
 		// update Front, Right and Up Vectors using the updated Euler angles
 		update_camera_vectors();
+		update_transformable_quaternion();
 	}
 
 	void camera::rotate(const glm::vec3& axis, float angle)
@@ -61,6 +62,7 @@ namespace vr
 		update_front_from_angle_axis(axis, angle);
 		update_yaw_and_pitch_from_front();
 		update_right_and_up_vectors();
+		update_transformable_quaternion();
 
 		spdlog::info("Pitch: {0}, Yaw: {1} after rotate event", m_pitch, m_yaw);
 	}
@@ -112,5 +114,11 @@ namespace vr
 	{
 		m_pitch = glm::degrees(std::asin(-m_front.y));
 		m_yaw = glm::degrees(std::atan2(m_front.z, m_front.x));
+	}
+
+	void camera::update_transformable_quaternion()
+	{
+		glm::vec3 euler(m_pitch, m_yaw, 0.f);
+		transformable::m_quaternion = glm::quat{ glm::radians(euler) };
 	}
 }
