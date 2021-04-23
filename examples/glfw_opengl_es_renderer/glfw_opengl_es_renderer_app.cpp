@@ -1,5 +1,6 @@
 #include "glfw_opengl_es_renderer_app.hpp"
 #include "main_loop.hpp"
+#include "preamble.hpp"
 
 #include <vr-glfw.hpp>
 #include <vr-gl.hpp>
@@ -30,8 +31,8 @@ void glfw_opengl_es_renderer_app::run()
 		{
 			spdlog::info("Window created successfully");
 
-			main_loop loop(window);
-			loop.run();
+			preamble glfw_preamble(window);
+			glfw_preamble.run_loop();
 		}
 		else
 		{

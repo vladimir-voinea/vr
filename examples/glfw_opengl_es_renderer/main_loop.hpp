@@ -21,29 +21,26 @@
 class main_loop
 {
 public:
-	main_loop(vr::glfw::window& window);
+	main_loop(int width, int height);
 	~main_loop();
 
 	void init();
-	void run();
+	void render_scene(float delta_time);
+	void resize(int width, int height);
+
+	vr::camera& get_camera();
 
 private:
 	vr::mesh import_model(const std::string& name);
-	void initialize_controls();
 	void initialize_position();
 
-	void process_input();
 	void print_state();
-	void render_scene();
 
 private:
-	vr::glfw::window& m_window;
-	vr::glfw::keyboard m_kb;
-	vr::glfw::mouse m_mouse;
+	int m_width;
+	int m_height;
 	vr::perspective_camera::settings m_camera_settings;
 	std::unique_ptr<vr::perspective_camera> m_camera;
-	fps_counter m_fps_counter;
-	input_listener m_input_listener;
 
 	vr::gl::renderer_settings m_renderer_settings;
 	std::unique_ptr<vr::gl::renderer> m_renderer;

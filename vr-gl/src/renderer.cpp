@@ -193,8 +193,6 @@ namespace
 
 namespace vr::gl
 {
-
-
 	renderer::renderer(const renderer_settings& settings)
 		: m_settings(settings)
 		, m_cache(std::make_unique<renderer_cache>())

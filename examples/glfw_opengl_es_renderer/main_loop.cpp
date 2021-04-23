@@ -5,8 +5,6 @@
 
 #include <cube_texture_material.hpp>
 
-#include <glfw_util.hpp>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -17,85 +15,6 @@
 #include <spdlog/spdlog.h>
 
 #include <stdexcept>
-
-static const auto start_position = glm::vec3{ -2.7872, 1.74459, 9.47206 };
-static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932346 };
-
-void initialize_glew()
-{
-	glewExperimental = GL_TRUE;
-	const auto glew_initialization = glewInit();
-	if (glew_initialization != GLEW_OK)
-	{
-		throw std::runtime_error("Could not initialize glew");
-	}
-}
-
-vr::perspective_camera::settings make_camera_settings(vr::glfw::window& window) 
-{
-	vr::perspective_camera::settings settings { 45.f, static_cast<float>(window.get_viewport_size().width) / static_cast<float>(window.get_viewport_size().height), 0.1f, 100.f,
-	/*start_position, start_direction */};
-
-	return settings;
-}
-
-main_loop::main_loop(vr::glfw::window& window)
-	: m_window(window)
-	, m_kb(window)
-	, m_mouse(window)
-	, m_camera_settings(make_camera_settings(m_window))
-	, m_camera(std::make_unique<vr::perspective_camera>(m_camera_settings))
-	, m_fps_counter(vr::glfw::get_time())
-	, m_input_listener(m_window, *m_camera, m_fps_counter)
-{
-	init();
-}
-
-main_loop::~main_loop()
-{
-}
-
-void main_loop::initialize_controls()
-{
-	m_kb.set_listener(&m_input_listener);
-	m_mouse.set_listener(&m_input_listener);
-	m_mouse.set_mode(vr::glfw::mouse_mode::disabled);
-	m_mouse.set_raw_motion(true);
-	const auto viewport_size = m_window.get_viewport_size();
-	const auto mouse_position = vr::glfw::mouse_position{ static_cast<double>(viewport_size.width / 2), static_cast<double>(viewport_size.height / 2) };
-	m_mouse.set_position(mouse_position);
-
-	m_kb.set_sticky_keys(true);
-	m_mouse.set_sticky_buttons(true);
-}
-
-void main_loop::initialize_position()
-{
-}
-
-void main_loop::process_input()
-{
-	//m_controls.process_events(m_delta_time);
-
-	if (m_kb.get_key_state(vr::glfw::key::escape) == vr::glfw::key_action::press)
-	{
-		m_window.request_close();
-	}
-
-}
-
-void main_loop::print_state()
-{
-	//spdlog::info("Position: {0}, {1}, {2}", m_camera->get_position().x, m_camera->get_position().y, m_camera->get_position().z);
-	//spdlog::info("Direction: {0}, {1}, {2}", m_camera->get_direction().x, m_camera->get_direction().y, m_camera->get_direction().z);
-	//spdlog::info("FPS: {0}", m_fps_counter->get_fps());
-
-	//for (auto i = 0u; i < m_monkeys.size(); ++i)
-	//{
-	//	std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_translation().x << ' ' << m_monkeys[i].obj->get_translation().y << ' ' << m_monkeys[i].obj->get_translation().z << '\n';
-	//	std::cout << "Monkey " << i << " lpos: " << m_monkeys[i].uniforms->at(2).value.vec3f.x << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.y << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.z << '\n';
-	//}
-}
 
 vr::geometry import_model(const std::string& name)
 {
@@ -161,10 +80,50 @@ vr::geometry import_model(const std::string& name)
 	return geometry;
 }
 
+static const auto start_position = glm::vec3{ -2.7872, 1.74459, 9.47206 };
+static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932346 };
+
+vr::perspective_camera::settings make_camera_settings(int width, int height) 
+{
+	vr::perspective_camera::settings settings { 45.f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.f,
+	/*start_position, start_direction */};
+
+	return settings;
+}
+
+main_loop::main_loop(int width, int height)
+	: m_width(width)
+	, m_height(height)
+	, m_camera_settings(make_camera_settings(m_width, m_height))
+	, m_camera(std::make_unique<vr::perspective_camera>(m_camera_settings))
+{
+	init();
+}
+
+main_loop::~main_loop()
+{
+}
+
+void main_loop::initialize_position()
+{
+}
+
+void main_loop::print_state()
+{
+	//spdlog::info("Position: {0}, {1}, {2}", m_camera->get_position().x, m_camera->get_position().y, m_camera->get_position().z);
+	//spdlog::info("Direction: {0}, {1}, {2}", m_camera->get_direction().x, m_camera->get_direction().y, m_camera->get_direction().z);
+	//spdlog::info("FPS: {0}", m_fps_counter->get_fps());
+
+	//for (auto i = 0u; i < m_monkeys.size(); ++i)
+	//{
+	//	std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_translation().x << ' ' << m_monkeys[i].obj->get_translation().y << ' ' << m_monkeys[i].obj->get_translation().z << '\n';
+	//	std::cout << "Monkey " << i << " lpos: " << m_monkeys[i].uniforms->at(2).value.vec3f.x << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.y << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.z << '\n';
+	//}
+}
+
+
 void main_loop::init()
 {
-	initialize_glew();
-
 	m_cube_texture = std::make_unique<vr::cube_texture>(std::unordered_map<std::string, std::string>{
 		//{ vr::cube_texture::p_x, "data/skybox/right.jpg" },
 		//{ vr::cube_texture::n_x, "data/skybox/left.jpg" },
@@ -186,19 +145,11 @@ void main_loop::init()
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
-	m_renderer_settings.size.width = m_window.get_viewport_size().width;
-	m_renderer_settings.size.height = m_window.get_viewport_size().height;
+	m_renderer_settings.size.width = m_width;
+	m_renderer_settings.size.height = m_height;
 
 	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
-	m_window.set_framebuffer_resize_callback([this](int width, int height)
-		{
-			spdlog::info("New framebuffer size: {0}, {1}", width, height);
-			m_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
-			m_renderer_settings.size.width = width;
-			m_renderer_settings.size.height = height;
-		});
 
-	initialize_controls();
 	initialize_position();
 
 	std::random_device dev;
@@ -261,13 +212,24 @@ void main_loop::init()
 	
 }
 
-void main_loop::render_scene()
+void main_loop::resize(int width, int height)
 {
-	const auto current_time = static_cast<float>(vr::glfw::get_time());
-	m_delta_time = current_time - m_last_timestamp;
-	m_last_timestamp = current_time;
+	m_width = width;
+	m_height = height;
 
-	m_fps_counter.frame(current_time);
+	spdlog::info("New framebuffer size: {0}, {1}", width, height);
+	m_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+	m_renderer_settings.size.width = width;
+	m_renderer_settings.size.height = height;
+}
+
+vr::camera& main_loop::get_camera()
+{
+	return *m_camera;
+}
+
+void main_loop::render_scene(float delta_time)
+{
 
 	const auto projection_matrix = m_camera->get_projection_matrix();
 	const auto view_matrix = m_camera->get_view_matrix();
@@ -305,7 +267,7 @@ void main_loop::render_scene()
 	};
 
 	const auto rotation_angle = -2.f;
-	m_monkeys.front().obj->rotate(vr::y_axis, rotation_angle * m_delta_time);
+	m_monkeys.front().obj->rotate(vr::y_axis, rotation_angle * delta_time);
 	
 	//auto frames = ++total_frames;
 	//if (frames < 500)
@@ -316,20 +278,4 @@ void main_loop::render_scene()
 
 	m_renderer->render(m_scene, *m_camera);
 
-	m_window.swap_buffers();
-}
-
-void main_loop::run()
-{
-	while (!m_window.close_requested())
-	{
-		if (m_window.has_focus())
-		{
-			process_input();
-			print_state();
-			render_scene();
-		}
-
-		vr::glfw::poll_events();
-	}
 }
