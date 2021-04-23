@@ -17,6 +17,7 @@ add_subdirectory ("gtest")
 if(DEFINED BUILD_ANDROID)
 	set(ASSIMP_ANDROID_JNIIOSYSTEM ON CACHE BOOL "" FORCE)
 	set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
+	set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 endif()
 add_subdirectory ("assimp")
 
