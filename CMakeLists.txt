@@ -4,6 +4,11 @@
 cmake_minimum_required (VERSION 3.8)
 project(vr VERSION 0.1 DESCRIPTION "Vladimir's graphics library")
 
+if(DEFINED ANDROID)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti -fexceptions -Wall")
+endif()
+
 if(${ANDROID_PLATFORM_LEVEL})
 	set(BUILD_ANDROID ON CACHE BOOL "" FORCE)
 endif()
