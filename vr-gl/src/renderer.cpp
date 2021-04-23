@@ -5,6 +5,7 @@
 #include "renderer_cache.hpp"
 #include "texture_loader.hpp"
 #include "opengl_debug_callback.hpp"
+#include "vr-opengl.h"
 #include <shader_material.hpp>
 
 #include <spdlog/spdlog.h>
@@ -208,7 +209,9 @@ namespace vr::gl
 
 		if (m_settings.wireframe_mode)
 		{
+#ifndef __ANDROID__
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
 		}
 
 		glEnable(GL_DEPTH_TEST);
