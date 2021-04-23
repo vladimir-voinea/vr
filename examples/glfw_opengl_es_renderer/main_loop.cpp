@@ -206,7 +206,7 @@ void main_loop::init()
 	{
 		m_monkey_data.geometry = ::import_model("suzanne");
 		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
-		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.DDS");
+		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.png");
 		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");
 		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec4{ 255, 0, 0, 0 });
 		m_monkey_data.m_random_engine = std::default_random_engine(dev());
