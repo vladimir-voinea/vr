@@ -3,7 +3,6 @@
 #include "mesh.hpp"
 #include "shader_material.hpp"
 #include "texture.hpp"
-#include "renderer_object.hpp"
 #include "transformable.hpp"
 
 #include <glm/glm.hpp>
@@ -12,7 +11,7 @@
 
 namespace vr
 {
-	class object3d : public has_renderer_object, public transformable
+	class object3d : public transformable
 	{
 	public:
 		object3d();
