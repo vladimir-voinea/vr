@@ -11,4 +11,4 @@ target_link_libraries(${LIB_NAME} PUBLIC glm spdlog::spdlog)
 target_include_directories(${LIB_NAME} PUBLIC include)
 
 enable_testing()
-add_subdirectory ("test")
+#add_subdirectory ("test")
