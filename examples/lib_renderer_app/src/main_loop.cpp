@@ -1,7 +1,7 @@
 #include "main_loop.hpp"
 #include <perspective_camera.hpp>
 #include "shader_loader.hpp"
-#include "texture_loader.hpp"
+#include "shaders.hpp"
 
 #include <cube_texture_material.hpp>
 

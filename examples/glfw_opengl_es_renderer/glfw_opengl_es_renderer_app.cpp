@@ -1,5 +1,4 @@
 #include "glfw_opengl_es_renderer_app.hpp"
-#include "main_loop.hpp"
 #include "preamble.hpp"
 
 #include <vr-glfw.hpp>

@@ -1,13 +1,7 @@
 #pragma once
 
-#include "shaders.hpp"
-#include "fps_counter.hpp"
-#include "input_listener.hpp"
 #include "monkey.hpp"
 
-#include <glfw_window.hpp>
-#include <glfw_keyboard.hpp>
-#include <glfw_mouse.hpp>
 #include <assimp/Importer.hpp>
 #include <glm/glm.hpp>
 

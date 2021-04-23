@@ -7,7 +7,7 @@
 #include "fps_counter.hpp"
 #include "input_listener.hpp"
 
-#include "main_loop.hpp"
+#include <main_loop.hpp>
 
 #include <memory>
 
