@@ -38,8 +38,7 @@ if(NOT DEFINED ANDROID)
 add_subdirectory ("vr-vk")
 endif()
 
-if(NOT DEFINED ANDROID)
-	# examples directory
-	add_subdirectory ("examples")
-endif()
+# examples directory
+add_subdirectory ("examples")
+
 message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")

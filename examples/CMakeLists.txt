@@ -1,2 +1,5 @@
 add_subdirectory (lib_renderer_app)
-add_subdirectory (glfw_opengl_es_renderer)
+
+if(NOT DEFINED ANDROID)
+	add_subdirectory (glfw_opengl_es_renderer)
+endif()
