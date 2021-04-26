@@ -28,6 +28,9 @@ endif()
 # vr-gl directory
 add_subdirectory ("vr-gl")
 
+# vr-platform directory
+add_subdirectory ("vr-platform")
+
 if(NOT DEFINED ANDROID)
 	# CMake modules
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
