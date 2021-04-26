@@ -16,6 +16,10 @@
 #include <stdexcept>
 
 #ifdef __ANDROID__
+#include "android_logging.hpp"
+#endif
+
+#ifdef __ANDROID__
 #define on_android(x) x
 #else
 #define on_android(x)
@@ -110,7 +114,7 @@ main_loop::main_loop(int width, int height)
 	}
 	catch (const std::exception& e)
 	{
-		on_android(spdlog::set_default_logger(std::make_shared<spdlog::android_logger_mt>("android", "vr"));)
+		on_android(setup_android_logging();)
 		spdlog::error("Could not initialize main loop: ", e.what());
 	}
 }
