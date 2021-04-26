@@ -1,14 +1,21 @@
 #include <jni.h>
 
+#include <android/log.h>
+#define ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, "ndk_interface.cpp", __VA_ARGS__)
+
 namespace vr::platform
 {
-    JavaVM* vm_pointer;
+    JavaVM* vm_pointer = nullptr;
 
-    JavaVM* get_java_vm();
+    JavaVM* get_java_vm()
+    {
+        return vm_pointer;
+    }
+
     JNIEnv* get_jni_env()
     {
         JNIEnv* env;
-        if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        if (get_java_vm()->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
             env = nullptr;
         }
         
@@ -19,6 +26,8 @@ namespace vr::platform
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     vr::platform::vm_pointer = vm;
+
+    ALOGV("on load!!");
 
     //JNIEnv* env;
     //if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
