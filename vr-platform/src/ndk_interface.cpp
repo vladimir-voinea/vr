@@ -1,7 +1,7 @@
 #include <jni.h>
 
 #include <android/log.h>
-#define ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, "ndk_interface.cpp", __VA_ARGS__)
+#define ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, "ndk_interface", __VA_ARGS__)
 
 namespace vr::platform
 {
@@ -23,17 +23,17 @@ namespace vr::platform
     }
 }
 
+extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
-JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+    __android_log_print(ANDROID_LOG_VERBOSE, "ndk_interface", "JNI OnLoad");
+
+    JNIEnv* env;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        __android_log_print(ANDROID_LOG_VERBOSE, "ndk_interface", "JNI OnLoad error, could not get JNI version 1.6");
+        return JNI_ERR;
+    }
+
     vr::platform::vm_pointer = vm;
-
-    ALOGV("on load!!");
-
-    //JNIEnv* env;
-    //if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-    //    return JNI_ERR;
-    //}
-
     //// Find your class. JNI_OnLoad is called from the correct class loader context for this to work.
     //jclass c = env->FindClass("com/example/app/package/MyClass");
     //if (c == nullptr) return JNI_ERR;
@@ -46,5 +46,5 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     //int rc = env->RegisterNatives(c, methods, sizeof(methods) / sizeof(JNINativeMethod));
     //if (rc != JNI_OK) return rc;
 
-    //return JNI_VERSION_1_6;
+    return JNI_VERSION_1_6;
 }
