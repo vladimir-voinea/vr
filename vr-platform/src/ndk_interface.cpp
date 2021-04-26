@@ -19,18 +19,20 @@ namespace vr::platform
         if (get_java_vm()->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
             env = nullptr;
         }
-        
-        return env;
-    }
 
-    void set_asset_manager(JNIEnv* env, jobject object, jobject manager)
-    {
-        ALOGV("Received asset manager");
-        asset_manager = manager;
+        return env;
     }
 }
 
-extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+extern "C" JNIEXPORT void JNICALL
+Java_com_android_gles3jni_GLES3JNILib_set_1asset_1manager(JNIEnv * env, jclass clazz,
+    jobject manager)
+{
+    ALOGV("Received asset manager");
+    vr::platform::asset_manager = env->NewGlobalRef(manager);
+}
+
+extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM * vm, void* reserved) {
 
     ALOGV("JNI OnLoad");
 
@@ -41,22 +43,6 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     }
 
     vr::platform::vm_pointer = vm;
-
-    jclass c = env->FindClass("com/android/gles3jni/GLES3JNILib");
-    if (c == nullptr)
-    {
-        return JNI_ERR;
-    }
-
-    static const JNINativeMethod methods[] = {
-        {"set_asset_manager", "(Landroid.content.res.AssetManager)V", reinterpret_cast<void*>(vr::platform::set_asset_manager)}
-    };
-
-    int rc = env->RegisterNatives(c, methods, sizeof(methods) / sizeof(JNINativeMethod));
-    if (rc != JNI_OK)
-    {
-        return rc;
-    }
 
     return JNI_VERSION_1_6;
 }
