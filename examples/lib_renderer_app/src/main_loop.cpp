@@ -97,7 +97,14 @@ main_loop::main_loop(int width, int height)
 	, m_camera_settings(make_camera_settings(m_width, m_height))
 	, m_camera(std::make_unique<vr::perspective_camera>(m_camera_settings))
 {
-	init();
+	try
+	{
+		init();
+	}
+	catch (const std::exception& e)
+	{
+		spdlog::error("Could not initialize main loop: ", e.what());
+	}
 }
 
 main_loop::~main_loop()
@@ -110,15 +117,7 @@ void main_loop::initialize_position()
 
 void main_loop::print_state()
 {
-	//spdlog::info("Position: {0}, {1}, {2}", m_camera->get_position().x, m_camera->get_position().y, m_camera->get_position().z);
-	//spdlog::info("Direction: {0}, {1}, {2}", m_camera->get_direction().x, m_camera->get_direction().y, m_camera->get_direction().z);
-	//spdlog::info("FPS: {0}", m_fps_counter->get_fps());
 
-	//for (auto i = 0u; i < m_monkeys.size(); ++i)
-	//{
-	//	std::cout << "Monkey " << i << " opos: " << m_monkeys[i].obj->get_translation().x << ' ' << m_monkeys[i].obj->get_translation().y << ' ' << m_monkeys[i].obj->get_translation().z << '\n';
-	//	std::cout << "Monkey " << i << " lpos: " << m_monkeys[i].uniforms->at(2).value.vec3f.x << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.y << ' ' << m_monkeys[i].uniforms->at(2).value.vec3f.z << '\n';
-	//}
 }
 
 
