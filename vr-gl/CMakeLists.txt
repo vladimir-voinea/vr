@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.8)
 
-if(NOT DEFINED BUILD_ANDROID)
+if(NOT DEFINED ANDROID)
 	find_package(OpenGL REQUIRED)
 	set(OPENGL_LIBS opengl32 glew_lib::static)
 else()

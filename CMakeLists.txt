@@ -20,7 +20,7 @@ add_subdirectory ("dependencies")
 # vr-glfw directory
 add_subdirectory ("vr")
 
-if(NOT DEFINED BUILD_ANDROID)
+if(NOT DEFINED ANDROID)
 	# vr-glfw directory
 	add_subdirectory ("vr-glfw")
 endif()
@@ -28,14 +28,14 @@ endif()
 # vr-gl directory
 add_subdirectory ("vr-gl")
 
-if(NOT DEFINED BUILD_ANDROID)
+if(NOT DEFINED ANDROID)
 	# CMake modules
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 	# vr-vk directory
 add_subdirectory ("vr-vk")
 endif()
 
-if(NOT DEFINED BUILD_ANDROID)
+if(NOT DEFINED ANDROID)
 	# examples directory
 	add_subdirectory ("examples")
 endif()
