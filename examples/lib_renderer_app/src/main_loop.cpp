@@ -25,8 +25,6 @@
 #define on_android(x)
 #endif
 
-on_android(#include "spdlog/sinks/android_sink.h")
-
 vr::geometry import_model(const std::string& name)
 {
 	const auto path = "data/models/" + name + ".obj";
