@@ -23,19 +23,20 @@ namespace vr::platform
         return env;
     }
 
-    void set_asset_manager(JNIEnv* env, jobject object, jobject asset_manager)
+    void set_asset_manager(JNIEnv* env, jobject object, jobject manager)
     {
-
+        ALOGV("Received asset manager");
+        asset_manager = manager;
     }
 }
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
-    __android_log_print(ANDROID_LOG_VERBOSE, "ndk_interface", "JNI OnLoad");
+    ALOGV("JNI OnLoad");
 
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-        __android_log_print(ANDROID_LOG_VERBOSE, "ndk_interface", "JNI OnLoad error, could not get JNI version 1.6");
+        ALOGV("JNI OnLoad error, could not get JNI version 1.6");
         return JNI_ERR;
     }
 
