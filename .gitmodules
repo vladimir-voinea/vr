@@ -16,5 +16,5 @@
 	branch = assimp_5.0_release
 [submodule "spdlog"]
 	path = dependencies/spdlog
-	url = https://github.com/gabime/spdlog.git
+	url = https://github.com/vladimir-voinea/spdlog.git
 	branch = v2.x
