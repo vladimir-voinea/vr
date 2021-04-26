@@ -6,6 +6,7 @@
 namespace vr::platform
 {
     JavaVM* vm_pointer = nullptr;
+    jobject asset_manager;
 
     JavaVM* get_java_vm()
     {
@@ -21,6 +22,11 @@ namespace vr::platform
         
         return env;
     }
+
+    void set_asset_manager(JNIEnv* env, jobject object, jobject asset_manager)
+    {
+
+    }
 }
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -34,17 +40,22 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     }
 
     vr::platform::vm_pointer = vm;
-    //// Find your class. JNI_OnLoad is called from the correct class loader context for this to work.
-    //jclass c = env->FindClass("com/example/app/package/MyClass");
-    //if (c == nullptr) return JNI_ERR;
 
-    //// Register your class' native methods.
-    //static const JNINativeMethod methods[] = {
-    //    {"nativeFoo", "()V", reinterpret_cast<void*>(nativeFoo)},
-    //    {"nativeBar", "(Ljava/lang/String;I)Z", reinterpret_cast<void*>(nativeBar)},
-    //};
-    //int rc = env->RegisterNatives(c, methods, sizeof(methods) / sizeof(JNINativeMethod));
-    //if (rc != JNI_OK) return rc;
+    jclass c = env->FindClass("com/android/gles3jni/GLES3JNILib");
+    if (c == nullptr)
+    {
+        return JNI_ERR;
+    }
+
+    static const JNINativeMethod methods[] = {
+        {"set_asset_manager", "(Landroid.content.res.AssetManager)V", reinterpret_cast<void*>(vr::platform::set_asset_manager)}
+    };
+
+    int rc = env->RegisterNatives(c, methods, sizeof(methods) / sizeof(JNINativeMethod));
+    if (rc != JNI_OK)
+    {
+        return rc;
+    }
 
     return JNI_VERSION_1_6;
 }
