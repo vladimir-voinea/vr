@@ -110,11 +110,11 @@ main_loop::main_loop(int width, int height)
 {
 	try
 	{
+		on_android(setup_android_logging();)
 		init();
 	}
 	catch (const std::exception& e)
 	{
-		on_android(setup_android_logging();)
 		spdlog::error("Could not initialize main loop: ", e.what());
 	}
 }
