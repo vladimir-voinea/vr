@@ -4,7 +4,7 @@ if(NOT DEFINED ANDROID)
 	set(PLATFORM_SOURCES "src/pc_platform_manager.cpp" "src/pc_asset_manager.cpp")
 	set(LIBS android)
 else()
-	set(PLATFORM_SOURCES "src/jni_loading.cpp" "src/android_platform_manager.cpp" "src/android_asset_manager.cpp")
+	set(PLATFORM_SOURCES "src/ndk_interface.cpp" "src/android_platform_manager.cpp" "src/android_asset_manager.cpp")
 	set(LIBS "")
 endif()
 
