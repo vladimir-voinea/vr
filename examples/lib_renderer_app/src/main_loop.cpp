@@ -95,7 +95,7 @@ static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932
 vr::perspective_camera::settings make_camera_settings(int width, int height) 
 {
 	vr::perspective_camera::settings settings { 45.f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.f,
-	/*start_position, start_direction */};
+	start_position, start_direction };
 
 	return settings;
 }
