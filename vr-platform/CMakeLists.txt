@@ -12,7 +12,7 @@ set(BASE_SOURCES "src/asset.cpp" "src/platform_manager_factory.cpp")
 
 set(LIB_NAME "vr-platform")
 			
-add_library (${LIB_NAME} STATIC ${BASE_SOURCES} ${PLATFORM_SOURCES})
+add_library (${LIB_NAME} SHARED ${BASE_SOURCES} ${PLATFORM_SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
 target_link_libraries(${LIB_NAME} PUBLIC ${LIBS})
 
