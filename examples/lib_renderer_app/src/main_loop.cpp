@@ -13,8 +13,15 @@
 #include <assimp/scene.h>
 
 #include <spdlog/spdlog.h>
-
 #include <stdexcept>
+
+#ifdef __ANDROID__
+#define on_android(x) x
+#else
+#define on_android(x)
+#endif
+
+on_android(#include "spdlog/sinks/android_sink.h")
 
 vr::geometry import_model(const std::string& name)
 {
@@ -103,6 +110,7 @@ main_loop::main_loop(int width, int height)
 	}
 	catch (const std::exception& e)
 	{
+		on_android(spdlog::set_default_logger(std::make_shared<spdlog::android_logger_mt>("android", "vr"));)
 		spdlog::error("Could not initialize main loop: ", e.what());
 	}
 }
