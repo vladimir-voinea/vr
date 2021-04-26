@@ -125,12 +125,6 @@ void main_loop::print_state()
 void main_loop::init()
 {
 	m_cube_texture = std::make_unique<vr::cube_texture>(std::unordered_map<std::string, std::string>{
-		//{ vr::cube_texture::p_x, "data/skybox/right.jpg" },
-		//{ vr::cube_texture::n_x, "data/skybox/left.jpg" },
-		//{ vr::cube_texture::p_y, "data/skybox/top.jpg" },
-		//{ vr::cube_texture::n_y, "data/skybox/bottom.jpg" },
-		//{ vr::cube_texture::n_z, "data/skybox/back.jpg" },
-		//{ vr::cube_texture::p_z, "data/skybox/front.jpg" }
 		{ vr::cube_texture::p_x, "data/skybox/urban-skyboxes/SaintLazarusChurch2/posx.jpg" },
 		{ vr::cube_texture::n_x, "data/skybox/urban-skyboxes/SaintLazarusChurch2/negx.jpg" },
 		{ vr::cube_texture::p_y, "data/skybox/urban-skyboxes/SaintLazarusChurch2/posy.jpg" },
@@ -141,7 +135,6 @@ void main_loop::init()
 	m_skybox_material = std::make_unique<vr::gl::cube_texture_material>();
 
 	m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
-	//m_renderer_settings.clear_color = std::make_unique<glm::vec3>(66, 155, 245);
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
@@ -160,7 +153,6 @@ void main_loop::init()
 		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.png");
 		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");
 		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec4{ 255, 0, 0, 0 });
-		m_monkey_data.m_random_engine = std::default_random_engine(dev());
 	}
 
 	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
@@ -176,10 +168,6 @@ void main_loop::init()
 		inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, inst.material.get(), texture);
 
 		inst.obj->add_mesh(inst.mesh.get());
-
-		inst.x_rand = std::uniform_real_distribution<>(limits_n(m_monkey_data.m_random_engine), limits_p(m_monkey_data.m_random_engine));
-		inst.y_rand = std::uniform_real_distribution<>(limits_n(m_monkey_data.m_random_engine), limits_p(m_monkey_data.m_random_engine));
-		inst.z_rand = std::uniform_real_distribution<>(limits_n(m_monkey_data.m_random_engine), limits_p(m_monkey_data.m_random_engine));
 
 		m_monkeys.push_back(std::move(inst));
 	}
@@ -230,51 +218,8 @@ vr::camera& main_loop::get_camera()
 
 void main_loop::render_scene(float delta_time)
 {
-
-	const auto projection_matrix = m_camera->get_projection_matrix();
-	const auto view_matrix = m_camera->get_view_matrix();
-
-	std::bernoulli_distribution true_or_false;
-	auto p_or_n = [&, true_or_false, this]() -> int { return  true_or_false(m_monkey_data.m_random_engine) ? 1 : -1; };
-
-	std::uniform_int_distribution distance_rand(1, 20);
-	int light_distance_from_object = distance_rand(m_monkey_data.m_random_engine);
-	auto light_direction_from_object = glm::vec3(p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object, p_or_n() * light_distance_from_object);
-
-	std::uniform_int_distribution axis_picker_rand(1, 3);
-	auto pick_axis = [&, axis_picker_rand, this]()
-	{
-		const auto random = axis_picker_rand(m_monkey_data.m_random_engine);
-		switch (random)
-		{
-		case 1:
-		{
-			return vr::x_axis;
-		}
-		case 2:
-		{
-			return vr::y_axis;
-		}
-		case 3:
-			return vr::z_axis;
-		}
-	};
-
-	std::uniform_real_distribution zero_one_rand(0.f, 1.f);
-	auto zero_one_vec = [&, zero_one_rand, this]()
-	{
-		return glm::normalize(glm::vec3(zero_one_rand(m_monkey_data.m_random_engine), zero_one_rand(m_monkey_data.m_random_engine), zero_one_rand(m_monkey_data.m_random_engine)));
-	};
-
 	const auto rotation_angle = -2.f;
 	m_monkeys.front().obj->rotate(vr::y_axis, rotation_angle * delta_time);
-	
-	//auto frames = ++total_frames;
-	//if (frames < 500)
-	//{
-	//	spdlog::info("Frames: {0}", frames);
-	//	m_camera->rotate(vr::z_axis, rotation_angle * m_delta_time);
-	//}
 
 	m_renderer->render(m_scene, *m_camera);
 

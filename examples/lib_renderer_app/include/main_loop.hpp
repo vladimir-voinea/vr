@@ -10,7 +10,6 @@
 #include <vr.hpp>
 
 #include <memory>
-#include <random>
 
 class main_loop
 {
@@ -53,7 +52,6 @@ private:
 		std::unique_ptr<vr::texture> texture_uvmap;
 		std::unique_ptr<vr::texture> texture_cobblestone;
 		std::unique_ptr<vr::gl::color_material> material;
-		std::default_random_engine m_random_engine;
 	} m_monkey_data;
 	const size_t n_monkeys = 5;
 	std::vector<monkey> m_monkeys;
