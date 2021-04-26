@@ -5,7 +5,7 @@ if(NOT DEFINED ANDROID)
 	set(LIBS "")
 else()
 	set(PLATFORM_SOURCES "src/ndk_interface.cpp" "src/android_platform_manager.cpp" "src/android_asset_manager.cpp")
-	set(LIBS android)
+	set(LIBS android log)
 endif()
 
 set(BASE_SOURCES "src/asset.cpp" "src/platform_manager_factory.cpp")
