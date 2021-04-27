@@ -22,6 +22,11 @@ namespace vr::platform
 
         return env;
     }
+
+    jobject get_asset_manager()
+    {
+        return asset_manager;
+    }
 }
 
 extern "C" JNIEXPORT void JNICALL
