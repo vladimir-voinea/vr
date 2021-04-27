@@ -10,5 +10,6 @@ namespace vr::platform
 		~pc_platform_manager() override = default;
 
 		std::unique_ptr<asset_manager> get_asset_manager() override;
+		std::unique_ptr<assimp_importer> get_assimp_importer() override;
 	};
 }

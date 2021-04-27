@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <platform_manager_factory.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -17,12 +18,16 @@
 
 #include <android_logging.hpp>
 
-vr::geometry import_model(const std::string& name)
+vr::geometry import_model(const std::string& asset_name)
 {
-	const auto path = "data/models/" + name + ".obj";
+	const auto name = "models/" + asset_name + ".dae";
+	
+	auto am = vr::platform::get_platform_manager()->get_asset_manager();
+	auto asset = am->get_asset_by_name(name);
+	const auto file = am->read_file(asset);
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiPostProcessSteps::aiProcess_ValidateDataStructure |
+	const aiScene* scene = importer.ReadFileFromMemory(file.data(), file.size(), aiPostProcessSteps::aiProcess_ValidateDataStructure |
 		aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
 		aiPostProcessSteps::aiProcess_Triangulate);
 	if (!scene)

@@ -2,10 +2,22 @@
 
 #include "android_asset_manager.hpp"
 
+#include <assimp/DefaultIOSystem.h>
+
 namespace vr::platform
 {
 	std::unique_ptr<asset_manager> android_platform_manager::get_asset_manager()
 	{
 		return std::make_unique<android_asset_manager>();
+	}
+
+	std::unique_ptr<assimp_importer> android_platform_manager::get_assimp_importer()
+	{
+		auto importer = std::make_unique<Assimp::Importer>();
+		auto iosystem = std::make_unique<Assimp::DefaultIOSystem>();
+
+		auto result = std::make_unique<assimp_importer>(std::move(importer), std::move(iosystem));
+
+		return result;
 	}
 }

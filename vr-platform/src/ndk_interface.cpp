@@ -6,6 +6,7 @@
 namespace vr::platform
 {
     JavaVM* vm_pointer = nullptr;
+    jobject activity;
     jobject asset_manager;
 
     JavaVM* get_java_vm()
@@ -23,10 +24,23 @@ namespace vr::platform
         return env;
     }
 
+    jobject get_activit()
+    {
+        return activity;
+    }
+
     jobject get_asset_manager()
     {
         return asset_manager;
     }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_android_gles3jni_GLES3JNILib_set_1activity(JNIEnv * env, jclass clazz,
+    jobject activity)
+{
+    ALOGV("Received activity");
+    vr::platform::activity = env->NewGlobalRef(activity);
 }
 
 extern "C" JNIEXPORT void JNICALL

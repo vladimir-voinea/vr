@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.8)
 
-set(BASE_LIBS spdlog)
+set(BASE_LIBS spdlog assimp)
 
 if(NOT DEFINED ANDROID)
 	set(PLATFORM_SOURCES "src/pc_platform_manager.cpp" "src/pc_asset_manager.cpp")
@@ -12,7 +12,7 @@ else()
 	set(LIB_TYPE SHARED)
 endif()
 
-set(BASE_SOURCES  "src/android_logging.cpp" "src/asset.cpp" "src/platform_manager_factory.cpp")
+set(BASE_SOURCES  "src/android_logging.cpp" "src/asset.cpp" "src/platform_manager_factory.cpp" "src/assimp_importer.cpp")
 
 set(LIB_NAME "vr-platform")
 			

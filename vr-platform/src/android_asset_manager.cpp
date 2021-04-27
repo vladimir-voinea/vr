@@ -1,9 +1,18 @@
 #include "android_asset_manager.hpp"
 
-#include <android/asset_manager.h>
+#include "ndk_interface.hpp"
+
+#include <android/asset_manager_jni.h>
+
+#include <spdlog/spdlog.h>
 
 namespace vr::platform
 {
+    android_asset_manager::android_asset_manager()
+        : m_asset_manager(AAssetManager_fromJava(get_jni_env(), get_asset_manager()))
+    {
+    }
+
 	asset android_asset_manager::get_asset_by_name(const std::string& name)
 	{
 		return "file:///android_asset/" + name;
@@ -11,17 +20,20 @@ namespace vr::platform
 
 	std::vector<uint8_t> android_asset_manager::read_file(const asset& asset)
 	{
-        //AAssetManager* mgr = AAssetManager_fromJava(env, assetManager);
-        //AAsset* asset = AAssetManager_open(mgr, (const char*)js, AASSET_MODE_UNKNOWN);
-        //if (NULL == asset) {
-        //    __android_log_print(ANDROID_LOG_ERROR, NF_LOG_TAG, "_ASSET_NOT_FOUND_");
-        //    return JNI_FALSE;
-        //}
-        //long size = AAsset_getLength(asset);
-        //char* buffer = (char*)malloc(sizeof(char) * size);
-        //AAsset_read(asset, buffer, size);
-        //__android_log_print(ANDROID_LOG_ERROR, NF_LOG_TAG, buffer);
-        //AAsset_close(asset);
-        return {};
+        std::vector<uint8_t> result;
+
+        if (AAsset* a = AAssetManager_open(m_asset_manager, asset.get_path().c_str(), AASSET_MODE_UNKNOWN); a != nullptr) {
+            spdlog::info("Successfully opened asset {0}", asset.get_path());
+            const auto size = AAsset_getLength(a);
+            result.resize(size);
+            AAsset_read(a, result.data(), result.size());
+            AAsset_close(a);
+        }
+        else
+        {
+            spdlog::error("Asset {0} not found", asset.get_path());
+        }
+
+        return result;
 	}
 }
