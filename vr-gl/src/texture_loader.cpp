@@ -1,4 +1,5 @@
 #include "texture_loader.hpp"
+#include <platform_manager_factory.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -15,12 +16,15 @@ namespace vr::gl
 {
 	GLuint load_stb(const std::string& path)
 	{
+		auto am = platform::get_platform_manager()->get_asset_manager();
+		const auto contents = am->read_file(am->get_asset_by_name(path));
+
 		int width = 0;
 		int height = 0;
 		int channels = 0;
 
 		stbi_set_flip_vertically_on_load(true);
-		auto stb_result = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb);
+		auto stb_result = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
 
 		GLuint texture;
 		glGenTextures(1, &texture);
@@ -34,7 +38,6 @@ namespace vr::gl
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
 		
-
 		stbi_image_free(stb_result);
 		stbi_set_flip_vertically_on_load(false);
 
@@ -44,17 +47,32 @@ namespace vr::gl
 
 	GLuint load_texture(const cube_texture* texture)
 	{
+		auto am = platform::get_platform_manager()->get_asset_manager();
+
 		int width = 0;
 		int height = 0;
 		int channels = 0;
 
+		std::vector<uint8_t> contents;
 		stbi_set_flip_vertically_on_load(false);
-		auto px_data = stbi_load(texture->get_paths().find(cube_texture::p_x)->second.c_str(), &width, &height, &channels, STBI_rgb);
-		auto nx_data = stbi_load(texture->get_paths().find(cube_texture::n_x)->second.c_str(), &width, &height, &channels, STBI_rgb);
-		auto py_data = stbi_load(texture->get_paths().find(cube_texture::p_y)->second.c_str(), &width, &height, &channels, STBI_rgb);
-		auto ny_data = stbi_load(texture->get_paths().find(cube_texture::n_y)->second.c_str(), &width, &height, &channels, STBI_rgb);
-		auto pz_data = stbi_load(texture->get_paths().find(cube_texture::p_z)->second.c_str(), &width, &height, &channels, STBI_rgb);
-		auto nz_data = stbi_load(texture->get_paths().find(cube_texture::n_z)->second.c_str(), &width, &height, &channels, STBI_rgb);
+		
+		contents = am->read_file(am->get_asset_by_name(texture->get_paths().find(cube_texture::p_x)->second));
+		auto px_data = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
+
+		contents = am->read_file(am->get_asset_by_name(texture->get_paths().find(cube_texture::n_x)->second));
+		auto nx_data = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
+
+		contents = am->read_file(am->get_asset_by_name(texture->get_paths().find(cube_texture::p_y)->second));
+		auto py_data = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
+
+		contents = am->read_file(am->get_asset_by_name(texture->get_paths().find(cube_texture::n_y)->second));
+		auto ny_data = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
+
+		contents = am->read_file(am->get_asset_by_name(texture->get_paths().find(cube_texture::p_z)->second));
+		auto pz_data = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
+
+		contents = am->read_file(am->get_asset_by_name(texture->get_paths().find(cube_texture::n_z)->second));
+		auto nz_data = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
 
 		GLuint texture_id;
 		glGenTextures(1, &texture_id);

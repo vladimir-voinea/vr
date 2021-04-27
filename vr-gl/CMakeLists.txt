@@ -13,7 +13,7 @@ set(SOURCES "src/shader.cpp" "src/shader_program.cpp" "src/renderer_cache.cpp" "
 			
 add_library (${LIB_NAME} STATIC ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
-target_link_libraries(${LIB_NAME} PUBLIC vr glm ${OPENGL_LIBS})
+target_link_libraries(${LIB_NAME} PUBLIC vr vr-platform glm ${OPENGL_LIBS})
 
 target_include_directories(${LIB_NAME} PUBLIC include)
 

@@ -131,12 +131,12 @@ void main_loop::print_state()
 void main_loop::init()
 {
 	m_cube_texture = std::make_unique<vr::cube_texture>(std::unordered_map<std::string, std::string>{
-		{ vr::cube_texture::p_x, "data/skybox/urban-skyboxes/SaintLazarusChurch2/posx.jpg" },
-		{ vr::cube_texture::n_x, "data/skybox/urban-skyboxes/SaintLazarusChurch2/negx.jpg" },
-		{ vr::cube_texture::p_y, "data/skybox/urban-skyboxes/SaintLazarusChurch2/posy.jpg" },
-		{ vr::cube_texture::n_y, "data/skybox/urban-skyboxes/SaintLazarusChurch2/negy.jpg" },
-		{ vr::cube_texture::n_z, "data/skybox/urban-skyboxes/SaintLazarusChurch2/negz.jpg" },
-		{ vr::cube_texture::p_z, "data/skybox/urban-skyboxes/SaintLazarusChurch2/posz.jpg" }
+		{ vr::cube_texture::p_x, "skybox/urban-skyboxes/SaintLazarusChurch2/posx.jpg" },
+		{ vr::cube_texture::n_x, "skybox/urban-skyboxes/SaintLazarusChurch2/negx.jpg" },
+		{ vr::cube_texture::p_y, "skybox/urban-skyboxes/SaintLazarusChurch2/posy.jpg" },
+		{ vr::cube_texture::n_y, "skybox/urban-skyboxes/SaintLazarusChurch2/negy.jpg" },
+		{ vr::cube_texture::n_z, "skybox/urban-skyboxes/SaintLazarusChurch2/negz.jpg" },
+		{ vr::cube_texture::p_z, "skybox/urban-skyboxes/SaintLazarusChurch2/posz.jpg" }
 	});
 	m_skybox_material = std::make_unique<vr::gl::cube_texture_material>();
 
@@ -156,8 +156,7 @@ void main_loop::init()
 	{
 		m_monkey_data.geometry = ::import_model("suzanne");
 		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
-		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("data/models/uvmap.png");
-		m_monkey_data.texture_cobblestone = std::make_unique<vr::texture>("data/models/light_bricks.jpg");
+		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("models/uvmap.png");
 		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec4{ 255, 0, 0, 0 });
 	}
 
