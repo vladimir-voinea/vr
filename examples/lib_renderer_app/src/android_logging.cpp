@@ -16,4 +16,12 @@ void setup_android_logging()
 	spdlog::set_default_logger(logger);
 }
 
+struct logger_installer_t
+{
+	logger_installer()
+	{
+		setup_android_logging();
+	}
+} logger_installer;
+
 #endif

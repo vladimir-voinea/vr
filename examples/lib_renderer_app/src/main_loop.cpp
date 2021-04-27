@@ -15,16 +15,6 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 
-#ifdef __ANDROID__
-#include "android_logging.hpp"
-#endif
-
-#ifdef __ANDROID__
-#define on_android(x) x
-#else
-#define on_android(x)
-#endif
-
 vr::geometry import_model(const std::string& name)
 {
 	const auto path = "data/models/" + name + ".obj";
@@ -108,7 +98,6 @@ main_loop::main_loop(int width, int height)
 {
 	try
 	{
-		on_android(setup_android_logging());
 		init();
 	}
 	catch (const std::exception& e)
