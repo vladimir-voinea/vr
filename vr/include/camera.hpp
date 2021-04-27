@@ -44,8 +44,5 @@ namespace vr
 		// euler Angles
 		float m_yaw;
 		float m_pitch;
-		// camera options
-		float m_movement_speed;
-		float m_mouse_sensitivity;
 	};
 }

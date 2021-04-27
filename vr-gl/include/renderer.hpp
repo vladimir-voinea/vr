@@ -22,7 +22,7 @@ namespace vr::gl
 	{
 	public:
 		renderer(const renderer_settings& settings);
-		~renderer();
+		~renderer() override;
 
 		void render(vr::scene& scene, const vr::camera& camera) override;
 

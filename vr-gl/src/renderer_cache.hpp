@@ -6,7 +6,7 @@
 
 namespace vr
 {
-	class geometry;
+	struct geometry;
 	class opengl_shader;
 	class texture;
 	class cube_texture;

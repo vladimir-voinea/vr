@@ -8,15 +8,11 @@
 
 namespace vr
 {
-	const float ZOOM = 45.0f;
-	const float YAW = -90.0f;
-	const float PITCH = 0.0f;
-
 	camera::camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch, float zoom)
 		: m_front(direction)
 		, m_world_up(up)
-		, m_pitch(pitch)
 		, m_yaw(yaw)
+		, m_pitch(pitch)
 		, m_zoom(zoom)
 	{
 		transformable::m_position = position;

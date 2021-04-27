@@ -367,7 +367,6 @@ namespace vr::gl
 		{
 			for (const auto* mesh : object->get_meshes())
 			{
-				const auto geometry = m_cache->get(mesh->get_geometry());
 				const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
 
 				if (mesh->get_texture())
