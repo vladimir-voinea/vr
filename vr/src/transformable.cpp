@@ -10,7 +10,7 @@ namespace vr
 		return translation * rotation;
 	}
 
-	const glm::vec3& transformable::get_rotation() const
+	glm::vec3 transformable::get_rotation() const
 	{
 		return glm::eulerAngles(m_quaternion);
 	}
@@ -20,7 +20,7 @@ namespace vr
 		m_quaternion *= glm::quat(glm::angleAxis(angle, axis));
 	}
 
-	const glm::vec3& transformable::get_translation() const
+	glm::vec3 transformable::get_translation() const
 	{
 		return m_position;
 	}
