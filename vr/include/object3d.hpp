@@ -15,6 +15,7 @@ namespace vr
 	{
 	public:
 		object3d();
+		~object3d() override = default;
 
 		object3d* get_parent();
 		const object3d* get_parent() const;

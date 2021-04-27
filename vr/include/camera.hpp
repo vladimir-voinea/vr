@@ -9,8 +9,8 @@ namespace vr
 	{
 	public:
 		camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, float yaw, float pitch, float zoom);
+		virtual ~camera() override = default;
 
-		virtual ~camera();
 		virtual glm::mat4 get_projection_matrix() const = 0;
 		virtual glm::mat4 get_view_matrix() const;
 

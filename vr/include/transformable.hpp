@@ -10,6 +10,7 @@ namespace vr
 	class transformable
 	{
 	public:
+		virtual ~transformable() = default;
 
 		virtual glm::mat4 get_transformation_matrix() const;
 

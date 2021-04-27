@@ -25,6 +25,7 @@ namespace vr
 
 	public:
 		perspective_camera(const settings& settings);
+		~perspective_camera() override = default;
 
 		glm::mat4 get_projection_matrix() const override;
 

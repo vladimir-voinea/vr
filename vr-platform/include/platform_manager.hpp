@@ -9,6 +9,8 @@ namespace vr::platform
 	class platform_manager
 	{	
 	public:
+		virtual ~platform_manager() = default;
+
 		virtual std::unique_ptr<asset_manager> get_asset_manager() = 0;
 	};
 

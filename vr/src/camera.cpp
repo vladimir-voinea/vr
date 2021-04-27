@@ -22,8 +22,6 @@ namespace vr
 		transformable::m_position = position;
 		update_camera_vectors();
 	}
-
-	camera::~camera() = default;
 	
 	glm::mat4 camera::get_view_matrix() const
 	{
