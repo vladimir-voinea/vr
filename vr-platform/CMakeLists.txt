@@ -1,16 +1,18 @@
 cmake_minimum_required (VERSION 3.8)
 
+set(BASE_LIBS spdlog)
+
 if(NOT DEFINED ANDROID)
 	set(PLATFORM_SOURCES "src/pc_platform_manager.cpp" "src/pc_asset_manager.cpp")
-	set(LIBS "")
+	set(LIBS ${BASE_LIBS})
 	set(LIB_TYPE STATIC)
 else()
 	set(PLATFORM_SOURCES "src/ndk_interface.cpp" "src/android_platform_manager.cpp" "src/android_asset_manager.cpp")
-	set(LIBS android log)
+	set(LIBS ${BASE_LIBS} android log)
 	set(LIB_TYPE SHARED)
 endif()
 
-set(BASE_SOURCES "src/asset.cpp" "src/platform_manager_factory.cpp")
+set(BASE_SOURCES  "src/android_logging.cpp" "src/asset.cpp" "src/platform_manager_factory.cpp")
 
 set(LIB_NAME "vr-platform")
 			

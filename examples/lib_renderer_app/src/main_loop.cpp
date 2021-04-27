@@ -15,6 +15,8 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 
+#include <android_logging.hpp>
+
 vr::geometry import_model(const std::string& name)
 {
 	const auto path = "data/models/" + name + ".obj";
@@ -98,6 +100,7 @@ main_loop::main_loop(int width, int height)
 {
 	try
 	{
+		vr::platform::setup_android_logging();
 		init();
 	}
 	catch (const std::exception& e)
