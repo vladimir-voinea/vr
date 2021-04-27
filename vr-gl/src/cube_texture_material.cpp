@@ -3,19 +3,19 @@
 namespace
 {
 	const auto vshader = R"(
-		#version 330 core
+		#version 300 es
 
-		layout(location = 0) in vec3 vr_vertex_position;
-		layout(location = 1) in vec3 vr_vertex_normal;
-		layout(location = 2) in vec4 vr_vertex_color;
-		layout(location = 3) in vec2 vr_vertex_uv;
+		in vec3 vr_vertex_position;
+		in vec3 vr_vertex_normal;
+		in vec4 vr_vertex_color;
+		in vec2 vr_vertex_uv;
 
 		uniform mat4 vr_mvp;
 		uniform mat4 vr_projection;
 		uniform mat4 vr_view;
 		uniform mat4 vr_model;
 
-		out vec3 cube_texcoords;
+		out highp vec3 cube_texcoords;
 
 		void main() {
 			vec4 position = vr_projection * vr_view * vec4(vr_vertex_position, 1.f);
@@ -25,10 +25,10 @@ namespace
 		)";
 
 	const auto fshader = R"(
-		#version 330 core
+		#version 300 es
 		
-		in vec3 cube_texcoords;
-		out vec4 color;
+		in highp vec3 cube_texcoords;
+		out highp vec4 color;
 		uniform samplerCube sampler;
 
 		void main()

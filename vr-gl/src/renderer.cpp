@@ -32,34 +32,42 @@ namespace
 		const auto& uniforms = program.get_uniform_names();
 		if (std::find(uniforms.begin(), uniforms.end(), uniform.name) != uniforms.end())
 		{
+		    spdlog::debug("Checking uniform location for uniform {}", uniform.name);
 			const auto location = glGetUniformLocation(program.get_id(), uniform.name.c_str());
+			spdlog::debug("Got location {}", location);
 
+			std::string loaded_type = "NONE";
 			using ut = vr::gl::uniform_type;
 			switch (uniform.type)
 			{
 			case ut::mat4fv:
 			{
+                loaded_type = "mat4fv";
 				glUniformMatrix4fv(location, 1, GL_FALSE, &uniform.value.mat4fv[0][0]);
 				break;
 			}
 			case ut::vec4f:
 			{
+                loaded_type = "4f";
 				const glm::vec4& value = uniform.value.vec4f;
 				glUniform4f(location, value.x, value.y, value.z, value.w);
 				break;
 			}
 			case ut::vec3f:
 			{
+                loaded_type = "3f";
 				const glm::vec3& value = uniform.value.vec3f;
 				glUniform3f(location, value.x, value.y, value.z);
 				break;
 			}
 			case ut::vec1i:
 			{
+                loaded_type = "1i";
 				glUniform1i(location, uniform.value.vec1i);
 				break;
 			}
 			}
+            spdlog::debug("Loaded a {} uniform", loaded_type);
 		}
 		else
 		{
@@ -102,8 +110,8 @@ namespace
 
 		vr::gl::uniform texture_sampler_uniform;
 		texture_sampler_uniform.name = builtin_texture_sampler_uniform_name;
-		mvp_uniform.type = vr::gl::uniform_type::vec1i;
-		mvp_uniform.value.vec1i = 0;
+        texture_sampler_uniform.type = vr::gl::uniform_type::vec1i;
+        texture_sampler_uniform.value.vec1i = 0;
 		load_uniform(shader->program, texture_sampler_uniform);
 	}
 
@@ -197,6 +205,9 @@ namespace vr::gl
 		: m_settings(settings)
 		, m_cache(std::make_unique<renderer_cache>())
 	{
+		const char* glsl_version = (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
+		spdlog::info("GLSL: {0}", glsl_version);
+
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(opengl_debug_callback, nullptr);
 

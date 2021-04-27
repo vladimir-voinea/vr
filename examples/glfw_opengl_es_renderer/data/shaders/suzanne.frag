@@ -1,7 +1,7 @@
-#version 330 core
+#version 300 es
 
-in vec2 uv;
-out vec3 color;
+in highp vec2 uv;
+out highp vec3 color;
 uniform sampler2D vr_texture_sampler;
 
 void main()

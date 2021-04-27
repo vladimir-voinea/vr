@@ -1,9 +1,9 @@
-#version 330 core
+#version 300 es
 
-layout(location = 0) in vec3 vr_vertex_position;
-layout(location = 1) in vec3 vr_vertex_normal;
-layout(location = 2) in vec4 vr_vertex_color;
-layout(location = 3) in vec2 vr_vertex_uv;
+in vec3 vr_vertex_position;
+in vec3 vr_vertex_normal;
+in vec4 vr_vertex_color;
+in vec2 vr_vertex_uv;
 
 out vec2 uv;
 
