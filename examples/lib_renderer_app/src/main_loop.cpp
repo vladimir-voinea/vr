@@ -144,8 +144,12 @@ void main_loop::init()
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
-	m_renderer_settings.size.width = m_width;
-	m_renderer_settings.size.height = m_height;
+
+	m_renderer_settings.viewport.x0 = 0;
+	m_renderer_settings.viewport.y0 = 0;
+
+	m_renderer_settings.viewport.x1 = m_width;
+	m_renderer_settings.viewport.y1 = m_height;
 
 	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
 
@@ -212,8 +216,9 @@ void main_loop::resize(int width, int height)
 
 	spdlog::info("New framebuffer size: {0}, {1}", width, height);
 	m_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
-	m_renderer_settings.size.width = width;
-	m_renderer_settings.size.height = height;
+
+	m_renderer_settings.viewport.x1 = width;
+	m_renderer_settings.viewport.y1 = height;
 }
 
 vr::camera& main_loop::get_camera()
