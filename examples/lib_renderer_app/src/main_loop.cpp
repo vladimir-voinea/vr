@@ -22,7 +22,7 @@
 vr::geometry import_model(const std::string& asset_name)
 {
 	const auto name = "models/" + asset_name + ".dae";
-	
+
 	auto am = vr::platform::get_platform_manager()->get_asset_manager();
 	auto asset = am->get_asset_by_name(name);
 	const auto file = am->read_file(asset);
@@ -90,10 +90,10 @@ vr::geometry import_model(const std::string& asset_name)
 static const auto start_position = glm::vec3{ -2.7872, 1.74459, 9.47206 };
 static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932346 };
 
-vr::perspective_camera::settings make_camera_settings(int width, int height) 
+vr::perspective_camera::settings make_camera_settings(int width, int height)
 {
 	vr::perspective_camera::settings settings;
-	
+
 	settings.fov = 45.f;
 	settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 
@@ -175,7 +175,7 @@ void main_loop::init()
 	});
 	m_skybox_material = std::make_unique<vr::gl::cube_texture_material>();
 
-	m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
+	//m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
@@ -217,7 +217,7 @@ void main_loop::init()
 	}
 	m_scene.add(m_monkeys[0].obj.get());
 	m_monkeys[0].obj->translate(glm::vec3(0.f, 10.f, -10.f));
-	
+
 	float offset = 5.f;
 	auto mid = m_monkeys.size() / 2;
 
@@ -241,7 +241,7 @@ void main_loop::init()
 		m_monkeys[i].obj->set_parent(m_monkeys[previous].obj.get());
 		m_monkeys[i].obj->translate(glm::vec3(offset, -offset, 0.f));
 	}
-	
+
 }
 
 void main_loop::resize(int width, int height)
@@ -258,7 +258,7 @@ void main_loop::resize(int width, int height)
 
 vr::camera& main_loop::get_camera()
 {
-	constexpr auto perspective = true;
+	constexpr auto perspective = false;
 
 	return perspective ? *m_perspective_camera : *m_orthographic_camera;
 }

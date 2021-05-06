@@ -13,11 +13,11 @@ namespace vr
 	glm::mat4 orthographic_camera::get_projection_matrix() const
 	{
 		return glm::ortho(
-			m_settings.left,
-			m_settings.right,
-			m_settings.bottom,
-			m_settings.top,
-			m_settings.near,
-			m_settings.far);
+			m_settings.left * m_zoom,
+			m_settings.right * m_zoom,
+			m_settings.bottom * m_zoom,
+			m_settings.top * m_zoom,
+			m_settings.near * m_zoom,
+			m_settings.far * m_zoom);
 	}
 }
