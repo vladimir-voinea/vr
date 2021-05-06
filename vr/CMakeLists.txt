@@ -2,7 +2,7 @@
 
 set(LIB_NAME "vr")
 
-set(SOURCES "src/camera.cpp" "src/perspective_camera.cpp" "src/mesh.cpp" "src/scene.cpp" "src/texture.cpp" "src/object3d.cpp" "src/transformable.cpp" "src/cube_texture.cpp" "src/skybox.cpp")
+set(SOURCES "src/camera.cpp" "src/perspective_camera.cpp" "src/mesh.cpp" "src/scene.cpp" "src/texture.cpp" "src/object3d.cpp" "src/transformable.cpp" "src/cube_texture.cpp" "src/skybox.cpp" "src/orthographic_camera.cpp")
 			
 add_library (${LIB_NAME} STATIC ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)

@@ -1,5 +1,6 @@
 #include "main_loop.hpp"
 #include <perspective_camera.hpp>
+#include <orthographic_camera.hpp>
 #include "shader_loader.hpp"
 #include "shaders.hpp"
 
@@ -91,8 +92,35 @@ static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932
 
 vr::perspective_camera::settings make_camera_settings(int width, int height) 
 {
-	vr::perspective_camera::settings settings { 45.f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.f,
-	start_position, start_direction };
+	vr::perspective_camera::settings settings;
+	
+	settings.fov = 45.f;
+	settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+
+	settings.near = 0.1f;
+	settings.far = 100.f;
+
+	settings.position = start_position;
+	settings.direction = start_direction;
+
+	return settings;
+}
+
+vr::orthographic_camera::settings make_ortohgraphic_camera_settings(int width, int height)
+{
+	vr::orthographic_camera::settings settings;
+
+	settings.left = -0.5f;
+	settings.right = 0.5f;
+	settings.bottom = -0.5f;
+	settings.top = 0.5f;
+
+	settings.near = 0.1f;
+	settings.far = 100.f;
+
+	settings.fov = 45.f;
+	settings.position = start_position;
+	settings.direction = start_direction;
 
 	return settings;
 }
@@ -100,8 +128,8 @@ vr::perspective_camera::settings make_camera_settings(int width, int height)
 main_loop::main_loop(int width, int height)
 	: m_width(width)
 	, m_height(height)
-	, m_camera_settings(make_camera_settings(m_width, m_height))
-	, m_camera(std::make_unique<vr::perspective_camera>(m_camera_settings))
+	, m_perspective_camera_settings(make_camera_settings(m_width, m_height))
+	, m_orthographic_camera_settings(make_ortohgraphic_camera_settings(m_width, m_height))
 {
 	try
 	{
@@ -127,9 +155,16 @@ void main_loop::print_state()
 
 }
 
+void main_loop::make_cameras()
+{
+	m_perspective_camera = std::make_unique<vr::perspective_camera>(m_perspective_camera_settings);
+	m_orthographic_camera = std::make_unique<vr::orthographic_camera>(m_orthographic_camera_settings);
+}
 
 void main_loop::init()
 {
+	make_cameras();
+
 	m_cube_texture = std::make_unique<vr::cube_texture>(std::unordered_map<std::string, std::string>{
 		{ vr::cube_texture::p_x, "skybox/urban-skyboxes/SaintLazarusChurch2/posx.jpg" },
 		{ vr::cube_texture::n_x, "skybox/urban-skyboxes/SaintLazarusChurch2/negx.jpg" },
@@ -215,7 +250,7 @@ void main_loop::resize(int width, int height)
 	m_height = height;
 
 	spdlog::info("New framebuffer size: {0}, {1}", width, height);
-	m_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+	m_perspective_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 
 	m_renderer_settings.viewport.x1 = width;
 	m_renderer_settings.viewport.y1 = height;
@@ -223,7 +258,9 @@ void main_loop::resize(int width, int height)
 
 vr::camera& main_loop::get_camera()
 {
-	return *m_camera;
+	constexpr auto perspective = true;
+
+	return perspective ? *m_perspective_camera : *m_orthographic_camera;
 }
 
 void main_loop::frame(float delta_time)
@@ -231,6 +268,5 @@ void main_loop::frame(float delta_time)
 	const auto rotation_angle = -2.f;
 	m_monkeys.front().obj->rotate(vr::y_axis, rotation_angle * delta_time);
 
-	m_renderer->render(m_scene, *m_camera);
-
+	m_renderer->render(m_scene, get_camera());
 }

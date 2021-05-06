@@ -29,11 +29,15 @@ private:
 
 	void print_state();
 
+	void make_cameras();
+
 private:
 	int m_width;
 	int m_height;
-	vr::perspective_camera::settings m_camera_settings;
-	std::unique_ptr<vr::perspective_camera> m_camera;
+	vr::perspective_camera::settings m_perspective_camera_settings;
+	vr::orthographic_camera::settings m_orthographic_camera_settings;
+	std::unique_ptr<vr::camera> m_perspective_camera;
+	std::unique_ptr<vr::camera> m_orthographic_camera;
 
 	vr::gl::renderer_settings m_renderer_settings;
 	std::unique_ptr<vr::gl::renderer> m_renderer;
