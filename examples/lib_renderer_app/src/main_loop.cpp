@@ -106,14 +106,31 @@ vr::perspective_camera::settings make_camera_settings(int width, int height)
 	return settings;
 }
 
-vr::orthographic_camera::settings make_ortohgraphic_camera_settings(int width, int height)
+void set_orthographic_view_mapping(vr::orthographic_camera::settings& settings, int width, int height)
+{
+	const auto aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+
+	if (width > height)
+	{
+		settings.left = -0.5f * aspect_ratio;
+		settings.right = -settings.left;
+		settings.bottom = -0.5f;
+		settings.top = 0.5f;
+	}
+	else
+	{
+		settings.left = -0.5f;
+		settings.right = 0.5f;
+		settings.bottom = -0.5f * aspect_ratio;
+		settings.top = -settings.bottom;
+	}
+}
+
+vr::orthographic_camera::settings make_orthographic_camera_settings(int width, int height)
 {
 	vr::orthographic_camera::settings settings;
 
-	settings.left = -0.5f;
-	settings.right = 0.5f;
-	settings.bottom = -0.5f;
-	settings.top = 0.5f;
+	set_orthographic_view_mapping(settings, width, height);
 
 	settings.near = 0.1f;
 	settings.far = 100.f;
@@ -129,7 +146,7 @@ main_loop::main_loop(int width, int height)
 	: m_width(width)
 	, m_height(height)
 	, m_perspective_camera_settings(make_camera_settings(m_width, m_height))
-	, m_orthographic_camera_settings(make_ortohgraphic_camera_settings(m_width, m_height))
+	, m_orthographic_camera_settings(make_orthographic_camera_settings(m_width, m_height))
 {
 	try
 	{
@@ -175,7 +192,7 @@ void main_loop::init()
 	});
 	m_skybox_material = std::make_unique<vr::gl::cube_texture_material>();
 
-	m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
+	//m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
@@ -252,13 +269,15 @@ void main_loop::resize(int width, int height)
 	spdlog::info("New framebuffer size: {0}, {1}", width, height);
 	m_perspective_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 
+	set_orthographic_view_mapping(m_orthographic_camera_settings, width, height);
+
 	m_renderer_settings.viewport.x1 = width;
 	m_renderer_settings.viewport.y1 = height;
 }
 
 vr::camera& main_loop::get_camera()
 {
-	constexpr auto perspective = true;
+	constexpr auto perspective = false;
 
 	return perspective ? *m_perspective_camera : *m_orthographic_camera;
 }
