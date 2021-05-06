@@ -61,7 +61,6 @@ private:
 		vr::geometry geometry;
 		std::unique_ptr<vr::gl::opengl_shader> shader;
 		std::unique_ptr<vr::texture> texture_uvmap;
-		std::unique_ptr<vr::gl::color_material> material;
 	} m_monkey_data;
 	const size_t n_monkeys = 5;
 	std::vector<monkey> m_monkeys;

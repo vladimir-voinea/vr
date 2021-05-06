@@ -212,7 +212,6 @@ void main_loop::init()
 		m_monkey_data.geometry = ::import_model("suzanne");
 		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
 		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("models/uvmap.png");
-		m_monkey_data.material = std::make_unique<vr::gl::color_material>(glm::vec4{ 255, 0, 0, 0 });
 	}
 
 	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
