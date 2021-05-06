@@ -28,7 +28,6 @@ private:
 	vr::glfw::mouse m_mouse;
 	fps_counter m_fps_counter;
 	std::unique_ptr<main_loop> m_main_loop;
-	std::unique_ptr<main_loop> m_main_loop2;
 	std::unique_ptr<input_listener> m_input_listener;
 
 	float m_last_timestamp = 0.f;
