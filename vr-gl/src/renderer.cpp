@@ -234,8 +234,8 @@ namespace vr::gl
 
 	void renderer::render(vr::scene& scene, const vr::camera& camera)
 	{
-		glViewport(m_settings.viewport.x0, m_settings.viewport.y0, m_settings.viewport.x1, m_settings.viewport.y1);
-		glScissor(m_settings.viewport.x0, m_settings.viewport.y0, m_settings.viewport.x1, m_settings.viewport.y1);
+		glViewport(m_settings.viewport.get_x0(), m_settings.viewport.get_y0(), m_settings.viewport.get_x1(), m_settings.viewport.get_y1());
+		glScissor(m_settings.viewport.get_x0(), m_settings.viewport.get_y0(), m_settings.viewport.get_x1(), m_settings.viewport.get_y1());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (m_settings.clear_color)

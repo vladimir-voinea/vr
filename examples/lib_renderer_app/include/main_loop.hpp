@@ -11,10 +11,18 @@
 
 #include <memory>
 
+struct viewport
+{
+	int x0;
+	int y0;
+	int width;
+	int height;
+};
+
 class main_loop
 {
 public:
-	main_loop(int width, int height);
+	main_loop(const viewport& viewport);
 	~main_loop();
 
 	void init();
@@ -32,8 +40,7 @@ private:
 	void make_cameras();
 
 private:
-	int m_width;
-	int m_height;
+	viewport m_viewport;
 	vr::perspective_camera::settings m_perspective_camera_settings;
 	vr::orthographic_camera::settings m_orthographic_camera_settings;
 	std::unique_ptr<vr::camera> m_perspective_camera;

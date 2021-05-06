@@ -142,11 +142,10 @@ vr::orthographic_camera::settings make_orthographic_camera_settings(int width, i
 	return settings;
 }
 
-main_loop::main_loop(int width, int height)
-	: m_width(width)
-	, m_height(height)
-	, m_perspective_camera_settings(make_camera_settings(m_width, m_height))
-	, m_orthographic_camera_settings(make_orthographic_camera_settings(m_width, m_height))
+main_loop::main_loop(const viewport& viewport)
+	: m_viewport(viewport)
+	, m_perspective_camera_settings(make_camera_settings(m_viewport.width, m_viewport.height))
+	, m_orthographic_camera_settings(make_orthographic_camera_settings(m_viewport.width, m_viewport.height))
 {
 	try
 	{
@@ -197,11 +196,11 @@ void main_loop::init()
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
 
-	m_renderer_settings.viewport.x0 = 0;
-	m_renderer_settings.viewport.y0 = 0;
+	m_renderer_settings.viewport.x0 = m_viewport.x0;
+	m_renderer_settings.viewport.y0 = m_viewport.y0;
 
-	m_renderer_settings.viewport.x1 = m_width;
-	m_renderer_settings.viewport.y1 = m_height;
+	m_renderer_settings.viewport.width = m_viewport.width;
+	m_renderer_settings.viewport.height = m_viewport.height;
 
 	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
 
@@ -263,16 +262,16 @@ void main_loop::init()
 
 void main_loop::resize(int width, int height)
 {
-	m_width = width;
-	m_height = height;
+	m_viewport.width = width;
+	m_viewport.height = height;
 
 	spdlog::info("New framebuffer size: {0}, {1}", width, height);
 	m_perspective_camera_settings.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 
 	set_orthographic_view_mapping(m_orthographic_camera_settings, width, height);
 
-	m_renderer_settings.viewport.x1 = width;
-	m_renderer_settings.viewport.y1 = height;
+	m_renderer_settings.viewport.width = width;
+	m_renderer_settings.viewport.height = height;
 }
 
 vr::camera& main_loop::get_camera()

@@ -12,8 +12,28 @@ namespace vr::gl
 	{
 		int x0;
 		int y0;
-		int x1;
-		int y1;
+		int width;
+		int height;
+
+		int get_x0() const
+		{
+			return x0;
+		}
+
+		int get_x1() const
+		{
+			return get_x0() + width;
+		}
+
+		int get_y0() const
+		{
+			return y0;
+		}
+
+		int get_y1() const
+		{
+			return get_y0() + height;
+		}
 	};
 
 	struct renderer_settings

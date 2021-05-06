@@ -19,10 +19,12 @@ void preamble::initialize()
 	m_window.set_framebuffer_resize_callback([this](int width, int height)
 		{
 			m_main_loop->resize(width, height);
+			m_main_loop2->resize(width, height);
 		});
 
 	const auto viewport_size = m_window.get_viewport_size();
-	m_main_loop = std::make_unique<main_loop>(viewport_size.width, viewport_size.height);
+	m_main_loop = std::make_unique<main_loop>(viewport{ 0, 0, viewport_size.width, viewport_size.height });
+	m_main_loop2 = std::make_unique<main_loop>(viewport{ viewport_size.width / 4, viewport_size.height / 4, viewport_size.width / 2, viewport_size.height / 2 });
 	m_input_listener = std::make_unique<input_listener>(m_window, m_main_loop->get_camera(), m_fps_counter);
 	initialize_controls();
 }
@@ -64,6 +66,7 @@ void preamble::run_loop()
 
 			process_input();
 			m_main_loop->frame(delta_time);
+			m_main_loop2->frame(delta_time);
 			m_window.swap_buffers();
 		}
 
