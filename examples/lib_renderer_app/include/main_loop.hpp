@@ -18,7 +18,7 @@ public:
 	~main_loop();
 
 	void init();
-	void render_scene(float delta_time);
+	void frame(float delta_time);
 	void resize(int width, int height);
 
 	vr::camera& get_camera();

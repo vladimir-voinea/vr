@@ -226,7 +226,7 @@ vr::camera& main_loop::get_camera()
 	return *m_camera;
 }
 
-void main_loop::render_scene(float delta_time)
+void main_loop::frame(float delta_time)
 {
 	const auto rotation_angle = -2.f;
 	m_monkeys.front().obj->rotate(vr::y_axis, rotation_angle * delta_time);

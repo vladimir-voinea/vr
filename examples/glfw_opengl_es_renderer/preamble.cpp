@@ -63,7 +63,7 @@ void preamble::run_loop()
 			m_fps_counter.frame(current_time);
 
 			process_input();
-			m_main_loop->render_scene(delta_time);
+			m_main_loop->frame(delta_time);
 			m_window.swap_buffers();
 		}
 
