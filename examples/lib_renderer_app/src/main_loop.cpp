@@ -192,7 +192,7 @@ void main_loop::init()
 	});
 	m_skybox_material = std::make_unique<vr::gl::cube_texture_material>();
 
-	//m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
+	m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;
@@ -277,7 +277,7 @@ void main_loop::resize(int width, int height)
 
 vr::camera& main_loop::get_camera()
 {
-	constexpr auto perspective = false;
+	constexpr auto perspective = true;
 
 	return perspective ? *m_perspective_camera : *m_orthographic_camera;
 }
