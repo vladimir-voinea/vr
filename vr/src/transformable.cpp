@@ -19,12 +19,12 @@ namespace vr
 
 	void transformable::rotate(const glm::vec3& axis, float angle)
 	{
-		m_quaternion *= glm::quat(glm::angleAxis(angle, axis));
+		m_quaternion *= glm::quat(glm::angleAxis(glm::radians(angle), axis));
 	}
 
 	void transformable::rotate_world(const glm::vec3& axis, float angle)
 	{
-		m_quaternion = glm::quat(glm::angleAxis(angle, axis)) * m_quaternion;
+		m_quaternion = glm::quat(glm::angleAxis(glm::radians(angle), axis)) * m_quaternion;
 	}
 
 	glm::vec3 transformable::get_translation() const

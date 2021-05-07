@@ -253,8 +253,6 @@ void main_loop::init()
 		m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
 		m_monkeys[i].obj->translate(glm::vec3(offset, -offset, 0.f));
 	}
-
-	m_monkeys.back().obj->add_child(&get_camera());
 }
 
 void main_loop::resize(int width, int height)
@@ -280,8 +278,8 @@ vr::camera& main_loop::get_camera()
 
 void main_loop::frame(float delta_time)
 {
-	const auto rotation_angle = -2.f;
-	m_monkeys.front().obj->rotate(vr::y_axis, rotation_angle * delta_time);
+	const auto rotation_angle = 150.f;
+	m_monkeys.front().obj->rotate(-vr::y_axis, rotation_angle * delta_time);
 
 	m_renderer->render(m_scene, get_camera());
 }
