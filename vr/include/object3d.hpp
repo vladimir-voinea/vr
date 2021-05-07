@@ -19,7 +19,6 @@ namespace vr
 
 		object3d* get_parent();
 		const object3d* get_parent() const;
-		void set_parent(object3d*);
 
 		const std::vector<object3d*>& get_children() const;
 		void add_child(object3d*);
@@ -32,6 +31,9 @@ namespace vr
 		bool has_geometry() const;
 
 		virtual glm::mat4 get_transformation_matrix() const override;
+
+	private:
+		void set_parent(object3d*);
 
 	private:
 		object3d* m_parent = nullptr;

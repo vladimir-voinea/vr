@@ -32,11 +32,13 @@ namespace vr
 	void object3d::add_child(object3d* child)
 	{
 		m_children.push_back(child);
+		child->set_parent(this);
 	}
 
 	void object3d::remove_child(object3d* child)
 	{
 		m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+		child->set_parent(nullptr);
 	}
 
 	const std::vector<const mesh*>& object3d::get_meshes() const

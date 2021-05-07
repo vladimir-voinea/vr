@@ -240,12 +240,10 @@ void main_loop::init()
 	{
 		const auto previous = i - 1;
 		m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
-		m_monkeys[i].obj->set_parent(m_monkeys[previous].obj.get());
 		m_monkeys[i].obj->translate(glm::vec3(-offset, -offset, 0.f));
 	}
 
 	m_monkeys[0].obj->add_child(m_monkeys[mid + 1].obj.get());
-	m_monkeys[mid + 1].obj->set_parent(m_monkeys[0].obj.get());
 	m_monkeys[mid + 1].obj->translate(glm::vec3(offset, -offset, 0.f));
 
 	for (auto i = mid + 2; i <= 2 * mid; ++i)
@@ -253,10 +251,10 @@ void main_loop::init()
 		const auto previous = i - 1;
 
 		m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
-		m_monkeys[i].obj->set_parent(m_monkeys[previous].obj.get());
 		m_monkeys[i].obj->translate(glm::vec3(offset, -offset, 0.f));
 	}
 
+	m_monkeys.back().obj->add_child(&get_camera());
 }
 
 void main_loop::resize(int width, int height)
