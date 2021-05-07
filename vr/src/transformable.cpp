@@ -39,16 +39,16 @@ namespace vr
 
 	glm::vec3 transformable::front() const
 	{
-		return glm::rotate(glm::inverse(m_quaternion), -vr::z_axis);
+		return glm::rotate(m_quaternion, -vr::z_axis);
 	}
 
 	glm::vec3 transformable::right() const
 	{
-		return glm::rotate(glm::inverse(m_quaternion), vr::x_axis);
+		return glm::rotate(m_quaternion, vr::x_axis);
 	}
 
 	glm::vec3 transformable::up() const
 	{
-		return glm::rotate(glm::inverse(m_quaternion), vr::y_axis);
+		return glm::rotate(m_quaternion, vr::y_axis);
 	}
 }
