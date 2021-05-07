@@ -5,7 +5,7 @@
 namespace vr
 {
 	perspective_camera::perspective_camera(const perspective_camera::settings& settings)
-		: camera(settings.position, settings.direction, settings.up, settings.yaw, settings.pitch, settings.fov)
+		: camera(settings.position, settings.direction, settings.fov)
 		, m_settings(settings)
 	{
 	}

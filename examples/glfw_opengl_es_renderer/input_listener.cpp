@@ -1,5 +1,7 @@
 #include "input_listener.hpp"
 
+#include <vr.hpp>
+
 #include <spdlog/spdlog.h>
 
 input_listener::input_listener(vr::glfw::window& window, vr::camera& camera, const fps_counter& timing)
@@ -14,30 +16,45 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 
 	if (state == vr::glfw::key_action::press || state == vr::glfw::key_action::repeat)
 	{
-		glm::vec3 direction = m_camera.get_front();
+		glm::vec3 direction = m_camera.front();
 
 		using k = vr::glfw::key;
 		switch (key)
 		{
 		case k::w:
 		{
-			direction = m_camera.get_front();
+			direction = m_camera.front();
 			break;
 		}
 		case k::a:
 		{
-			direction = -m_camera.get_right();
+			direction = -m_camera.right();
 			break;
 		}
 		case k::s:
 		{
-			direction = -m_camera.get_front();
+			direction = -m_camera.front();
 			break;
 		}
 		case k::d:
 		{
-			direction = m_camera.get_right();
+			direction = m_camera.right();
 			break;
+		}
+		case k::space:
+		{
+			direction = m_camera.up();
+			break;
+		}
+		case k::left_ctrl:
+		{
+			direction = -m_camera.up();
+			break;
+		}
+		default:
+		{
+			spdlog::info("No handler for key {}", key);
+			return;
 		}
 		}
 
@@ -58,13 +75,14 @@ void input_listener::on_position_event(const vr::glfw::mouse_position& position)
 		m_last_mouse_position = vr::glfw::mouse_position{ static_cast<double>(viewport_size.width / 2), static_cast<double>(viewport_size.height / 2) };
 
 	}
-	const float sensitivity = 0.1f;
-	const float xoffset = (position.x - m_last_mouse_position->x) * sensitivity;
+	const float sensitivity = 0.001f;
+	const float xoffset = (m_last_mouse_position->x - position.x) * sensitivity;
 	const float yoffset = (m_last_mouse_position->y - position.y) * sensitivity;
 	m_last_mouse_position = position;
 	spdlog::info("Mouse offsets: x = {0}, y = {1}", xoffset, yoffset);
 
-	m_camera.process_mouse_movement(xoffset, yoffset);
+	m_camera.rotate(vr::x_axis, yoffset);
+	m_camera.rotate_world(vr::y_axis, xoffset);
 }
 
 void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mouse_action action)

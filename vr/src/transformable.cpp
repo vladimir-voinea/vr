@@ -1,5 +1,7 @@
 #include "transformable.hpp"
 
+#include "defs.hpp"
+
 namespace vr
 {
 	glm::mat4 transformable::get_transformation_matrix() const
@@ -20,6 +22,11 @@ namespace vr
 		m_quaternion *= glm::quat(glm::angleAxis(angle, axis));
 	}
 
+	void transformable::rotate_world(const glm::vec3& axis, float angle)
+	{
+		m_quaternion = glm::quat(glm::angleAxis(angle, axis)) * m_quaternion;
+	}
+
 	glm::vec3 transformable::get_translation() const
 	{
 		return m_position;
@@ -28,5 +35,20 @@ namespace vr
 	void transformable::translate(const glm::vec3& position)
 	{
 		m_position += position;
+	}
+
+	glm::vec3 transformable::front() const
+	{
+		return glm::rotate(glm::inverse(m_quaternion), -vr::z_axis);
+	}
+
+	glm::vec3 transformable::right() const
+	{
+		return glm::rotate(glm::inverse(m_quaternion), vr::x_axis);
+	}
+
+	glm::vec3 transformable::up() const
+	{
+		return glm::rotate(glm::inverse(m_quaternion), vr::y_axis);
 	}
 }
