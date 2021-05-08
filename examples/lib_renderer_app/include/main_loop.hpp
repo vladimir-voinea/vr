@@ -58,15 +58,7 @@ private:
 	float m_last_timestamp;
 	float m_delta_time;
 
-	struct {
-		vr::geometry geometry;
-		std::unique_ptr<vr::gl::opengl_shader> shader;
-		std::unique_ptr<vr::texture> texture_uvmap;
-	} m_monkey_data;
-	const size_t n_monkeys = 5;
-	std::vector<monkey> m_monkeys;
-
-	vr::model::model m_monkey_model;
+	vr::model::model m_scene_model;
 
 	int total_frames = 0;
 };

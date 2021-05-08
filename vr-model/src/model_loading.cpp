@@ -6,6 +6,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <spdlog/spdlog.h>
+
 #include <iterator>
 #include <stdexcept>
 
@@ -73,7 +75,7 @@ namespace vr::model
 			parent->add_child(std::move(node));
 		}
 
-		const auto assimp_transformation = assimp_node->mTransformation * accumulated_transformation;
+		const auto assimp_transformation = assimp_node->mTransformation;
 
 		aiVector3D scale;
 		aiVector3D rotation_axis;
@@ -81,15 +83,15 @@ namespace vr::model
 		aiVector3D translate;
 		assimp_transformation.Decompose(scale, rotation_axis, rotation_angle, translate);
 
+		current_node->translate({ translate.x, translate.y, translate.z });
+		current_node->rotate({ rotation_axis.x, rotation_axis.y, rotation_axis.z }, rotation_angle);
+		current_node->scale({ scale.x, scale.y, scale.z });
+
 		for (auto i = 0u; i < assimp_node->mNumMeshes; ++i)
 		{
 			const auto mesh_idx = assimp_node->mMeshes[i];
 			vr::mesh* mesh = &model.data.meshes.at(mesh_idx);
 			current_node->add_mesh(mesh);
-
-			current_node->translate({ translate.x, translate.y, translate.z });
-			current_node->rotate({ rotation_axis.x, rotation_axis.y, rotation_axis.z }, rotation_angle);
-			current_node->scale({ scale.x, scale.y, scale.z });
 		}
 
 		for (auto i = 0u; i < assimp_node->mNumChildren; ++i)
