@@ -88,7 +88,7 @@ namespace
 				uniform.name != builtin_view_uniform_name && uniform.name != builtin_model_uniform_name && 
 				uniform.name != builtin_normal_uniform_name && uniform.name != builtin_texture_sampler_uniform_name)
 			{
-				spdlog::warn("Uniform {0} not found in program {1}", uniform.name, program.get_id());
+				spdlog::debug("Uniform {0} not found in program {1}", uniform.name, program.get_id());
 			}
 		}
 	}

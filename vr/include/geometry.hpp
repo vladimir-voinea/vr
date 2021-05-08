@@ -24,7 +24,6 @@ namespace vr
 	struct geometry
 	{
 		std::unordered_map<std::string, attribute> attributes;
-		std::vector<attribute> m_attributes;
 		std::vector<uint16_t> indices;
 	};
 }
