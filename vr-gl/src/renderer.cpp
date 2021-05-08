@@ -26,6 +26,7 @@ namespace
 	constexpr auto builtin_view_uniform_name = "vr_view";
 	constexpr auto builtin_model_uniform_name = "vr_model";
 	constexpr auto builtin_texture_sampler_uniform_name = "vr_texture_sampler";
+	constexpr auto builtin_modelview_uniform_name = "vr_modelview";
 	constexpr auto builtin_normal_uniform_name = "vr_normal";
 
 	bool has_uniform(const vr::gl::shader_program& program, const std::string& name)
@@ -99,9 +100,6 @@ namespace
 		const auto projection_matrix = camera.get_projection_matrix();
 		const auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
 
-		const auto modelview_matrix = view_matrix * model_matrix;
-		const auto normal_matrix = glm::transpose(glm::inverse(modelview_matrix));
-
 		vr::gl::uniform mvp_uniform;
 		mvp_uniform.name = builtin_mvp_uniform_name;
 		mvp_uniform.type = vr::gl::uniform_type::mat4fv;
@@ -126,11 +124,26 @@ namespace
 		model_uniform.value.mat4fv = model_matrix;
 		load_uniform(shader->program, model_uniform);
 
-		vr::gl::uniform normal_uniform;
-		normal_uniform.name = builtin_normal_uniform_name;
-		normal_uniform.type = vr::gl::uniform_type::mat4fv;
-		normal_uniform.value.mat4fv = normal_matrix;
-		load_uniform(shader->program, normal_uniform);
+		if (has_uniform(shader->program, builtin_modelview_uniform_name))
+		{
+			const auto modelview_matrix = view_matrix * model_matrix;
+			vr::gl::uniform modelview_uniform;
+			modelview_uniform.name = builtin_modelview_uniform_name;
+			modelview_uniform.type = vr::gl::uniform_type::mat4fv;
+			modelview_uniform.value.mat4fv = modelview_matrix;
+			load_uniform(shader->program, modelview_uniform);
+		}
+		
+		if (has_uniform(shader->program, builtin_normal_uniform_name))
+		{
+			const auto modelview_matrix = view_matrix * model_matrix;
+			const auto normal_matrix = glm::transpose(glm::inverse(modelview_matrix));
+			vr::gl::uniform normal_uniform;
+			normal_uniform.name = builtin_normal_uniform_name;
+			normal_uniform.type = vr::gl::uniform_type::mat4fv;
+			normal_uniform.value.mat4fv = normal_matrix;
+			load_uniform(shader->program, normal_uniform);
+		}
 
 		vr::gl::uniform texture_sampler_uniform;
 		texture_sampler_uniform.name = builtin_texture_sampler_uniform_name;
@@ -310,7 +323,7 @@ namespace vr::gl
 			}
 		}
 
-		for (auto& child : object->get_children())
+		for (const auto& child : object->get_children())
 		{
 			load_object(child.get());
 		}

@@ -20,11 +20,15 @@ namespace vr::model
 			in vec2 vr_vertex_uv;
 
 			out vec2 uv;
+			out vec3 normal;
+			out vec3 position;
 
 			uniform mat4 vr_mvp;
 			uniform mat4 vr_projection;
 			uniform mat4 vr_view;
 			uniform mat4 vr_model;
+			uniform mat4 vr_modelview;
+			uniform mat4 vr_normal;
 
 			uniform vec3 vr_ambient;
 			uniform vec3 vr_diffuse;
@@ -42,6 +46,9 @@ namespace vr::model
 			#version 300 es
 
 			in highp vec2 uv;
+			in highp vec3 normal;
+			in highp vec3 position;
+
 			out highp vec3 color;
 			uniform sampler2D vr_texture_sampler;
 
@@ -163,25 +170,25 @@ namespace vr::model
 		ambient_uniform.name = "vr_ambient";
 		ambient_uniform.type = vr::gl::uniform_type::vec3f;
 		ambient_uniform.value.vec3f = { ambient.r, ambient.g, ambient.b };
-		//created_uniforms.push_back(ambient_uniform);
+		created_uniforms.push_back(ambient_uniform);
 
 		vr::gl::uniform diffuse_uniform;
 		diffuse_uniform.name = "vr_diffuse";
 		diffuse_uniform.type = vr::gl::uniform_type::vec3f;
 		diffuse_uniform.value.vec3f = { diffuse.r, diffuse.g, diffuse.b };
-		//created_uniforms.push_back(diffuse_uniform);
+		created_uniforms.push_back(diffuse_uniform);
 
 		vr::gl::uniform specular_uniform;
 		specular_uniform.name = "vr_specular";
 		specular_uniform.type = vr::gl::uniform_type::vec3f;
 		specular_uniform.value.vec3f = { specular.r, specular.g, specular.b };
-		//created_uniforms.push_back(specular_uniform);
+		created_uniforms.push_back(specular_uniform);
 
 		vr::gl::uniform shininess_uniform;
 		shininess_uniform.name = "vr_shininess";
 		shininess_uniform.type = vr::gl::uniform_type::vec1f;
 		shininess_uniform.value.vec1f = shininess;
-		//created_uniforms.push_back(shininess_uniform);
+		created_uniforms.push_back(shininess_uniform);
 
 		const auto uniforms = &model.data.uniforms.emplace_back(std::move(created_uniforms));
 		const auto& shader = model.data.shaders.emplace_back(vshader, fshader);
