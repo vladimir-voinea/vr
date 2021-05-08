@@ -14,11 +14,14 @@ namespace vr
 
 		virtual glm::mat4 get_transformation_matrix() const;
 
+		virtual const glm::vec3& get_scale() const;
+		virtual void scale(const glm::vec3& scale);
+
 		virtual glm::vec3 get_rotation() const;
 		virtual void rotate(const glm::vec3& axis, float angle);
 		virtual void rotate_world(const glm::vec3& axis, float angle);
 
-		virtual glm::vec3 get_translation() const;
+		virtual const glm::vec3& get_translation() const;
 		virtual void translate(const glm::vec3& position);
 
 		virtual glm::vec3 front() const;
@@ -26,7 +29,8 @@ namespace vr
 		virtual glm::vec3 up() const;
 
 	protected:
-		glm::quat m_quaternion;
 		glm::vec3 m_position;
+		glm::quat m_quaternion;
+		glm::vec3 m_scale;
 	};
 }

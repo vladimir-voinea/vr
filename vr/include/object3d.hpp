@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include <utility>
+#include <memory>
 
 namespace vr
 {
@@ -20,8 +21,8 @@ namespace vr
 		object3d* get_parent();
 		const object3d* get_parent() const;
 
-		const std::vector<object3d*>& get_children() const;
-		void add_child(object3d*);
+		const std::vector<std::unique_ptr<object3d>>& get_children() const;
+		void add_child(std::unique_ptr<object3d>);
 		void remove_child(object3d*);
 
 		const std::vector<const mesh*>& get_meshes() const;
@@ -37,7 +38,7 @@ namespace vr
 
 	private:
 		object3d* m_parent = nullptr;
-		std::vector<object3d*> m_children;
+		std::vector<std::unique_ptr<object3d>> m_children;
 		std::vector<const mesh*> m_meshes;
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;

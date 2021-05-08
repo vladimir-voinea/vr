@@ -206,53 +206,57 @@ void main_loop::init()
 
 	initialize_position();
 
-	std::random_device dev;
+	//std::random_device dev;
 
-	{
-		m_monkey_data.geometry = ::import_model("suzanne");
-		m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
-		m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("models/uvmap.png");
-	}
+	//{
+	//	m_monkey_data.geometry = ::import_model("suzanne");
+	//	m_monkey_data.shader = std::make_unique<vr::gl::opengl_shader>(load_vertex_shader_code("suzanne"), load_fragment_shader_code("suzanne"));
+	//	m_monkey_data.texture_uvmap = std::make_unique<vr::texture>("models/uvmap.png");
+	//}
 
-	std::uniform_real_distribution<> limits_n(-5.f, 0.f);
-	std::uniform_real_distribution<> limits_p(0.f, 5.f);
+	//std::uniform_real_distribution<> limits_n(-5.f, 0.f);
+	//std::uniform_real_distribution<> limits_p(0.f, 5.f);
 
-	for (auto i = 0u; i < n_monkeys; ++i)
-	{
-		monkey inst;
-		inst.obj = std::make_unique<vr::object3d>();
 
-		inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, inst.uniforms.get());
-		vr::texture* texture = m_monkey_data.texture_uvmap.get();
-		inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, inst.material.get(), texture);
+	//for (auto i = 0u; i < n_monkeys; ++i)
+	//{
+	//	monkey inst;
+	//	inst.obj = std::make_unique<vr::object3d>();
 
-		inst.obj->add_mesh(inst.mesh.get());
+	//	inst.material = std::make_unique<vr::gl::opengl_shader_material>(*m_monkey_data.shader, inst.uniforms.get());
+	//	vr::texture* texture = m_monkey_data.texture_uvmap.get();
+	//	inst.mesh = std::make_unique<vr::mesh>(&m_monkey_data.geometry, inst.material.get(), texture);
 
-		m_monkeys.push_back(std::move(inst));
-	}
-	m_scene.add(m_monkeys[0].obj.get());
-	m_monkeys[0].obj->translate(glm::vec3(0.f, 10.f, -10.f));
+	//	inst.obj->add_mesh(inst.mesh.get());
 
-	float offset = 5.f;
-	auto mid = m_monkeys.size() / 2;
+	//	m_monkeys.push_back(std::move(inst));
+	//}
+	//m_scene.add(m_monkeys[0].obj.get());
+	//m_monkeys[0].obj->translate(glm::vec3(0.f, 10.f, -10.f));
 
-	for (auto i = 1u; i <= mid; ++i)
-	{
-		const auto previous = i - 1;
-		m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
-		m_monkeys[i].obj->translate(glm::vec3(-offset, -offset, 0.f));
-	}
+	//float offset = 5.f;
+	//auto mid = m_monkeys.size() / 2;
 
-	m_monkeys[0].obj->add_child(m_monkeys[mid + 1].obj.get());
-	m_monkeys[mid + 1].obj->translate(glm::vec3(offset, -offset, 0.f));
+	//for (auto i = 1u; i <= mid; ++i)
+	//{
+	//	const auto previous = i - 1;
+	//	m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
+	//	m_monkeys[i].obj->translate(glm::vec3(-offset, -offset, 0.f));
+	//}
 
-	for (auto i = mid + 2; i <= 2 * mid; ++i)
-	{
-		const auto previous = i - 1;
+	//m_monkeys[0].obj->add_child(m_monkeys[mid + 1].obj.get());
+	//m_monkeys[mid + 1].obj->translate(glm::vec3(offset, -offset, 0.f));
 
-		m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
-		m_monkeys[i].obj->translate(glm::vec3(offset, -offset, 0.f));
-	}
+	//for (auto i = mid + 2; i <= 2 * mid; ++i)
+	//{
+	//	const auto previous = i - 1;
+
+	//	m_monkeys[previous].obj->add_child(m_monkeys[i].obj.get());
+	//	m_monkeys[i].obj->translate(glm::vec3(offset, -offset, 0.f));
+	//}
+
+	m_monkey_model = vr::model::load_model("suzanne");
+	m_scene.add(m_monkey_model.root_node.get());
 }
 
 void main_loop::resize(int width, int height)
@@ -279,7 +283,10 @@ vr::camera& main_loop::get_camera()
 void main_loop::frame(float delta_time)
 {
 	const auto rotation_angle = 114.f;
-	m_monkeys.front().obj->rotate(-vr::y_axis, rotation_angle * delta_time);
+	if (!m_monkeys.empty())
+	{
+		m_monkeys.front().obj->rotate(-vr::y_axis, rotation_angle * delta_time);
+	}
 
 	m_renderer->render(m_scene, get_camera());
 }

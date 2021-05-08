@@ -16,29 +16,21 @@ endif()
 
 # External dependencies
 add_subdirectory ("dependencies")
-
-# vr-glfw directory
 add_subdirectory ("vr")
+add_subdirectory ("vr-model")
+add_subdirectory ("vr-gl")
+add_subdirectory ("vr-platform")
 
 if(NOT DEFINED ANDROID)
-	# vr-glfw directory
 	add_subdirectory ("vr-glfw")
 endif()
-
-# vr-gl directory
-add_subdirectory ("vr-gl")
-
-# vr-platform directory
-add_subdirectory ("vr-platform")
 
 if(NOT DEFINED ANDROID)
 	# CMake modules
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-	# vr-vk directory
 add_subdirectory ("vr-vk")
 endif()
 
-# examples directory
 add_subdirectory ("examples")
 
 message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")

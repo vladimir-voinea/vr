@@ -26,11 +26,17 @@ namespace
 	constexpr auto builtin_view_uniform_name = "vr_view";
 	constexpr auto builtin_model_uniform_name = "vr_model";
 	constexpr auto builtin_texture_sampler_uniform_name = "vr_texture_sampler";
+	constexpr auto builtin_normal_uniform_name = "vr_normal";
+
+	bool has_uniform(const vr::gl::shader_program& program, const std::string& name)
+	{
+		return std::find(program.get_uniform_names().begin(), program.get_uniform_names().end(), name) != program.get_uniform_names().end();
+	}
 
 	void load_uniform(const vr::gl::shader_program& program, const vr::gl::uniform& uniform)
 	{
 		const auto& uniforms = program.get_uniform_names();
-		if (std::find(uniforms.begin(), uniforms.end(), uniform.name) != uniforms.end())
+		if (has_uniform(program, uniform.name))
 		{
 		    spdlog::debug("Checking uniform location for uniform {}", uniform.name);
 			const auto location = glGetUniformLocation(program.get_id(), uniform.name.c_str());
@@ -66,6 +72,12 @@ namespace
 				glUniform1i(location, uniform.value.vec1i);
 				break;
 			}
+			case ut::vec1f:
+			{
+				loaded_type = "1f";
+				glUniform1f(location, uniform.value.vec1f);
+				break;
+			}
 			}
             spdlog::debug("Loaded a {} uniform", loaded_type);
 		}
@@ -73,40 +85,52 @@ namespace
 		{
 			if (uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_projection_uniform_name &&
 				uniform.name != builtin_view_uniform_name && uniform.name != builtin_model_uniform_name && 
-				uniform.name != builtin_texture_sampler_uniform_name)
+				uniform.name != builtin_normal_uniform_name && uniform.name != builtin_texture_sampler_uniform_name)
 			{
-				spdlog::error("Uniform {0} not found", uniform.name);
+				spdlog::warn("Uniform {0} not found in program {1}", uniform.name, program.get_id());
 			}
 		}
 	}
 
 	void load_builtin_uniforms(const vr::gl::loaded_shader* shader, const vr::object3d* object, const vr::camera& camera)
 	{
-		const auto model_transformation = object->get_transformation_matrix();
+		const auto model_matrix = object->get_transformation_matrix();
+		const auto view_matrix = camera.get_view_matrix();
+		const auto projection_matrix = camera.get_projection_matrix();
+		const auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
+
+		const auto modelview_matrix = view_matrix * model_matrix;
+		const auto normal_matrix = glm::transpose(glm::inverse(modelview_matrix));
 
 		vr::gl::uniform mvp_uniform;
 		mvp_uniform.name = builtin_mvp_uniform_name;
 		mvp_uniform.type = vr::gl::uniform_type::mat4fv;
-		mvp_uniform.value.mat4fv = camera.get_projection_matrix() * camera.get_view_matrix() * model_transformation;
+		mvp_uniform.value.mat4fv = mvp_matrix;
 		load_uniform(shader->program, mvp_uniform);
 
 		vr::gl::uniform projection_uniform;
 		projection_uniform.name = builtin_projection_uniform_name;
 		projection_uniform.type = vr::gl::uniform_type::mat4fv;
-		projection_uniform.value.mat4fv = camera.get_projection_matrix();
+		projection_uniform.value.mat4fv = projection_matrix;
 		load_uniform(shader->program, projection_uniform);
 
 		vr::gl::uniform view_uniform;
 		view_uniform.name = builtin_view_uniform_name;
 		view_uniform.type = vr::gl::uniform_type::mat4fv;
-		view_uniform.value.mat4fv = camera.get_view_matrix();
+		view_uniform.value.mat4fv = view_matrix;
 		load_uniform(shader->program, view_uniform);
 
 		vr::gl::uniform model_uniform;
 		model_uniform.name = builtin_model_uniform_name;
 		model_uniform.type = vr::gl::uniform_type::mat4fv;
-		model_uniform.value.mat4fv = model_transformation;
+		model_uniform.value.mat4fv = model_matrix;
 		load_uniform(shader->program, model_uniform);
+
+		vr::gl::uniform normal_uniform;
+		normal_uniform.name = builtin_normal_uniform_name;
+		normal_uniform.type = vr::gl::uniform_type::mat4fv;
+		normal_uniform.value.mat4fv = normal_matrix;
+		load_uniform(shader->program, normal_uniform);
 
 		vr::gl::uniform texture_sampler_uniform;
 		texture_sampler_uniform.name = builtin_texture_sampler_uniform_name;
@@ -286,9 +310,9 @@ namespace vr::gl
 			}
 		}
 
-		for (auto child : object->get_children())
+		for (auto& child : object->get_children())
 		{
-			load_object(child);
+			load_object(child.get());
 		}
 	}
 
@@ -397,9 +421,9 @@ namespace vr::gl
 			}
 		}
 
-		for (const auto child : object->get_children())
+		for (const auto& child : object->get_children())
 		{
-			render_object(child, camera);
+			render_object(child.get(), camera);
 		}
 	}
 

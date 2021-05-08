@@ -24,20 +24,19 @@ namespace vr
 		m_parent = parent;
 	}
 
-	const std::vector<object3d*>& object3d::get_children() const
+	const std::vector<std::unique_ptr<object3d>>& object3d::get_children() const
 	{
 		return m_children;
 	}
 
-	void object3d::add_child(object3d* child)
+	void object3d::add_child(std::unique_ptr<object3d> child)
 	{
-		m_children.push_back(child);
-		child->set_parent(this);
+		m_children.emplace_back(std::move(child))->set_parent(this);
 	}
 
 	void object3d::remove_child(object3d* child)
 	{
-		m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+		m_children.erase(std::remove_if(m_children.begin(), m_children.end(), [child](const auto& child_ptr) { return child_ptr.get() == child; }), m_children.end());
 		child->set_parent(nullptr);
 	}
 

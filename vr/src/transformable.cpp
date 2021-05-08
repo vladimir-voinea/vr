@@ -8,8 +8,19 @@ namespace vr
 	{
 		const auto translation = glm::translate(glm::mat4(1.f), m_position);
 		const auto rotation = glm::toMat4(m_quaternion);
+		const auto scale = glm::scale(glm::mat4(1.f), m_scale);
 
-		return translation * rotation;
+		return translation * rotation;// *scale;
+	}
+
+	const glm::vec3& transformable::get_scale() const
+	{
+		return m_position;
+	}
+
+	void transformable::scale(const glm::vec3& scale)
+	{
+		m_scale += scale;
 	}
 
 	glm::vec3 transformable::get_rotation() const
@@ -27,7 +38,7 @@ namespace vr
 		m_quaternion = glm::quat(glm::angleAxis(glm::radians(angle), axis)) * m_quaternion;
 	}
 
-	glm::vec3 transformable::get_translation() const
+	const glm::vec3& transformable::get_translation() const
 	{
 		return m_position;
 	}

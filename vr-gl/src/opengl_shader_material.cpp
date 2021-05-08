@@ -9,6 +9,8 @@ namespace vr::gl
 		, m_uniforms(uniforms)
 	{}
 
+	opengl_shader_material::~opengl_shader_material() = default;
+
 	const opengl_shader& opengl_shader_material::get_shader() const
 	{
 		return m_shader;

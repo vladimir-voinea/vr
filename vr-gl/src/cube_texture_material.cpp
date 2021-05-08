@@ -2,7 +2,7 @@
 
 namespace
 {
-	const auto vshader = R"(
+	constexpr auto vshader = R"(
 		#version 300 es
 
 		in vec3 vr_vertex_position;
@@ -24,7 +24,7 @@ namespace
 		}
 		)";
 
-	const auto fshader = R"(
+	constexpr auto fshader = R"(
 		#version 300 es
 		
 		in highp vec3 cube_texcoords;

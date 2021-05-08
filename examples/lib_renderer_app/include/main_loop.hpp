@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <color_mateiral.hpp>
+#include <vr-model.hpp>
 #include <vr-gl.hpp>
 #include <vr.hpp>
 
@@ -64,6 +65,8 @@ private:
 	} m_monkey_data;
 	const size_t n_monkeys = 5;
 	std::vector<monkey> m_monkeys;
+
+	vr::model::model m_monkey_model;
 
 	int total_frames = 0;
 };
