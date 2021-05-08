@@ -31,6 +31,6 @@ namespace vr
 	protected:
 		glm::vec3 m_position;
 		glm::quat m_quaternion;
-		glm::vec3 m_scale;
+		glm::vec3 m_scale = glm::vec3(1.f, 1.f, 1.f);
 	};
 }

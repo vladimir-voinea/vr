@@ -10,7 +10,7 @@ namespace vr
 		const auto rotation = glm::toMat4(m_quaternion);
 		const auto scale = glm::scale(glm::mat4(1.f), m_scale);
 
-		return translation * rotation;// *scale;
+		return translation * rotation * scale;
 	}
 
 	const glm::vec3& transformable::get_scale() const
@@ -20,7 +20,7 @@ namespace vr
 
 	void transformable::scale(const glm::vec3& scale)
 	{
-		m_scale += scale;
+		m_scale *= scale;
 	}
 
 	glm::vec3 transformable::get_rotation() const
