@@ -135,8 +135,8 @@ void main_loop::init()
 
 	m_scene_model = vr::model::load_model("2.fbx");
 	m_scene_model.root_node->translate({ 0.0, 0.0, -10.0 });
-	m_scene_model.root_node->scale({ 0.10, 0.10, 0.10 });
-	m_scene_model.root_node->rotate(vr::y_axis, 180);
+	//m_scene_model.root_node->scale({ 0.10, 0.10, 0.10 });
+	//m_scene_model.root_node->rotate(vr::y_axis, 180);
 	m_scene.add(m_scene_model.root_node.get());
 }
 
