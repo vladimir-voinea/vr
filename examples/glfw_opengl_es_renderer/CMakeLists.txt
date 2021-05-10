@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 
 set(APP_NAME "glfw_opengl_es_renderer_app")
 
-set(SOURCES "main.cpp" "glfw_opengl_es_renderer_app.cpp" "fps_counter.cpp" "input_listener.cpp" "preamble.cpp")
+set(SOURCES "main.cpp" "glfw_opengl_es_renderer_app.cpp" "fps_counter.cpp" "input_listener.cpp" "preamble.cpp" "gui.cpp")
 
 add_executable(${APP_NAME} ${SOURCES})
 target_compile_features(${APP_NAME} PRIVATE cxx_std_17)

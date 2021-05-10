@@ -6,6 +6,7 @@
 
 #include "fps_counter.hpp"
 #include "input_listener.hpp"
+#include "gui.hpp"
 
 #include <main_loop.hpp>
 
@@ -29,6 +30,7 @@ private:
 	fps_counter m_fps_counter;
 	std::unique_ptr<main_loop> m_main_loop;
 	std::unique_ptr<input_listener> m_input_listener;
+	std::unique_ptr<gui> m_gui;
 
 	float m_last_timestamp = 0.f;
 };

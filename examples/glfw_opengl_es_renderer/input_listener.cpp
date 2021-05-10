@@ -78,14 +78,14 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 
 void input_listener::on_char_event(unsigned int codepoint)
 {
-	spdlog::info("Char event. Codepoint: {0}", codepoint);
+	spdlog::info("Char event. Codepoint: {0}. Listener state: {1}", codepoint, m_state);
 	auto& io = ImGui::GetIO();
 
 	switch (m_state)
 	{
 	case state::imgui_input:
 	{
-		if (io.WantCaptureKeyboard)
+		if (io.WantTextInput)
 		{
 			io.AddInputCharacter(codepoint);
 		}
