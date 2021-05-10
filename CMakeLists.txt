@@ -14,6 +14,13 @@ if(${ANDROID_PLATFORM_LEVEL})
 endif()
 
 
+if(NOT DEFINED ANDROID)
+	find_package(OpenGL REQUIRED)
+	set(OPENGL_LIBS opengl32 glew_lib::static)
+else()
+	set(OPENGL_LIBS ${OPENGL_LIB} EGL)
+endif()
+
 # External dependencies
 add_subdirectory ("dependencies")
 add_subdirectory ("vr")

@@ -20,5 +20,6 @@ if(DEFINED ANDROID)
 	set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 endif()
 add_subdirectory ("assimp")
+add_subdirectory ("imgui")
 
 add_subdirectory ("spdlog")
