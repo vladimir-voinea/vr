@@ -14,5 +14,7 @@ namespace vr::platform
 
 		virtual asset get_asset_by_name(const std::string& name) = 0;
 		virtual std::vector<uint8_t> read_file(const asset& asset) = 0;
+		virtual bool exists(const asset& asset) = 0;
+		virtual std::vector<asset> get_assets() = 0;
 	};
 }

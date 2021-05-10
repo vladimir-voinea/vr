@@ -28,6 +28,7 @@ void preamble::initialize()
 	m_main_loop = std::make_unique<main_loop>(viewport{ 0, 0, viewport_size.width, viewport_size.height });
 	m_input_listener = std::make_unique<input_listener>(m_window, m_mouse, m_main_loop->get_camera(), m_fps_counter);
 	initialize_controls();
+
 	m_gui = std::make_unique<gui>(m_window);
 }
 
@@ -66,8 +67,9 @@ void preamble::run_loop()
 			m_fps_counter.frame(current_time);
 
 			process_input();
-			m_main_loop->frame(delta_time);
-			
+
+			m_main_loop->frame(delta_time, m_gui->model_parameters);
+
 			m_gui->frame();
 			
 			m_window.swap_buffers();

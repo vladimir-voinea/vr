@@ -9,6 +9,7 @@
 #include <spdlog/spdlog.h>
 
 #include <iterator>
+#include <filesystem>
 #include <stdexcept>
 
 namespace vr::model
@@ -60,19 +61,19 @@ namespace vr::model
 			}
 	)";
 
-	void load_node(model& model, const aiScene* scene, const aiNode* assimp_node, object3d* parent, const aiMatrix4x4& accumulated_transformation)
+	void load_node(model_data& data, std::unique_ptr<object3d>& node, const aiScene* scene, const aiNode* assimp_node, object3d* parent, const aiMatrix4x4& accumulated_transformation)
 	{
 		object3d* current_node = nullptr;
 		if (!parent)
 		{
-			model.root_node = std::make_unique<object3d>();
-			current_node = model.root_node.get();
+			node = std::make_unique<object3d>();
+			current_node = node.get();
 		}
 		else
 		{
-			auto node = std::make_unique<object3d>();
-			current_node = node.get();
-			parent->add_child(std::move(node));
+			auto new_node = std::make_unique<object3d>();
+			current_node = new_node.get();
+			parent->add_child(std::move(new_node));
 		}
 
 		const auto assimp_transformation = assimp_node->mTransformation;
@@ -90,17 +91,17 @@ namespace vr::model
 		for (auto i = 0u; i < assimp_node->mNumMeshes; ++i)
 		{
 			const auto mesh_idx = assimp_node->mMeshes[i];
-			vr::mesh* mesh = &model.data.meshes.at(mesh_idx);
+			vr::mesh* mesh = &data.meshes.at(mesh_idx);
 			current_node->add_mesh(mesh);
 		}
 
 		for (auto i = 0u; i < assimp_node->mNumChildren; ++i)
 		{
-			load_node(model, scene, assimp_node->mChildren[i], current_node, assimp_transformation);
+			load_node(data, node, scene, assimp_node->mChildren[i], current_node, assimp_transformation);
 		}
 	}
 
-	void load_mesh(model& model, const aiMesh* mesh)
+	void load_mesh(model_data& data, const aiMesh* mesh)
 	{
 		vr::geometry loaded_geometry;
 
@@ -147,14 +148,14 @@ namespace vr::model
 			}
 		}
 
-		vr::geometry* geometry = &model.data.geometries.emplace_back(std::move(loaded_geometry));
-		vr::shader_material* material = model.data.materials.at(mesh->mMaterialIndex).get();
-		vr::texture* texture = &model.data.textures.emplace_back("models/uvmap.png");
+		vr::geometry* geometry = &data.geometries.emplace_back(std::move(loaded_geometry));
+		vr::shader_material* material = data.materials.at(mesh->mMaterialIndex).get();
+		vr::texture* texture = &data.textures.emplace_back("models/uvmap.png");
 
-		model.data.meshes.emplace_back(geometry, material, texture);
+		data.meshes.emplace_back(geometry, material, texture);
 	}
 
-	void load_material(model& model, const aiMaterial* assimp_material)
+	void load_material(model_data& data, const aiMaterial* assimp_material)
 	{
 
 		aiColor3D ambient;
@@ -192,17 +193,21 @@ namespace vr::model
 		shininess_uniform.value.vec1f = shininess;
 		created_uniforms.push_back(shininess_uniform);
 
-		const auto uniforms = &model.data.uniforms.emplace_back(std::move(created_uniforms));
-		const auto& shader = model.data.shaders.emplace_back(vshader, fshader);
+		const auto uniforms = &data.uniforms.emplace_back(std::move(created_uniforms));
+		const auto& shader = data.shaders.emplace_back(vshader, fshader);
 		auto material = std::make_unique<vr::gl::opengl_shader_material>(shader, uniforms);
 
-		model.data.materials.push_back(std::move(material));
+		data.materials.push_back(std::move(material));
 	}
 
-	model load_model(const std::string& asset_name)
+	std::pair<std::unique_ptr<object3d>, model_data> load_model(const std::string& path)
 	{
 #ifdef WIN32
-		const auto name = "data/models/" + asset_name;
+		const auto name = path;
+		if (!std::filesystem::exists(path))
+		{
+			throw std::runtime_error("Could not find " + path);
+		}
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(name,
 #else
@@ -220,22 +225,22 @@ namespace vr::model
 		);
 		if (scene)
 		{
-			model result;
+			std::pair<std::unique_ptr<object3d>, model_data> result;
 
 			const auto n_materials = scene->mNumMaterials;
 			for (auto i = 0u; i < n_materials; ++i)
 			{
-				load_material(result, scene->mMaterials[i]);
+				load_material(result.second, scene->mMaterials[i]);
 			}
 
 			const auto n_meshes = scene->mNumMeshes;
 			for (auto i = 0u; i < n_meshes; ++i)
 			{
-				load_mesh(result, scene->mMeshes[i]);
+				load_mesh(result.second, scene->mMeshes[i]);
 			}
 
 			const aiMatrix4x4 identity;
-			load_node(result, scene, scene->mRootNode, nullptr, identity);
+			load_node(result.second, result.first, scene, scene->mRootNode, nullptr, identity);
 
 			return result;
 		}

@@ -197,8 +197,24 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 void input_listener::on_scroll_event(const vr::glfw::mouse_scroll& scroll)
 {
 	spdlog::info("Mouse scroll event: x offset: {0}, y offset: {1}", scroll.xoffset, scroll.yoffset);
+	auto& io = ImGui::GetIO();
 
-	m_camera.process_mouse_scroll(scroll.yoffset);
+	switch (m_state)
+	{
+	case state::imgui_input:
+	{
+		if (io.WantCaptureMouse)
+		{
+			io.MouseWheel += scroll.yoffset;
+		}
+		break;
+	}
+	default:
+	{
+		m_camera.process_mouse_scroll(scroll.yoffset);
+		break;
+	}
+	}
 }
 
 void input_listener::on_enter_event(bool entered)

@@ -1,14 +1,10 @@
 #pragma once
 
-#include "monkey.hpp"
-
-#include <assimp/Importer.hpp>
-#include <glm/glm.hpp>
-
-#include <color_mateiral.hpp>
 #include <vr-model.hpp>
 #include <vr-gl.hpp>
 #include <vr.hpp>
+
+#include "parameters.hpp"
 
 #include <memory>
 
@@ -27,7 +23,7 @@ public:
 	~main_loop();
 
 	void init();
-	void frame(float delta_time);
+	void frame(float delta_time, const parameters& parameters);
 	void resize(int width, int height);
 
 	vr::camera& get_camera();
@@ -39,6 +35,8 @@ private:
 	void print_state();
 
 	void make_cameras();
+
+	void transform_model(const parameters& parameters);
 
 private:
 	viewport m_viewport;
@@ -58,7 +56,10 @@ private:
 	float m_last_timestamp;
 	float m_delta_time;
 
-	vr::model::model m_scene_model;
+	std::unordered_map<std::string, std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data>> m_loaded_models;
+
+	std::string m_scene_model_path;
+	vr::object3d* m_scene_model = nullptr;
 
 	int total_frames = 0;
 };

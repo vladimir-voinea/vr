@@ -2,7 +2,10 @@
 
 #include <glfw_window.hpp>
 
+#include <parameters.hpp>
+
 #include <string>
+#include <regex>
 
 class gui
 {
@@ -11,8 +14,13 @@ public:
 
 	void frame();
 
-public:
+private:
+	void render_model_options();
 
-	float f = 0.5f;
-	std::string text_input = "Type here";
+public:
+	parameters model_parameters;
+	
+private:
+	bool m_scale_uniformly = true;
+	std::regex m_model_files_regex;
 };

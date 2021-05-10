@@ -14,6 +14,8 @@
 
 #include <android_logging.hpp>
 
+#include <filesystem>
+
 static const auto start_position = glm::vec3{ -2.7872, 1.74459, 9.47206 };
 static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932346 };
 
@@ -133,11 +135,8 @@ void main_loop::init()
 
 	initialize_position();
 
-	m_scene_model = vr::model::load_model("2.fbx");
-	m_scene_model.root_node->translate({ 0.0, 0.0, -10.0 });
-	//m_scene_model.root_node->scale({ 0.10, 0.10, 0.10 });
-	//m_scene_model.root_node->rotate(vr::y_axis, 180);
-	m_scene.add(m_scene_model.root_node.get());
+	//m_scene_model = vr::model::load_model("2.fbx");
+	//m_scene.add(m_scene_model.root_node.get());
 }
 
 void main_loop::resize(int width, int height)
@@ -161,10 +160,40 @@ vr::camera& main_loop::get_camera()
 	return perspective ? *m_perspective_camera : *m_orthographic_camera;
 }
 
-void main_loop::frame(float delta_time)
+void main_loop::frame(float delta_time, const parameters& parameters)
 {
-	const auto rotation_angle = -114.f;
-	//m_scene_model.root_node->rotate(vr::y_axis, rotation_angle * delta_time);
+	if (parameters.path != m_scene_model_path)
+	{
+		if (std::filesystem::exists(parameters.path))
+		{
+			m_scene.remove(m_scene_model);
+			if (auto it = m_loaded_models.find(parameters.path); it == m_loaded_models.end())
+			{
+				auto insert = m_loaded_models.insert(std::make_pair(parameters.path, vr::model::load_model(parameters.path)));
+				m_scene_model = insert.first->second.first.get();
+			}
+			else
+			{
+				m_scene_model = it->second.first.get();
+			}
+			m_scene.add(m_scene_model);
+		}
+	}
+	transform_model(parameters);
 
 	m_renderer->render(m_scene, get_camera());
+}
+
+void main_loop::transform_model(const parameters& parameters)
+{
+	if (m_scene_model)
+	{
+		m_scene_model->set_translation(parameters.translation.vec);
+
+		m_scene_model->set_rotation(vr::x_axis, parameters.rotation.euler_angles.x);
+		m_scene_model->rotate_world(vr::y_axis, parameters.rotation.euler_angles.y);
+		m_scene_model->rotate_world(vr::z_axis, parameters.rotation.euler_angles.z);
+
+		m_scene_model->set_scale({ parameters.scale.value.x, parameters.scale.value.y, parameters.scale.value.z });
+	}
 }

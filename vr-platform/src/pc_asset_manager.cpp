@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iterator>
+#include <filesystem>
 
 namespace vr::platform
 {
@@ -21,5 +22,19 @@ namespace vr::platform
 		}
 
 		return std::vector<uint8_t> ( std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>() );
+	}
+
+	bool pc_asset_manager::exists(const asset& asset)
+	{
+		return std::filesystem::exists(asset.get_path());
+	}
+
+	std::vector<asset> pc_asset_manager::get_assets()
+	{
+		std::vector<asset> result;
+		std::transform(std::filesystem::recursive_directory_iterator("data/"), std::filesystem::recursive_directory_iterator(), 
+			std::back_inserter(result), [](const auto& path) { return asset{ path.path().string() }; });
+		
+		return result;
 	}
 }

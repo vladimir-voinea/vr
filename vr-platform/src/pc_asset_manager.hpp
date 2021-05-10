@@ -11,5 +11,7 @@ namespace vr::platform
 
 		asset get_asset_by_name(const std::string& name) override;
 		std::vector<uint8_t> read_file(const asset& asset) override;
+		bool exists(const asset& asset) override;
+		std::vector<asset> get_assets() override;
 	};
 }

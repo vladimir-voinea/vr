@@ -22,6 +22,11 @@ namespace vr
 	{
 		m_scale *= scale;
 	}
+	
+	void transformable::set_scale(const glm::vec3& scale)
+	{
+		m_scale = scale;
+	}
 
 	glm::vec3 transformable::get_rotation() const
 	{
@@ -38,6 +43,16 @@ namespace vr
 		m_quaternion = glm::quat(glm::angleAxis(glm::radians(angle), axis)) * m_quaternion;
 	}
 
+	void transformable::set_rotation(const glm::vec3& euler)
+	{
+		m_quaternion = glm::quat(glm::radians(euler));
+	}
+
+	void transformable::set_rotation(const glm::vec3& axis, float angle)
+	{
+		m_quaternion = glm::quat(glm::angleAxis(glm::radians(angle), axis));
+	}
+
 	const glm::vec3& transformable::get_translation() const
 	{
 		return m_position;
@@ -46,6 +61,11 @@ namespace vr
 	void transformable::translate(const glm::vec3& position)
 	{
 		m_position += position;
+	}
+
+	void transformable::set_translation(const glm::vec3& position)
+	{
+		m_position = position;
 	}
 
 	glm::vec3 transformable::front() const

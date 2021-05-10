@@ -24,11 +24,6 @@ namespace vr::model
 		std::vector<vr::mesh> meshes;
 	};
 
-	struct model
-	{
-		model_data data;
-		std::unique_ptr<object3d> root_node;
-	};
-
-	model load_model(const std::string& asset_name);
+	//TODO work with either asset or path
+	std::pair<std::unique_ptr<object3d>, model_data> load_model(const std::string& path);
 }
