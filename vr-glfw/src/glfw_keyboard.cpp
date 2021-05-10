@@ -41,7 +41,10 @@ namespace
 		{ k::space, GLFW_KEY_SPACE},
 		{ k::left_ctrl, GLFW_KEY_LEFT_CONTROL },
 		{ k::left_shift, GLFW_KEY_LEFT_SHIFT },
-		{ k::escape, GLFW_KEY_ESCAPE }
+		{ k::alt, GLFW_KEY_LEFT_ALT },
+		{ k::super, GLFW_KEY_LEFT_SUPER },
+		{ k::escape, GLFW_KEY_ESCAPE },
+		{ k::backspace, GLFW_KEY_BACKSPACE }
 	};
 
 	const std::unordered_map<int, k> glfw_to_key_mapping = {
@@ -74,7 +77,10 @@ namespace
 	{ GLFW_KEY_SPACE, k::space },
 	{ GLFW_KEY_LEFT_CONTROL, k::left_ctrl },
 	{ GLFW_KEY_LEFT_SHIFT, k::left_shift },
-	{ GLFW_KEY_ESCAPE, k::escape }
+	{ GLFW_KEY_LEFT_ALT, k::alt },
+	{ GLFW_KEY_LEFT_SUPER, k::super },
+	{ GLFW_KEY_ESCAPE, k::escape },
+	{ GLFW_KEY_BACKSPACE, k::backspace }
 	};
 
 	int enum_to_glfw_key(const k& key)
@@ -125,6 +131,7 @@ namespace vr::glfw
 	{
 		static_cast<user_pointer*>(glfwGetWindowUserPointer(window.get_handle()))->keyboard = this;
 		glfwSetKeyCallback(window.get_handle(), glfw_key_callback);
+		glfwSetCharCallback(window.get_handle(), glfw_char_callback);
 	}
 
 	void keyboard::set_listener(keyboard_listener* listener)
@@ -216,10 +223,28 @@ namespace vr::glfw
 		}
 	}
 
+	void keyboard::char_callback(unsigned int codepoint)
+	{
+		if (m_listener)
+		{
+			m_listener->on_char_event(codepoint);
+		}
+	}
+
+	int keyboard::convert_to_raw(key key)
+	{
+		return enum_to_glfw_key(key);
+	}
+
 	void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard;
 		kb->key_callback(key, scancode, action, mods);
 	}
 
+	void glfw_char_callback(GLFWwindow* window, unsigned int codepoint)
+	{
+		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard;
+		kb->char_callback(codepoint);
+	}
 }

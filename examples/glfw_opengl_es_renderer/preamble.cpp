@@ -29,7 +29,7 @@ void preamble::initialize()
 
 	const auto viewport_size = m_window.get_viewport_size();
 	m_main_loop = std::make_unique<main_loop>(viewport{ 0, 0, viewport_size.width, viewport_size.height });
-	m_input_listener = std::make_unique<input_listener>(m_window, m_main_loop->get_camera(), m_fps_counter);
+	m_input_listener = std::make_unique<input_listener>(m_window, m_mouse, m_main_loop->get_camera(), m_fps_counter);
 	initialize_controls();
 
 	IMGUI_CHECKVERSION();
@@ -52,7 +52,6 @@ void preamble::initialize_controls()
 {
 	m_kb.set_listener(m_input_listener.get());
 	m_mouse.set_listener(m_input_listener.get());
-	m_mouse.set_mode(vr::glfw::mouse_mode::disabled);
 	m_mouse.set_raw_motion(true);
 	const auto viewport_size = m_window.get_viewport_size();
 	const auto mouse_position = vr::glfw::mouse_position{ static_cast<double>(viewport_size.width / 2), static_cast<double>(viewport_size.height / 2) };

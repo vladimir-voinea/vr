@@ -52,6 +52,9 @@ namespace vr::glfw
 		space,
 		left_ctrl,
 		left_shift,
-		escape
+		alt,
+		super,
+		escape,
+		backspace
 	};
 }
