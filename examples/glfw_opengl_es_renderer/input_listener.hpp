@@ -15,7 +15,7 @@
 enum class state
 {
 	imgui_input,
-	camera_move,
+	object_move,
 	free_mouse // initial state
 };
 
@@ -46,11 +46,10 @@ private:
 
 	void update_state(state new_state);
 
-	void camera_handle_position_event(const vr::glfw::mouse_position& position);
+	void object_handle_position_event(const vr::glfw::mouse_position& position);
 	void imgui_forward_button_event(vr::glfw::mouse_button button, vr::glfw::mouse_action action);
-	void camera_handle_key_event(vr::glfw::key key, vr::glfw::key_action state, vr::glfw::modifiers mods);
 
-	void camera_move_towards(direction direction);
+	void object_move_towards(direction direction, float delta_time);
 
 private:
 	vr::glfw::window& m_window;
@@ -59,6 +58,8 @@ private:
 	const fps_counter& m_timing;
 	std::optional<vr::glfw::mouse_position> m_last_mouse_position;
 	state m_state;
+
+	std::unordered_map<vr::glfw::key, bool> m_key_state_cache;
 	bool m_left_button_down = false;
 	bool m_right_button_down = false;
 };

@@ -22,15 +22,16 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 	spdlog::info("Key event. Key: {0}, state: {1}, modifiers: {2}. Listener state: {3}", key, state, mods, m_state);
 	auto& io = ImGui::GetIO();
 
+	const auto raw_key = vr::glfw::keyboard::convert_to_raw(key);
+	const auto pressed = state == vr::glfw::key_action::release ? false : true;
+	m_key_state_cache[key] = pressed;
+
 	switch (m_state)
 	{
 	case state::imgui_input:
 	{
 		if (io.WantCaptureKeyboard)
 		{
-			const auto raw_key = vr::glfw::keyboard::convert_to_raw(key);
-			const auto pressed = state == vr::glfw::key_action::release ? false : true;
-			
 			io.KeysDown[raw_key] = pressed;
 
 			switch (key)
@@ -65,12 +66,11 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 	}
 	case state::free_mouse:
 	{
-		// interpolate rotation to align camera with viewing character's rotation
+		// TODO interpolate rotation to align camera with viewing character's rotation
 		break;
 	}
-	case state::camera_move:
+	case state::object_move:
 	{
-		camera_handle_key_event(key, state, mods);
 		break;
 	}
 	}
@@ -78,7 +78,6 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 
 void input_listener::on_char_event(unsigned int codepoint)
 {
-	spdlog::info("Char event. Codepoint: {0}. Listener state: {1}", codepoint, m_state);
 	auto& io = ImGui::GetIO();
 
 	switch (m_state)
@@ -108,9 +107,9 @@ void input_listener::on_position_event(const vr::glfw::mouse_position& position)
 
 	switch (m_state)
 	{
-	case state::camera_move:
+	case state::object_move:
 	{
-		camera_handle_position_event(position);
+		object_handle_position_event(position);
 		break;
 	}
 	case state::free_mouse:
@@ -150,7 +149,6 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 		m_left_button_down = action == vr::glfw::mouse_action::release ? false : true;
 	}
 
-	spdlog::info("L/R button down: {}, {}", m_left_button_down, m_right_button_down);
 
 	switch (m_state)
 	{
@@ -158,11 +156,11 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 	{
 		if (m_right_button_down)
 		{
-			update_state(state::camera_move);
+			update_state(state::object_move);
 		}
 		break;
 	}
-	case state::camera_move:
+	case state::object_move:
 	{
 		if (!m_right_button_down)
 		{
@@ -172,14 +170,7 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 			}
 			else
 			{
-				if (m_left_button_down)
-				{
-					camera_move_towards(direction::forward);
-				}
-				else
-				{
-					update_state(state::free_mouse);
-				}
+				update_state(state::free_mouse);
 			}
 		}
 		break;
@@ -241,7 +232,7 @@ void input_listener::update_state(state new_state)
 		m_mouse.set_mode(vr::glfw::mouse_mode::normal);
 		break;
 	}
-	case state::camera_move:
+	case state::object_move:
 	{
 		m_mouse.set_mode(vr::glfw::mouse_mode::disabled);
 		break;
@@ -251,7 +242,7 @@ void input_listener::update_state(state new_state)
 	m_state = new_state;
 }
 
-void input_listener::camera_handle_position_event(const vr::glfw::mouse_position& position)
+void input_listener::object_handle_position_event(const vr::glfw::mouse_position& position)
 {
 	if (!m_last_mouse_position)
 	{
@@ -291,56 +282,9 @@ void input_listener::imgui_forward_button_event(vr::glfw::mouse_button button, v
 	io.MouseDown[imgui_button] = imgui_action;
 }
 
-void input_listener::camera_handle_key_event(vr::glfw::key key, vr::glfw::key_action state, vr::glfw::modifiers mods)
+void input_listener::object_move_towards(direction direction, float delta_time)
 {
-	if (state == vr::glfw::key_action::press || state == vr::glfw::key_action::repeat)
-	{
-		glm::vec3 direction = m_object.front();
-
-		using k = vr::glfw::key;
-		switch (key)
-		{
-		case k::w:
-		{
-			camera_move_towards(direction::forward);
-			break;
-		}
-		case k::a:
-		{
-			camera_move_towards(direction::left);
-			break;
-		}
-		case k::s:
-		{
-			camera_move_towards(direction::backward);
-			break;
-		}
-		case k::d:
-		{
-			camera_move_towards(direction::right);
-			break;
-		}
-		case k::space:
-		{
-			camera_move_towards(direction::up);
-			break;
-		}
-		case k::left_ctrl:
-		{
-			camera_move_towards(direction::down);
-			break;
-		}
-		default:
-		{
-			spdlog::info("No handler for key {}", key);
-			return;
-		}
-		}
-	}
-}
-
-void input_listener::camera_move_towards(direction direction)
-{
+	spdlog::info("Moving!");
 	glm::vec3 direction_vector;
 
 	switch (direction)
@@ -378,7 +322,54 @@ void input_listener::camera_move_towards(direction direction)
 	}
 
 	const auto speed = 2.5f;
-	const auto delta_time = m_timing.get_time_since_last_frame();
 	const auto velocity = speed * delta_time;
 	m_object.translate(direction_vector * velocity);
+}
+
+void input_listener::frame(float delta_time)
+{
+	switch (m_state)
+	{
+	case state::object_move:
+	{
+		// TODO add strafe directions so that movement speed doesn't add up if going forward and left/right
+		if (m_key_state_cache[vr::glfw::key::w])
+		{
+			object_move_towards(direction::forward, delta_time);
+		}
+		else if (m_right_button_down && m_left_button_down)
+		{
+			object_move_towards(direction::forward, delta_time);
+		}
+		if (m_key_state_cache[vr::glfw::key::s])
+		{
+			object_move_towards(direction::backward, delta_time);
+		}
+		if (m_key_state_cache[vr::glfw::key::a])
+		{
+			object_move_towards(direction::left, delta_time);
+		}
+		if (m_key_state_cache[vr::glfw::key::d])
+		{
+			object_move_towards(direction::right, delta_time);
+		}
+		if (m_key_state_cache[vr::glfw::key::space])
+		{
+			object_move_towards(direction::up, delta_time);
+		}
+		if (m_key_state_cache[vr::glfw::key::left_ctrl])
+		{
+			object_move_towards(direction::down, delta_time);
+		}
+		break;
+	}
+	case state::free_mouse:
+	{
+		break;
+	}
+	case state::imgui_input:
+	{
+		break;
+	}
+	}
 }

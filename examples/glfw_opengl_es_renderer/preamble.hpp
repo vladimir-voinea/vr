@@ -21,7 +21,7 @@ public:
 	void initialize_controls();
 
 	void run_loop();
-	void process_input();
+	void process_input(float delta_time);
 
 private:
 	vr::glfw::window& m_window;

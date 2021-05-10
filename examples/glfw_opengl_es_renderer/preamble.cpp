@@ -66,7 +66,7 @@ void preamble::run_loop()
 			m_last_timestamp = current_time;
 			m_fps_counter.frame(current_time);
 
-			process_input();
+			process_input(delta_time);
 
 			m_main_loop->frame(delta_time, m_gui->model_parameters);
 
@@ -79,11 +79,14 @@ void preamble::run_loop()
 	}
 }
 
-void preamble::process_input()
+void preamble::process_input(float delta_time)
 {
 	if (m_kb.get_key_state(vr::glfw::key::escape) == vr::glfw::key_action::press)
 	{
 		m_window.request_close();
 	}
-
+	else
+	{
+		m_input_listener->frame(delta_time);
+	}
 }
