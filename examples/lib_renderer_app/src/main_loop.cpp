@@ -133,9 +133,10 @@ void main_loop::init()
 
 	initialize_position();
 
-	m_scene_model = vr::model::load_model("model.dae");
-	//m_monkey_model.root_node->scale({ 0.01, 0.01, 0.01 });
-	//m_scene_model.root_node->rotate(vr::x_axis, -90);
+	m_scene_model = vr::model::load_model("2.fbx");
+	m_scene_model.root_node->translate({ 0.0, 0.0, -10.0 });
+	m_scene_model.root_node->scale({ 0.10, 0.10, 0.10 });
+	m_scene_model.root_node->rotate(vr::y_axis, 180);
 	m_scene.add(m_scene_model.root_node.get());
 }
 

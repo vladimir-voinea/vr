@@ -201,16 +201,23 @@ namespace vr::model
 
 	model load_model(const std::string& asset_name)
 	{
+#ifdef WIN32
+		const auto name = "data/models/" + asset_name;
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFile(name,
+#else
 		const auto name = "models/" + asset_name;
-
 		auto am = vr::platform::get_platform_manager()->get_asset_manager();
 		auto asset = am->get_asset_by_name(name);
 		const auto file = am->read_file(asset);
 
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFileFromMemory(file.data(), file.size(), aiPostProcessSteps::aiProcess_ValidateDataStructure |
-			aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
-			aiPostProcessSteps::aiProcess_Triangulate);
+		const aiScene* scene = importer.ReadFileFromMemory(file.data(), file.size(),
+#endif
+			aiPostProcessSteps::aiProcess_ValidateDataStructure
+			| aiPostProcessSteps::aiProcess_JoinIdenticalVertices 
+			| aiPostProcessSteps::aiProcess_Triangulate
+		);
 		if (scene)
 		{
 			model result;
