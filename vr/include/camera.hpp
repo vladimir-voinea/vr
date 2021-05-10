@@ -14,8 +14,7 @@ namespace vr
 		virtual glm::mat4 get_projection_matrix() const = 0;
 		virtual glm::mat4 get_view_matrix() const;
 
-		//void process_mouse_movement(float xoffset, float yoffset, bool constrain_pitch = true);
-		void process_mouse_scroll(float yoffset);
+		void scale(const glm::vec3& scale) override;
 
 	protected:
 		float m_zoom;

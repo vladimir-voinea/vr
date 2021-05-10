@@ -5,7 +5,7 @@
 #include <glfw_window.hpp>
 #include <glfw_mouse.hpp>
 #include <glfw_keyboard.hpp>
-#include <camera.hpp>
+#include <object3d.hpp>
 #include <unordered_map>
 
 #include "fps_counter.hpp"
@@ -32,7 +32,7 @@ enum class direction
 class input_listener : public vr::glfw::keyboard_listener, public vr::glfw::mouse_listener
 {
 public:
-	input_listener(vr::glfw::window& window, vr::glfw::mouse& mouse, vr::camera& camera, const fps_counter& timing);
+	input_listener(vr::glfw::window& window, vr::glfw::mouse& mouse, vr::object3d& camera, const fps_counter& timing);
 
 	void on_key_event(vr::glfw::key key, vr::glfw::key_action state, vr::glfw::modifiers mods) override;
 	void on_char_event(unsigned int codepoint) override;
@@ -55,7 +55,7 @@ private:
 private:
 	vr::glfw::window& m_window;
 	vr::glfw::mouse& m_mouse;
-	vr::camera& m_camera;
+	vr::object3d& m_object;
 	const fps_counter& m_timing;
 	std::optional<vr::glfw::mouse_position> m_last_mouse_position;
 	state m_state;

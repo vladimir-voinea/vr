@@ -8,10 +8,10 @@
 
 #include <string>
 
-input_listener::input_listener(vr::glfw::window& window, vr::glfw::mouse& mouse, vr::camera& camera, const fps_counter& timing)
+input_listener::input_listener(vr::glfw::window& window, vr::glfw::mouse& mouse, vr::object3d& object, const fps_counter& timing)
 	: m_window(window)
 	, m_mouse(mouse)
-	, m_camera(camera)
+	, m_object(object)
 	, m_timing(timing)
 	, m_state(state::free_mouse)
 {
@@ -216,7 +216,7 @@ void input_listener::on_scroll_event(const vr::glfw::mouse_scroll& scroll)
 	}
 	default:
 	{
-		m_camera.process_mouse_scroll(scroll.yoffset);
+		m_object.scale({ scroll.yoffset, scroll.yoffset, scroll.yoffset });
 		break;
 	}
 	}
@@ -264,8 +264,8 @@ void input_listener::camera_handle_position_event(const vr::glfw::mouse_position
 	const float yoffset = (m_last_mouse_position->y - position.y) * sensitivity;
 	spdlog::debug("Mouse offsets: x = {0}, y = {1}", xoffset, yoffset);
 
-	m_camera.rotate(vr::x_axis, yoffset);
-	m_camera.rotate_world(vr::y_axis, xoffset);
+	m_object.rotate(vr::x_axis, yoffset);
+	m_object.rotate_world(vr::y_axis, xoffset);
 }
 
 void input_listener::imgui_forward_button_event(vr::glfw::mouse_button button, vr::glfw::mouse_action action)
@@ -295,7 +295,7 @@ void input_listener::camera_handle_key_event(vr::glfw::key key, vr::glfw::key_ac
 {
 	if (state == vr::glfw::key_action::press || state == vr::glfw::key_action::repeat)
 	{
-		glm::vec3 direction = m_camera.front();
+		glm::vec3 direction = m_object.front();
 
 		using k = vr::glfw::key;
 		switch (key)
@@ -347,32 +347,32 @@ void input_listener::camera_move_towards(direction direction)
 	{
 	case direction::forward:
 	{
-		direction_vector = m_camera.front();
+		direction_vector = m_object.front();
 		break;
 	}
 	case direction::backward:
 	{
-		direction_vector = -m_camera.front();
+		direction_vector = -m_object.front();
 		break;
 	}
 	case direction::left:
 	{
-		direction_vector = -m_camera.right();
+		direction_vector = -m_object.right();
 		break;
 	}
 	case direction::right:
 	{
-		direction_vector = m_camera.right();
+		direction_vector = m_object.right();
 		break;
 	}
 	case direction::up:
 	{
-		direction_vector = m_camera.up();
+		direction_vector = m_object.up();
 		break;
 	}
 	case direction::down:
 	{
-		direction_vector = -m_camera.up();
+		direction_vector = -m_object.up();
 		break;
 	}
 	}
@@ -380,5 +380,5 @@ void input_listener::camera_move_towards(direction direction)
 	const auto speed = 2.5f;
 	const auto delta_time = m_timing.get_time_since_last_frame();
 	const auto velocity = speed * delta_time;
-	m_camera.translate(direction_vector * velocity);
+	m_object.translate(direction_vector * velocity);
 }

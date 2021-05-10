@@ -20,9 +20,9 @@ namespace vr
 	}
 
 	// processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-	void camera::process_mouse_scroll(float yoffset)
+	void camera::scale(const glm::vec3& scale)
 	{
-		m_zoom -= (float)yoffset;
+		m_zoom -= scale.x;
 		if (m_zoom < 1.0f)
 			m_zoom = 1.0f;
 		if (m_zoom > 75.0f)
