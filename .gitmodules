@@ -18,3 +18,7 @@
 	path = dependencies/spdlog
 	url = https://github.com/vladimir-voinea/spdlog.git
 	branch = v2.x
+[submodule "imgui"]
+	path = dependencies/imgui
+	url = https://github.com/vladimir-voinea/imgui.git
+	branch = branch-v1.82
