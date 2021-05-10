@@ -29,7 +29,7 @@ void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state,
 		if (io.WantCaptureKeyboard)
 		{
 			const auto raw_key = vr::glfw::keyboard::convert_to_raw(key);
-			const auto pressed = state == vr::glfw::key_action::release ? false : true;;
+			const auto pressed = state == vr::glfw::key_action::release ? false : true;
 			
 			io.KeysDown[raw_key] = pressed;
 
@@ -100,7 +100,7 @@ void input_listener::on_char_event(unsigned int codepoint)
 
 void input_listener::on_position_event(const vr::glfw::mouse_position& position)
 {
-	spdlog::info("Mouse move event: x = {0}, y = {1}", position.x, position.y);
+	spdlog::debug("Mouse move event: x = {0}, y = {1}", position.x, position.y);
 
 	auto& io = ImGui::GetIO();
 	io.MousePos.x = position.x;
@@ -139,25 +139,24 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 	spdlog::info("Mouse button event: Button {0}, action {1}", button, action);
 
 	auto& io = ImGui::GetIO();
-	auto right_button_down = false;
 
 	if (button == vr::glfw::mouse_button::right)
 	{
-		if (action == vr::glfw::mouse_action::press)
-		{
-			right_button_down = true;
-		}
-		else if (action == vr::glfw::mouse_action::release)
-		{
-			right_button_down = false;
-		}
+		m_right_button_down = action == vr::glfw::mouse_action::release ? false : true;
 	}
+
+	if (button == vr::glfw::mouse_button::left)
+	{
+		m_left_button_down = action == vr::glfw::mouse_action::release ? false : true;
+	}
+
+	spdlog::info("L/R button down: {}, {}", m_left_button_down, m_right_button_down);
 
 	switch (m_state)
 	{
 	case state::free_mouse:
 	{
-		if (right_button_down)
+		if (m_right_button_down)
 		{
 			update_state(state::camera_move);
 		}
@@ -165,7 +164,7 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 	}
 	case state::camera_move:
 	{
-		if (!right_button_down)
+		if (!m_right_button_down)
 		{
 			if (io.WantCaptureMouse)
 			{
@@ -173,9 +172,15 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 			}
 			else
 			{
-				update_state(state::free_mouse);
+				if (m_left_button_down)
+				{
+					camera_move_towards(direction::forward);
+				}
+				else
+				{
+					update_state(state::free_mouse);
+				}
 			}
-
 		}
 		break;
 	}
@@ -257,7 +262,7 @@ void input_listener::camera_handle_position_event(const vr::glfw::mouse_position
 	const float sensitivity = 0.1f;
 	const float xoffset = (m_last_mouse_position->x - position.x) * sensitivity;
 	const float yoffset = (m_last_mouse_position->y - position.y) * sensitivity;
-	spdlog::info("Mouse offsets: x = {0}, y = {1}", xoffset, yoffset);
+	spdlog::debug("Mouse offsets: x = {0}, y = {1}", xoffset, yoffset);
 
 	m_camera.rotate(vr::x_axis, yoffset);
 	m_camera.rotate_world(vr::y_axis, xoffset);
@@ -297,32 +302,32 @@ void input_listener::camera_handle_key_event(vr::glfw::key key, vr::glfw::key_ac
 		{
 		case k::w:
 		{
-			direction = m_camera.front();
+			camera_move_towards(direction::forward);
 			break;
 		}
 		case k::a:
 		{
-			direction = -m_camera.right();
+			camera_move_towards(direction::left);
 			break;
 		}
 		case k::s:
 		{
-			direction = -m_camera.front();
+			camera_move_towards(direction::backward);
 			break;
 		}
 		case k::d:
 		{
-			direction = m_camera.right();
+			camera_move_towards(direction::right);
 			break;
 		}
 		case k::space:
 		{
-			direction = m_camera.up();
+			camera_move_towards(direction::up);
 			break;
 		}
 		case k::left_ctrl:
 		{
-			direction = -m_camera.up();
+			camera_move_towards(direction::down);
 			break;
 		}
 		default:
@@ -331,10 +336,49 @@ void input_listener::camera_handle_key_event(vr::glfw::key key, vr::glfw::key_ac
 			return;
 		}
 		}
-
-		const auto speed = 2.5f;
-		const auto delta_time = m_timing.get_time_since_last_frame();
-		const auto velocity = speed * delta_time;
-		m_camera.translate(direction * velocity);
 	}
+}
+
+void input_listener::camera_move_towards(direction direction)
+{
+	glm::vec3 direction_vector;
+
+	switch (direction)
+	{
+	case direction::forward:
+	{
+		direction_vector = m_camera.front();
+		break;
+	}
+	case direction::backward:
+	{
+		direction_vector = -m_camera.front();
+		break;
+	}
+	case direction::left:
+	{
+		direction_vector = -m_camera.right();
+		break;
+	}
+	case direction::right:
+	{
+		direction_vector = m_camera.right();
+		break;
+	}
+	case direction::up:
+	{
+		direction_vector = m_camera.up();
+		break;
+	}
+	case direction::down:
+	{
+		direction_vector = -m_camera.up();
+		break;
+	}
+	}
+
+	const auto speed = 2.5f;
+	const auto delta_time = m_timing.get_time_since_last_frame();
+	const auto velocity = speed * delta_time;
+	m_camera.translate(direction_vector * velocity);
 }

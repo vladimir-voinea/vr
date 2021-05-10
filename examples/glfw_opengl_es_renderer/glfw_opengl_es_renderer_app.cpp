@@ -19,7 +19,7 @@ void glfw_opengl_es_renderer_app::run()
 		vr::glfw::window_settings settings;
 		settings.width = 1920;
 		settings.height = 1080;
-		settings.full_screen = true;
+		settings.full_screen = false;
 		settings.name = "GLFW OpenGL ES 2.0 Renderer";
 		settings.opengl_context = opengl_context_settings;
 		settings.resizable = true;
