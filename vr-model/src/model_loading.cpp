@@ -26,6 +26,7 @@ namespace vr::model
 			out vec3 normal;
 			out vec3 position;
 
+			uniform vec3 vr_view_position;
 			uniform mat4 vr_mvp;
 			uniform mat4 vr_projection;
 			uniform mat4 vr_view;
@@ -33,18 +34,13 @@ namespace vr::model
 			uniform mat4 vr_modelview;
 			uniform mat4 vr_normal;
 
-			uniform vec3 vr_ambient;
-			uniform vec3 vr_diffuse;
-			uniform vec3 vr_specular;
-			uniform float vr_shininess;
-
 			void main(){
 				vec4 position4 = vr_mvp * vec4(vr_vertex_position, 1);
 				position = vec3(position4.xyz);
 				gl_Position = position4;
 
-				vec4 normal4 = vr_modelview * vec4(vr_vertex_normal, 0.f);
-				normal = normalize(vec3(normal4.xyz));
+				vec4 normal4 = vr_normal * vec4(vr_vertex_normal, 0.f);
+				normal = vec3(normal4.xyz);
 				
 				uv = vr_vertex_uv;
 			}
@@ -53,30 +49,50 @@ namespace vr::model
 	constexpr auto fshader = R"(
 			#version 300 es
 
+			struct vr_material_t
+			{
+				highp vec3 ambient;
+				highp vec3 diffuse;
+				highp vec3 specular;
+				highp float shininess;
+			};
+
+			struct vr_light_t
+			{
+				highp vec3 position;
+				highp vec3 ambient;
+				highp vec3 diffuse;
+				highp vec3 specular;
+			};
+
 			in highp vec2 uv;
 			in highp vec3 normal;
 			in highp vec3 position;
+			out highp vec4 out_color4;
 
-			uniform highp vec3 vr_ambient;
-			uniform highp vec3 vr_diffuse;
-			uniform highp vec3 vr_specular;
-			uniform highp float vr_shininess;
-
-			out highp vec3 out_color3;
+			uniform highp vec3 vr_view_position;
+			uniform vr_material_t vr_material;
+			uniform vr_light_t vr_light;
 			uniform sampler2D vr_texture_sampler;
 
 			void main()
 			{
-				//out_color3 = texture(vr_texture_sampler, uv).rgb;
-
-				highp vec3 light_dir = normalize(vec3(1.f, 1.f, 1.f));
+				highp vec3 ambient = vr_light.ambient * vr_material.ambient;
+				
 				highp vec3 normalized_normal = normalize(normal);
-				highp float intensity = max(dot(light_dir, normalized_normal), 0.f);
-				
-				highp vec3 color = texture(vr_texture_sampler, uv).rgb;
-				highp vec3 amb = color * 0.33;
-				
-				out_color3 = (color * intensity) + amb;
+				highp vec3 light_direction = normalize(vr_light.position - position);
+				highp float diff = max(dot(normalized_normal, light_direction), 0.f);
+				highp vec3 diffuse = vr_light.diffuse * (diff * vr_material.diffuse);
+
+				highp vec3 view_direction = normalize(vr_view_position - position);
+				highp vec3 reflect_direction = reflect(-light_direction, normalized_normal);
+				highp float spec = pow(max(dot(view_direction, reflect_direction), 0.f), vr_material.shininess);
+				highp vec3 specular = vr_light.specular * (spec * vr_material.specular);
+
+				highp vec3 result = ambient + diffuse + specular;
+				out_color4 = vec4(result, 1.f);
+
+				//out_color4 = texture(vr_texture_sampler, uv);
 			}
 	)";
 
@@ -189,25 +205,25 @@ namespace vr::model
 
 		std::vector<vr::gl::uniform> created_uniforms;
 		vr::gl::uniform ambient_uniform;
-		ambient_uniform.name = "vr_ambient";
+		ambient_uniform.name = "vr_material.ambient";
 		ambient_uniform.type = vr::gl::uniform_type::vec3f;
 		ambient_uniform.value.vec3f = { ambient.r, ambient.g, ambient.b };
 		created_uniforms.push_back(ambient_uniform);
 
 		vr::gl::uniform diffuse_uniform;
-		diffuse_uniform.name = "vr_diffuse";
+		diffuse_uniform.name = "vr_material.diffuse";
 		diffuse_uniform.type = vr::gl::uniform_type::vec3f;
 		diffuse_uniform.value.vec3f = { diffuse.r, diffuse.g, diffuse.b };
 		created_uniforms.push_back(diffuse_uniform);
 
 		vr::gl::uniform specular_uniform;
-		specular_uniform.name = "vr_specular";
+		specular_uniform.name = "vr_material.specular";
 		specular_uniform.type = vr::gl::uniform_type::vec3f;
 		specular_uniform.value.vec3f = { specular.r, specular.g, specular.b };
 		created_uniforms.push_back(specular_uniform);
 
 		vr::gl::uniform shininess_uniform;
-		shininess_uniform.name = "vr_shininess";
+		shininess_uniform.name = "vr_material.shininess";
 		shininess_uniform.type = vr::gl::uniform_type::vec1f;
 		shininess_uniform.value.vec1f = shininess;
 		created_uniforms.push_back(shininess_uniform);

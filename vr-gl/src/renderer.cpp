@@ -10,6 +10,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <glm/gtx/matrix_decompose.hpp> 
+
 #include <map>
 #include <algorithm>
 #include <numeric>
@@ -21,6 +23,7 @@ namespace
 	constexpr auto builtin_vertex_color_attribute_name = "vr_vertex_color";
 	constexpr auto builtin_vertex_uv_attribute_name = "vr_vertex_uv";
 
+	constexpr auto builtin_view_position_uniform_name = "vr_view_position";
 	constexpr auto builtin_mvp_uniform_name = "vr_mvp";
 	constexpr auto builtin_projection_uniform_name = "vr_projection";
 	constexpr auto builtin_view_uniform_name = "vr_view";
@@ -39,7 +42,7 @@ namespace
 		const auto& uniforms = program.get_uniform_names();
 		if (has_uniform(program, uniform.name))
 		{
-		    spdlog::debug("Checking uniform location for uniform {}", uniform.name);
+			spdlog::debug("Checking uniform location for uniform {}", uniform.name);
 			const auto location = glGetUniformLocation(program.get_id(), uniform.name.c_str());
 			spdlog::debug("Got location {}", location);
 
@@ -49,27 +52,27 @@ namespace
 			{
 			case ut::mat4fv:
 			{
-                loaded_type = "mat4fv";
+				loaded_type = "mat4fv";
 				glUniformMatrix4fv(location, 1, GL_FALSE, &uniform.value.mat4fv[0][0]);
 				break;
 			}
 			case ut::vec4f:
 			{
-                loaded_type = "4f";
+				loaded_type = "4f";
 				const glm::vec4& value = uniform.value.vec4f;
 				glUniform4f(location, value.x, value.y, value.z, value.w);
 				break;
 			}
 			case ut::vec3f:
 			{
-                loaded_type = "3f";
+				loaded_type = "3f";
 				const glm::vec3& value = uniform.value.vec3f;
 				glUniform3f(location, value.x, value.y, value.z);
 				break;
 			}
 			case ut::vec1i:
 			{
-                loaded_type = "1i";
+				loaded_type = "1i";
 				glUniform1i(location, uniform.value.vec1i);
 				break;
 			}
@@ -80,12 +83,13 @@ namespace
 				break;
 			}
 			}
-            spdlog::debug("Loaded a {} uniform", loaded_type);
+			spdlog::debug("Loaded a {} uniform", loaded_type);
 		}
 		else
 		{
-			if (uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_projection_uniform_name &&
-				uniform.name != builtin_view_uniform_name && uniform.name != builtin_model_uniform_name && 
+			if (uniform.name != builtin_view_position_uniform_name &&
+				uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_projection_uniform_name &&
+				uniform.name != builtin_view_uniform_name && uniform.name != builtin_model_uniform_name &&
 				uniform.name != builtin_normal_uniform_name && uniform.name != builtin_texture_sampler_uniform_name)
 			{
 				spdlog::debug("Uniform {0} not found in program {1}", uniform.name, program.get_id());
@@ -97,6 +101,7 @@ namespace
 	{
 		const auto model_matrix = object->get_transformation_matrix();
 		const auto view_matrix = camera.get_view_matrix();
+		const auto view_matrix_inverse = glm::inverse(view_matrix);
 		const auto projection_matrix = camera.get_projection_matrix();
 		const auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
 
@@ -124,6 +129,21 @@ namespace
 		model_uniform.value.mat4fv = model_matrix;
 		load_uniform(shader->program, model_uniform);
 
+		if (has_uniform(shader->program, builtin_view_position_uniform_name))
+		{
+			vr::gl::uniform view_position_uniform;
+			view_position_uniform.name = builtin_view_position_uniform_name;
+			view_position_uniform.type = vr::gl::uniform_type::vec3f;
+			glm::vec3 scale;
+			glm::quat orientation;
+			glm::vec3 translation;
+			glm::vec3 skew;
+			glm::vec4 perspective;
+			glm::decompose(view_matrix_inverse, scale, orientation, translation, skew, perspective);
+			view_position_uniform.value.vec3f = translation;
+			load_uniform(shader->program, view_position_uniform);
+		}
+
 		if (has_uniform(shader->program, builtin_modelview_uniform_name))
 		{
 			const auto modelview_matrix = view_matrix * model_matrix;
@@ -133,11 +153,11 @@ namespace
 			modelview_uniform.value.mat4fv = modelview_matrix;
 			load_uniform(shader->program, modelview_uniform);
 		}
-		
+
 		if (has_uniform(shader->program, builtin_normal_uniform_name))
 		{
 			const auto modelview_matrix = view_matrix * model_matrix;
-			const auto normal_matrix = glm::transpose(glm::inverse(modelview_matrix));
+			const auto normal_matrix = glm::transpose(view_matrix_inverse);
 			vr::gl::uniform normal_uniform;
 			normal_uniform.name = builtin_normal_uniform_name;
 			normal_uniform.type = vr::gl::uniform_type::mat4fv;
@@ -147,8 +167,8 @@ namespace
 
 		vr::gl::uniform texture_sampler_uniform;
 		texture_sampler_uniform.name = builtin_texture_sampler_uniform_name;
-        texture_sampler_uniform.type = vr::gl::uniform_type::vec1i;
-        texture_sampler_uniform.value.vec1i = 0;
+		texture_sampler_uniform.type = vr::gl::uniform_type::vec1i;
+		texture_sampler_uniform.value.vec1i = 0;
 		load_uniform(shader->program, texture_sampler_uniform);
 	}
 
