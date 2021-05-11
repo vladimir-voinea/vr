@@ -41,7 +41,7 @@ namespace
 namespace vr::gl
 {
 	cube_texture_material::cube_texture_material()
-		: opengl_shader_material(m_shader, &m_uniforms)
+		: opengl_shader_material(m_shader, m_uniforms)
 		, m_shader(vshader, fshader)
 	{
 	}

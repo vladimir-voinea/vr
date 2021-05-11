@@ -6,11 +6,11 @@
 
 namespace vr
 {
-	enum class shading_model
-	{
-		phong,
-		gourad
-	};
+	//enum class shading_model
+	//{
+	//	phong,
+	//	gourad
+	//};
 
 	class shader_material
 	{
@@ -18,7 +18,7 @@ namespace vr
 		shader_material();
 		virtual ~shader_material();
 
-		const std::string& get_name() const;
+		/*const std::string& get_name() const;
 		void set_name(const std::string& name);
 
 		const shading_model& get_shading_model() const;
@@ -34,15 +34,15 @@ namespace vr
 		void set_specular(const glm::vec3& specular);
 
 		const float& get_shininess() const;
-		void set_shininess(float shininess);
+		void set_shininess(float shininess);*/
 
 	private:
-		glm::vec3 m_ambient;
-		glm::vec3 m_diffuse;
-		glm::vec3 m_specular;
-		float m_shininess;
+		//glm::vec3 m_ambient;
+		//glm::vec3 m_diffuse;
+		//glm::vec3 m_specular;
+		//float m_shininess;
 
-		std::string m_name;
-		shading_model m_shading_model;
+		//std::string m_name;
+		//shading_model m_shading_model;
 	};
 }

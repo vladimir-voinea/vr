@@ -338,13 +338,13 @@ namespace vr::gl
 				{
 					m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
 				}
-				if (const auto opengl_shader = &static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader(); !m_cache->get(opengl_shader))
+				auto material = static_cast<const opengl_shader_material*>(mesh->get_material());
+				if (const auto opengl_shader = &material->get_shader(); !m_cache->get(opengl_shader))
 				{
 					m_cache->set(opengl_shader, load_shader(*opengl_shader));
-				}
-				if (mesh->get_textures())
-				{
-					for (const auto* texture : *mesh->get_textures())
+
+					const auto& textures = material->get_textures();
+					for (const auto* texture : textures)
 					{
 						if (!m_cache->get(texture))
 						{
@@ -352,7 +352,6 @@ namespace vr::gl
 						}
 					}
 				}
-
 			}
 		}
 
@@ -402,12 +401,9 @@ namespace vr::gl
 
 	void renderer::load_shader_uniforms(const opengl_shader_material* material, const loaded_shader* shader)
 	{
-		if (material->get_uniforms())
+		for (const auto& uniform : material->get_uniforms())
 		{
-			for (const auto& uniform : *material->get_uniforms())
-			{
-				load_uniform(shader->program, uniform);
-			}
+			load_uniform(shader->program, uniform);
 		}
 	}
 
@@ -451,18 +447,15 @@ namespace vr::gl
 		{
 			for (auto* mesh : object->get_meshes())
 			{
-				const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
+				const auto material = static_cast<const opengl_shader_material*>(mesh->get_material());
+				const auto shader = m_cache->get(&material->get_shader());
 
-				if (mesh->get_textures())
+				for (auto i = 0u; i < material->get_textures().size(); ++i)
 				{
-					for (auto i = 0u; i < mesh->get_textures()->size(); ++i)
-					{
-						const auto texture = m_cache->get(mesh->get_textures()->at(i));
-						activate_texture(texture, i);
-					}
-					
+					const auto texture = m_cache->get(material->get_textures()[i]);
+					activate_texture(texture, i);
 				}
-
+				
 				activate_shader(shader);
 				load_builtin_uniforms(shader, object, camera);
 				load_shader_uniforms(static_cast<const opengl_shader_material*>(mesh->get_material()), shader);

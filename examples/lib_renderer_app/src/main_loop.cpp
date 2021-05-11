@@ -241,7 +241,7 @@ void set_light_parameters(vr::object3d* object, const parameters& parameters)
 	for (auto& mesh : object->get_meshes())
 	{
 		vr::gl::opengl_shader_material* material = static_cast<vr::gl::opengl_shader_material*>(mesh->get_material());
-		auto& uniforms = *material->get_uniforms();
+		auto& uniforms = material->get_uniforms();
 		create_or_update(uniforms, "vr_light.position", parameters.light.position);
 		create_or_update(uniforms, "vr_light.ambient", parameters.light.ambient);
 		create_or_update(uniforms, "vr_light.diffuse", parameters.light.diffuse);

@@ -37,7 +37,7 @@ namespace
 namespace vr::gl
 {
 	color_material::color_material(const glm::vec4& color)
-		: opengl_shader_material(m_shader, &m_uniforms)
+		: opengl_shader_material(m_shader, m_uniforms)
 		, m_shader(vshader, fshader)
 		, m_color(color)
 	{

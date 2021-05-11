@@ -185,7 +185,7 @@ namespace vr::model
 		vr::shader_material* material = data.materials.at(mesh->mMaterialIndex).get();
 		vr::texture* texture = &data.textures.emplace_back("models/uvmap.png");
 
-		data.meshes.emplace_back(geometry, material, nullptr);
+		data.meshes.emplace_back(geometry, material);
 	}
 
 	void load_texture(model_data& data, const aiTexture* assimp_texture)
@@ -210,7 +210,6 @@ namespace vr::model
 
 	void load_material(model_data& data, const aiMaterial* assimp_material)
 	{
-
 		aiColor3D ambient;
 		aiColor3D diffuse;
 		aiColor3D specular;
@@ -221,34 +220,32 @@ namespace vr::model
 		assimp_material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
 		assimp_material->Get(AI_MATKEY_SHININESS, shininess);
 
-		std::vector<vr::gl::uniform> created_uniforms;
+		std::vector<vr::gl::uniform> uniforms;
 		vr::gl::uniform ambient_uniform;
 		ambient_uniform.name = "vr_material.ambient";
 		ambient_uniform.type = vr::gl::uniform_type::vec3f;
 		ambient_uniform.value.vec3f = { ambient.r, ambient.g, ambient.b };
-		created_uniforms.push_back(ambient_uniform);
+		uniforms.push_back(ambient_uniform);
 
 		vr::gl::uniform diffuse_uniform;
 		diffuse_uniform.name = "vr_material.diffuse";
 		diffuse_uniform.type = vr::gl::uniform_type::vec3f;
 		diffuse_uniform.value.vec3f = { diffuse.r, diffuse.g, diffuse.b };
-		created_uniforms.push_back(diffuse_uniform);
+		uniforms.push_back(diffuse_uniform);
 
 		vr::gl::uniform specular_uniform;
 		specular_uniform.name = "vr_material.specular";
 		specular_uniform.type = vr::gl::uniform_type::vec3f;
 		specular_uniform.value.vec3f = { specular.r, specular.g, specular.b };
-		created_uniforms.push_back(specular_uniform);
+		uniforms.push_back(specular_uniform);
 
 		vr::gl::uniform shininess_uniform;
 		shininess_uniform.name = "vr_material.shininess";
 		shininess_uniform.type = vr::gl::uniform_type::vec1f;
 		shininess_uniform.value.vec1f = shininess;
-		created_uniforms.push_back(shininess_uniform);
+		uniforms.push_back(shininess_uniform);
 
-		const auto uniforms = &data.uniforms.emplace_back(std::move(created_uniforms));
-		const auto& shader = data.shaders.emplace_back(vshader, fshader);
-		auto material = std::make_unique<vr::gl::opengl_shader_material>(shader, uniforms);
+		auto material = std::make_unique<vr::gl::opengl_shader_material>(*data.shader, uniforms);
 
 		/*assimp_material->Get(AI_MATKEY_TEXTURE_AMBIENT,)*/
 
@@ -282,6 +279,7 @@ namespace vr::model
 		if (scene)
 		{
 			std::pair<std::unique_ptr<object3d>, model_data> result;
+			result.second.shader = std::make_unique<vr::gl::opengl_shader>(vshader, fshader);
 
 			const auto n_textures = scene->mNumTextures;
 			for (auto i = 0u; i < n_textures; ++i)
