@@ -185,12 +185,21 @@ namespace
 			accumulated_offset += attribute.second.data.size();
 		}
 
+		spdlog::info("Loaded mesh with {} KB ({} MB)", accumulated_offset / 1024, static_cast<float>(accumulated_offset) / 1024.f / 1024.f);
+
 		glGenBuffers(1, &vao.indices.id);
 		glBindBuffer(GL_ARRAY_BUFFER, vao.indices.id);
 		glBufferData(GL_ARRAY_BUFFER, geometry->indices.size() * sizeof(decltype(geometry->indices)::value_type), geometry->indices.data(), GL_STATIC_DRAW);
 		vao.indices_size = geometry->indices.size();
 
 		loaded_geometry.vao = vao;
+
+		const auto size_kb = accumulated_offset / 1024;
+		const auto size_mb = static_cast<float>(size_kb) / 1024.f;
+		const auto n_triangles = geometry->indices.size() / 3;
+		const auto n_triangles_k = static_cast<float>(n_triangles) / 1000.f;
+		spdlog::info("Loaded mesh with {} KB ({} MB) with {} triangles ({}k)", size_kb,
+			size_mb, n_triangles, n_triangles_k);
 
 		return loaded_geometry;
 	}
@@ -402,7 +411,7 @@ namespace vr::gl
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_on_gpu->vao.indices.id);
 
-		glDrawElements(GL_TRIANGLES, geometry_on_gpu->vao.indices_size, GL_UNSIGNED_SHORT, nullptr);
+		glDrawElements(GL_TRIANGLES, geometry_on_gpu->vao.indices_size, GL_UNSIGNED_INT, nullptr);
 
 		for (const auto& bound_attribute : bound_attributes)
 		{
