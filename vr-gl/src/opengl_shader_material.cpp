@@ -4,7 +4,7 @@
 
 namespace vr::gl
 {
-	opengl_shader_material::opengl_shader_material(const opengl_shader& shader, const std::vector<uniform>* uniforms)
+	opengl_shader_material::opengl_shader_material(const opengl_shader& shader, std::vector<uniform>* uniforms)
 		: m_shader(shader)
 		, m_uniforms(uniforms)
 	{}
@@ -15,8 +15,13 @@ namespace vr::gl
 	{
 		return m_shader;
 	}
-	
+
 	const std::vector<uniform>* opengl_shader_material::get_uniforms() const
+	{
+		return m_uniforms;
+	}
+
+	std::vector<uniform>* opengl_shader_material::get_uniforms()
 	{
 		return m_uniforms;
 	}

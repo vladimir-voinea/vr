@@ -26,8 +26,9 @@ namespace vr
 		void add_child(std::unique_ptr<object3d>);
 		void remove_child(object3d*);
 
-		const std::vector<const mesh*>& get_meshes() const;
-		void add_mesh(const mesh*);
+		const std::vector<mesh*>& get_meshes() const;
+		std::vector<mesh*>& get_meshes();
+		void add_mesh(mesh*);
 		void remove_mesh(const mesh*);
 
 		bool has_geometry() const;
@@ -37,13 +38,15 @@ namespace vr
 		void set_before_render_callback(std::function<void(void)> callback);
 		void on_before_render();
 
+		void traverse(std::function<void(object3d*)> func);
+
 	private:
 		void set_parent(object3d*);
 
 	private:
 		object3d* m_parent = nullptr;
 		std::vector<std::unique_ptr<object3d>> m_children;
-		std::vector<const mesh*> m_meshes;
+		std::vector<mesh*> m_meshes;
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;
 

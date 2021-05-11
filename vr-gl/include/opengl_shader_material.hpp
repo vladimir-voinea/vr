@@ -36,14 +36,15 @@ namespace vr::gl
 	class opengl_shader_material : public vr::shader_material
 	{
 	public:
-		opengl_shader_material(const opengl_shader& shader, const std::vector<uniform>* uniforms);
+		opengl_shader_material(const opengl_shader& shader, std::vector<uniform>* uniforms);
 		~opengl_shader_material() override;
 
 		const opengl_shader& get_shader() const;
 		const std::vector<uniform>* get_uniforms() const;
+		std::vector<uniform>* get_uniforms();
 
 	private:
 		const opengl_shader& m_shader;
-		const std::vector<uniform>* m_uniforms;
+		std::vector<uniform>* m_uniforms;
 	};
 }

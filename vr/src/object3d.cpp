@@ -40,12 +40,17 @@ namespace vr
 		child->set_parent(nullptr);
 	}
 
-	const std::vector<const mesh*>& object3d::get_meshes() const
+	const std::vector<mesh*>& object3d::get_meshes() const
 	{
 		return m_meshes;
 	}
 
-	void object3d::add_mesh(const mesh* mesh)
+	std::vector<mesh*>& object3d::get_meshes()
+	{
+		return m_meshes;
+	}
+
+	void object3d::add_mesh(mesh* mesh)
 	{
 		m_meshes.push_back(mesh);
 	}
@@ -82,6 +87,16 @@ namespace vr
 		if (m_before_render_callback)
 		{
 			m_before_render_callback();
+		}
+	}
+
+	void object3d::traverse(std::function<void(object3d*)> func)
+	{
+		func(this);
+
+		for (auto& child : get_children())
+		{
+			child->traverse(func);
 		}
 	}
 }

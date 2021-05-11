@@ -1,5 +1,7 @@
 #include "gui.hpp"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -94,6 +96,18 @@ void gui::render_model_options()
 		ImGui::SliderFloat("Y##s", &model_parameters.scale.value.y, 0.0f, 1.0f);
 		ImGui::SliderFloat("Z##s", &model_parameters.scale.value.z, 0.0f, 1.0f);
 	}
+	ImGui::EndGroup();
+
+	ImGui::BeginGroup();
+	ImGui::ColorEdit3("Light ambient##l", glm::value_ptr(model_parameters.light.ambient), ImGuiColorEditFlags_DisplayRGB);
+	ImGui::ColorEdit3("Light diffuse##l", glm::value_ptr(model_parameters.light.diffuse), ImGuiColorEditFlags_DisplayRGB);
+	ImGui::ColorEdit3("Light specular##l", glm::value_ptr(model_parameters.light.specular), ImGuiColorEditFlags_DisplayRGB);
+
+	ImGui::Text("Translation");
+	ImGui::SliderFloat("X##l", &model_parameters.light.position.x, -10.f, 10.f);
+	ImGui::SliderFloat("Y##l", &model_parameters.light.position.y, -10.f, 10.f);
+	ImGui::SliderFloat("Z##l", &model_parameters.light.position.z, -10.f, 10.f);
+
 	ImGui::EndGroup();
 
 

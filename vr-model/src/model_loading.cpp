@@ -91,8 +91,6 @@ namespace vr::model
 
 				highp vec3 result = ambient + diffuse + specular;
 				out_color4 = vec4(result, 1.f);
-
-				//out_color4 = texture(vr_texture_sampler, uv);
 			}
 	)";
 

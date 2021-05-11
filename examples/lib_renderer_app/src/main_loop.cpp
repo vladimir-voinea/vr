@@ -135,8 +135,10 @@ void main_loop::init()
 
 	initialize_position();
 
-	//m_scene_model = vr::model::load_model("2.fbx");
-	//m_scene.add(m_scene_model.root_node.get());
+	m_light_bulb_model = vr::model::load_model("data/models/uv_sphere.obj");
+	m_light_bulb = m_light_bulb_model.first.get();
+	m_light_bulb->scale({ 0.1, 0.1, 0.1 });
+	m_scene.add(m_light_bulb);
 }
 
 void main_loop::resize(int width, int height)
@@ -184,10 +186,50 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 	m_renderer->render(m_scene, get_camera());
 }
 
+void create_or_update(std::vector<vr::gl::uniform>& uniforms, const std::string& name, const glm::vec3& value)
+{
+	auto uniform_it = std::find_if(uniforms.begin(), uniforms.end(), [&name](const vr::gl::uniform& uniform)
+		{
+			return uniform.name == name;
+		});
+
+	if (uniform_it == uniforms.end())
+	{
+		vr::gl::uniform uniform;
+		uniform.name = name;
+		uniform.type = vr::gl::uniform_type::vec3f;
+		uniform.value.vec3f = value;
+		uniforms.push_back(uniform);
+	}
+	else
+	{
+		uniform_it->value.vec3f = value;
+	}
+}
+
+void set_light_parameters(vr::object3d* object, const parameters& parameters)
+{
+	for (auto& mesh : object->get_meshes())
+	{
+		vr::gl::opengl_shader_material* material = static_cast<vr::gl::opengl_shader_material*>(mesh->get_material());
+		auto& uniforms = *material->get_uniforms();
+		create_or_update(uniforms, "vr_light.position", parameters.light.position);
+		create_or_update(uniforms, "vr_light.ambient", parameters.light.ambient);
+		create_or_update(uniforms, "vr_light.diffuse", parameters.light.diffuse);
+		create_or_update(uniforms, "vr_light.specular", parameters.light.specular);
+	}
+}
+
 void main_loop::transform_model(const parameters& parameters)
 {
 	if (m_scene_model)
 	{
+		m_light_bulb->set_translation(parameters.light.position);
+		m_scene_model->traverse([&parameters](vr::object3d* obj)
+			{
+				set_light_parameters(obj, parameters);
+			});
+
 		m_scene_model->set_translation(parameters.translation.vec);
 
 		m_scene_model->set_rotation(vr::x_axis, parameters.rotation.euler_angles.x);
