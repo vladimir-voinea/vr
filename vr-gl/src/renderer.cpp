@@ -384,7 +384,6 @@ namespace vr::gl
 		glBindVertexArray(geometry_on_gpu->vao.id);
 		glBindBuffer(GL_ARRAY_BUFFER, geometry_on_gpu->vao.buffer.id);
 
-		ptrdiff_t accumulated_offset = 0;
 		std::vector<GLint> bound_attributes;
 		const auto& shader_attributes = shader->program.get_attribute_names();
 		for (const auto& attribute : geometry->attributes)
@@ -397,7 +396,6 @@ namespace vr::gl
 				glVertexAttribPointer(attribute_location, geometry_on_gpu->vao.buffer.loaded_attributes[name].components,
 					::convert_to_gl_enum(geometry_on_gpu->vao.buffer.loaded_attributes[name].type), GL_FALSE, 0,
 					static_cast<const void*>(static_cast<const uint8_t*>(nullptr) + geometry_on_gpu->vao.buffer.loaded_attributes[name].start));
-				accumulated_offset += attribute.second.data.size();
 				bound_attributes.push_back(attribute_location);
 			}
 		}
