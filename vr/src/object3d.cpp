@@ -71,4 +71,17 @@ namespace vr
 			return transformable::get_transformation_matrix();
 		}
 	}
+
+	void object3d::set_before_render_callback(std::function<void(void)> callback)
+	{
+		m_before_render_callback = callback;
+	}
+
+	void object3d::on_before_render()
+	{
+		if (m_before_render_callback)
+		{
+			m_before_render_callback();
+		}
+	}
 }

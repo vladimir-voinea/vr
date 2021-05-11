@@ -419,8 +419,10 @@ namespace vr::gl
 		}
 	}
 
-	void renderer::render_object(const object3d* object, const vr::camera& camera)
+	void renderer::render_object(object3d* object, const vr::camera& camera)
 	{
+		object->on_before_render();
+
 		if (object->has_geometry())
 		{
 			for (const auto* mesh : object->get_meshes())
@@ -441,7 +443,7 @@ namespace vr::gl
 			}
 		}
 
-		for (const auto& child : object->get_children())
+		for (auto& child : object->get_children())
 		{
 			render_object(child.get(), camera);
 		}

@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include <utility>
+#include <functional>
 #include <memory>
 
 namespace vr
@@ -33,6 +34,9 @@ namespace vr
 
 		virtual glm::mat4 get_transformation_matrix() const override;
 
+		void set_before_render_callback(std::function<void(void)> callback);
+		void on_before_render();
+
 	private:
 		void set_parent(object3d*);
 
@@ -42,5 +46,7 @@ namespace vr
 		std::vector<const mesh*> m_meshes;
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;
+
+		std::function<void(void)> m_before_render_callback;
 	};
 }

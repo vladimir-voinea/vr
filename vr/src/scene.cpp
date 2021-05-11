@@ -22,4 +22,9 @@ namespace vr
 	{
 		return m_objects;
 	}
+
+	std::vector<object3d*>& scene::get_objects()
+	{
+		return m_objects;
+	}
 }

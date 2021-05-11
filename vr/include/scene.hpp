@@ -11,6 +11,7 @@ namespace vr
 		void remove(object3d* object);
 
 		const std::vector<object3d*>& get_objects() const;
+		std::vector<object3d*>& get_objects();
 
 	private:
 		std::vector<object3d*> m_objects;
