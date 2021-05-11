@@ -57,12 +57,26 @@ namespace vr::model
 			in highp vec3 normal;
 			in highp vec3 position;
 
-			out highp vec3 color;
+			uniform highp vec3 vr_ambient;
+			uniform highp vec3 vr_diffuse;
+			uniform highp vec3 vr_specular;
+			uniform highp float vr_shininess;
+
+			out highp vec3 out_color3;
 			uniform sampler2D vr_texture_sampler;
 
 			void main()
 			{
-				color = texture(vr_texture_sampler, uv).rgb;
+				//out_color3 = texture(vr_texture_sampler, uv).rgb;
+
+				highp vec3 light_dir = normalize(vec3(1.f, 1.f, 1.f));
+				highp vec3 normalized_normal = normalize(normal);
+				highp float intensity = max(dot(light_dir, normalized_normal), 0.f);
+				
+				highp vec3 color = texture(vr_texture_sampler, uv).rgb;
+				highp vec3 amb = color * 0.33;
+				
+				out_color3 = (color * intensity) + amb;
 			}
 	)";
 
