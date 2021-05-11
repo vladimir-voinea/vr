@@ -19,7 +19,8 @@ namespace vr::model
 		std::list<std::vector<vr::gl::uniform>> uniforms;
 		std::vector<std::unique_ptr<vr::gl::opengl_shader_material>> materials;
 
-		std::list<vr::texture> textures;
+		std::vector<vr::texture> textures;
+		std::list<std::vector<const texture*>> textures_per_mesh;
 
 		std::vector<vr::mesh> meshes;
 	};

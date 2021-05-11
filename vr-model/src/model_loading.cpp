@@ -185,7 +185,27 @@ namespace vr::model
 		vr::shader_material* material = data.materials.at(mesh->mMaterialIndex).get();
 		vr::texture* texture = &data.textures.emplace_back("models/uvmap.png");
 
-		data.meshes.emplace_back(geometry, material, texture);
+		data.meshes.emplace_back(geometry, material, nullptr);
+	}
+
+	void load_texture(model_data& data, const aiTexture* assimp_texture)
+	{
+		std::vector<vr::texel> texels;
+
+		const auto width = assimp_texture->mWidth;
+		const auto height = assimp_texture->mHeight;
+		const auto n_texels = width * height;
+		
+		for (auto i = 0u; i < n_texels; ++i)
+		{
+			const aiTexel& assimp_texel = assimp_texture->pcData[i];
+			texels.emplace_back(assimp_texel.r, assimp_texel.g, assimp_texel.b);
+		}
+
+		const std::string path = assimp_texture->mFilename.C_Str() ? assimp_texture->mFilename.C_Str() : "";
+
+		data.textures.emplace_back(path, std::move(texels), width, height);
+		
 	}
 
 	void load_material(model_data& data, const aiMaterial* assimp_material)
@@ -230,6 +250,8 @@ namespace vr::model
 		const auto& shader = data.shaders.emplace_back(vshader, fshader);
 		auto material = std::make_unique<vr::gl::opengl_shader_material>(shader, uniforms);
 
+		/*assimp_material->Get(AI_MATKEY_TEXTURE_AMBIENT,)*/
+
 		data.materials.push_back(std::move(material));
 	}
 
@@ -255,10 +277,17 @@ namespace vr::model
 			aiPostProcessSteps::aiProcess_ValidateDataStructure
 			| aiPostProcessSteps::aiProcess_JoinIdenticalVertices 
 			| aiPostProcessSteps::aiProcess_Triangulate
+			| aiPostProcessSteps::aiProcess_EmbedTextures
 		);
 		if (scene)
 		{
 			std::pair<std::unique_ptr<object3d>, model_data> result;
+
+			const auto n_textures = scene->mNumTextures;
+			for (auto i = 0u; i < n_textures; ++i)
+			{
+				load_texture(result.second, scene->mTextures[i]);
+			}
 
 			const auto n_materials = scene->mNumMaterials;
 			for (auto i = 0u; i < n_materials; ++i)

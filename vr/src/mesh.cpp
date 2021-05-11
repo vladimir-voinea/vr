@@ -4,10 +4,10 @@ namespace vr
 {
 	mesh::mesh() = default;
 
-	mesh::mesh(const mesh::geometry_type* geometry, shader_material* material, const texture* texture)
+	mesh::mesh(const mesh::geometry_type* geometry, shader_material* material, const std::vector<const texture*>* textures)
 		: m_geometry(std::move(geometry))
 		, m_material(material)
-		, m_texture(texture)
+		, m_textures(textures)
 	{ }
 
 
@@ -24,10 +24,5 @@ namespace vr
 	shader_material* mesh::get_material()
 	{
 		return m_material;
-	}
-
-	const texture* mesh::get_texture() const
-	{
-		return m_texture;
 	}
 }

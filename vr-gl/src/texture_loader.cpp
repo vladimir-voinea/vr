@@ -14,6 +14,24 @@
 
 namespace vr::gl
 {
+	GLuint load_from_memory(const std::vector<vr::texel>& texels, unsigned int width, unsigned int height)
+	{
+		GLuint texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		static_assert(sizeof(vr::texel) == 3 * sizeof(uint8_t));
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texels.data());
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		return texture;
+	}
+
 	GLuint load_stb(const std::string& path)
 	{
 		auto am = platform::get_platform_manager()->get_asset_manager();
@@ -104,14 +122,23 @@ namespace vr::gl
 
 	GLuint load_texture(const texture* texture)
 	{
-		std::regex e("(.*)(\\.DDS)", std::regex::ECMAScript | std::regex::icase);
-		if (std::regex_match(texture->get_path(), e)) {
-
-			return 0;
+		if (texture->is_loaded_in_memory())
+		{
+			assert(texture->get_width() != 0);
+			assert(texture->get_height() != 0);
+			load_from_memory(texture->get_texels(), texture->get_width(), texture->get_height());
 		}
 		else
 		{
-			return load_stb(texture->get_path());
+			std::regex e("(.*)(\\.DDS)", std::regex::ECMAScript | std::regex::icase);
+			if (std::regex_match(texture->get_path(), e)) {
+
+				return 0;
+			}
+			else
+			{
+				return load_stb(texture->get_path());
+			}
 		}
 	}
 }

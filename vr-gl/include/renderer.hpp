@@ -31,7 +31,7 @@ namespace vr::gl
 		void load_skybox(const skybox* skybox);
 
 	private:
-		void activate_texture(const loaded_texture* texture);
+		void activate_texture(const loaded_texture* texture, unsigned int target);
 		void activate_shader(const loaded_shader* shader);
 		void load_shader_uniforms(const opengl_shader_material* material, const loaded_shader* shader);
 		void render_geometry(const vr::geometry* geometry, const loaded_shader* shader);

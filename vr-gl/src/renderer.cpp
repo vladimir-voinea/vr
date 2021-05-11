@@ -333,22 +333,26 @@ namespace vr::gl
 		{
 			for (const auto mesh : object->get_meshes())
 			{
-				loaded_geometry* geometry = nullptr;
-				loaded_shader* shader = nullptr;
-				loaded_texture* texture = nullptr;
 
 				if (!m_cache->get(mesh->get_geometry()))
 				{
-					geometry = m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
+					m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
 				}
 				if (const auto opengl_shader = &static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader(); !m_cache->get(opengl_shader))
 				{
-					shader = m_cache->set(opengl_shader, load_shader(*opengl_shader));
+					m_cache->set(opengl_shader, load_shader(*opengl_shader));
 				}
-				if (mesh->get_texture() && !m_cache->get(mesh->get_texture()))
+				if (mesh->get_textures())
 				{
-					texture = m_cache->set(mesh->get_texture(), ::load_texture(mesh->get_texture()));
+					for (const auto* texture : *mesh->get_textures())
+					{
+						if (!m_cache->get(texture))
+						{
+							m_cache->set(texture, ::load_texture(texture));
+						}
+					}
 				}
+
 			}
 		}
 
@@ -377,12 +381,12 @@ namespace vr::gl
 		}
 	}
 
-	void renderer::activate_texture(const loaded_texture* texture)
+	void renderer::activate_texture(const loaded_texture* texture, unsigned int target)
 	{
 		if (texture->id != m_last_shader_id)
 		{
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(texture->target, texture->id);
+			glActiveTexture(GL_TEXTURE0 + target);
+			glBindTexture(GL_TEXTURE_2D, texture->id);
 			m_last_texture_id = texture->id;
 		}
 	}
@@ -449,10 +453,14 @@ namespace vr::gl
 			{
 				const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(mesh->get_material())->get_shader());
 
-				if (mesh->get_texture())
+				if (mesh->get_textures())
 				{
-					const auto texture = m_cache->get(mesh->get_texture());
-					activate_texture(texture);
+					for (auto i = 0u; i < mesh->get_textures()->size(); ++i)
+					{
+						const auto texture = m_cache->get(mesh->get_textures()->at(i));
+						activate_texture(texture, i);
+					}
+					
 				}
 
 				activate_shader(shader);
@@ -479,7 +487,7 @@ namespace vr::gl
 		}
 
 		auto cube_texture = m_cache->get(skybox->get_texture());
-		activate_texture(cube_texture);
+		activate_texture(cube_texture, 0);
 
 		const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(skybox->get_material())->get_shader());
 		activate_shader(shader);
