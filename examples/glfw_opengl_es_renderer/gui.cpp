@@ -9,7 +9,7 @@
 #include <spdlog/spdlog.h>
 
 gui::gui(vr::glfw::window& window)
-	: m_model_files_regex("^.*\.(dae|obj|OBJ|fbx|gltf)$")
+	: m_model_files_regex("^.*\.(dae|obj|OBJ|fbx|glb)$")
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

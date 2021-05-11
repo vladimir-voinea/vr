@@ -23,6 +23,7 @@ endif()
 
 # External dependencies
 add_subdirectory ("dependencies")
+
 add_subdirectory ("vr")
 add_subdirectory ("vr-model")
 add_subdirectory ("vr-gl")
