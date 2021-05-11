@@ -19,6 +19,31 @@
 static const auto start_position = glm::vec3{ -2.7872, 1.74459, 9.47206 };
 static const auto start_direction = glm::vec3{ 0.115009114, 0.016061125, -0.9932346 };
 
+constexpr auto light_bulb_vshader = R"(
+		#version 300 es
+
+		in vec3 vr_vertex_position;
+		uniform mat4 vr_mvp;
+		out highp vec3 cube_texcoords;
+
+		void main() {
+			vec4 position = vr_mvp * vec4(vr_vertex_position, 1.f);
+			gl_Position = position;
+		}
+)";
+
+constexpr auto light_bulb_fshader = R"(
+		#version 300 es
+		
+		out highp vec4 out_color4;
+		uniform highp vec3 color;
+
+		void main()
+		{
+			out_color4 = vec4(color, 0.f);
+		}
+)";
+
 vr::perspective_camera::settings make_camera_settings(int width, int height)
 {
 	vr::perspective_camera::settings settings;
@@ -134,7 +159,11 @@ void main_loop::init()
 	m_renderer = std::make_unique<vr::gl::renderer>(m_renderer_settings);
 
 	initialize_position();
+	add_light_bulb();
+}
 
+void main_loop::add_light_bulb()
+{
 	m_light_bulb_model = vr::model::load_model("data/models/uv_sphere.obj");
 	m_light_bulb = m_light_bulb_model.first.get();
 	m_light_bulb->scale({ 0.1, 0.1, 0.1 });
@@ -222,9 +251,9 @@ void set_light_parameters(vr::object3d* object, const parameters& parameters)
 
 void main_loop::transform_model(const parameters& parameters)
 {
+	m_light_bulb->set_translation(parameters.light.position);
 	if (m_scene_model)
 	{
-		m_light_bulb->set_translation(parameters.light.position);
 		m_scene_model->traverse([&parameters](vr::object3d* obj)
 			{
 				set_light_parameters(obj, parameters);

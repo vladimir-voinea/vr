@@ -10,6 +10,12 @@
 
 #include <spdlog/spdlog.h>
 
+#include <sstream>
+#include <iomanip>
+
+constexpr auto max_translation = 5.f;
+constexpr auto max_scale = 2.f;
+
 gui::gui(vr::glfw::window& window)
 	: m_model_files_regex("^.*\.(dae|obj|OBJ|fbx|glb)$")
 {
@@ -26,20 +32,24 @@ gui::~gui()
 	ImGui::DestroyContext();
 }
 
-void gui::frame()
+void gui::frame(float delta_time)
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	render_model_options();
+	render_model_options(delta_time);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void gui::render_model_options()
+void gui::render_model_options(float delta_time)
 {
+	std::ostringstream s;
+	s << "Time per frame: " << std::setprecision(2) << delta_time * 1000 << "ms";
+	ImGui::Text(s.str().c_str());
+
 	if (ImGui::BeginCombo("Model##m", model_parameters.path.c_str()))
 	{
 		const auto all_assets = vr::platform::get_platform_manager()->get_asset_manager()->get_assets();
@@ -69,9 +79,9 @@ void gui::render_model_options()
 
 	ImGui::BeginGroup();
 	ImGui::Text("Translation");
-	ImGui::SliderFloat("X##t", &model_parameters.translation.vec.x, -100.f, 100.f);
-	ImGui::SliderFloat("Y##t", &model_parameters.translation.vec.y, -100.f, 100.f);
-	ImGui::SliderFloat("Z##t", &model_parameters.translation.vec.z, -100.f, 100.f);
+	ImGui::SliderFloat("X##t", &model_parameters.translation.vec.x, -max_translation, max_translation);
+	ImGui::SliderFloat("Y##t", &model_parameters.translation.vec.y, -max_translation, max_translation);
+	ImGui::SliderFloat("Z##t", &model_parameters.translation.vec.z, -max_translation, max_translation);
 	ImGui::EndGroup();
 
 	ImGui::BeginGroup();
@@ -86,15 +96,15 @@ void gui::render_model_options()
 	ImGui::Checkbox("Uniform##s", &m_scale_uniformly);
 	if (m_scale_uniformly)
 	{
-		ImGui::SliderFloat("Value##s", &model_parameters.scale.value.x, 0.0f, 1.0f);
+		ImGui::SliderFloat("Value##s", &model_parameters.scale.value.x, 0.0f, max_scale);
 		model_parameters.scale.value.y = model_parameters.scale.value.x;
 		model_parameters.scale.value.z = model_parameters.scale.value.x;
 	}
 	else
 	{
-		ImGui::SliderFloat("X##s", &model_parameters.scale.value.x, 0.0f, 1.0f);
-		ImGui::SliderFloat("Y##s", &model_parameters.scale.value.y, 0.0f, 1.0f);
-		ImGui::SliderFloat("Z##s", &model_parameters.scale.value.z, 0.0f, 1.0f);
+		ImGui::SliderFloat("X##s", &model_parameters.scale.value.x, 0.0f, max_scale);
+		ImGui::SliderFloat("Y##s", &model_parameters.scale.value.y, 0.0f, max_scale);
+		ImGui::SliderFloat("Z##s", &model_parameters.scale.value.z, 0.0f, max_scale);
 	}
 	ImGui::EndGroup();
 
@@ -104,9 +114,9 @@ void gui::render_model_options()
 	ImGui::ColorEdit3("Light specular##l", glm::value_ptr(model_parameters.light.specular), ImGuiColorEditFlags_DisplayRGB);
 
 	ImGui::Text("Translation");
-	ImGui::SliderFloat("X##l", &model_parameters.light.position.x, -10.f, 10.f);
-	ImGui::SliderFloat("Y##l", &model_parameters.light.position.y, -10.f, 10.f);
-	ImGui::SliderFloat("Z##l", &model_parameters.light.position.z, -10.f, 10.f);
+	ImGui::SliderFloat("X##l", &model_parameters.light.position.x, -max_translation, max_translation);
+	ImGui::SliderFloat("Y##l", &model_parameters.light.position.y, -max_translation, max_translation);
+	ImGui::SliderFloat("Z##l", &model_parameters.light.position.z, -max_translation, max_translation);
 
 	ImGui::EndGroup();
 

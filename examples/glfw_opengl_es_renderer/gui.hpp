@@ -13,10 +13,10 @@ public:
 	gui(vr::glfw::window& window);
 	~gui();
 
-	void frame();
+	void frame(float delta_time);
 
 private:
-	void render_model_options();
+	void render_model_options(float delta_time);
 
 public:
 	parameters model_parameters;

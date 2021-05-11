@@ -183,7 +183,7 @@ namespace vr::glfw
 		if (window_instance != nullptr)
 		{
 			const bool status = focused;
-			spdlog::info("Got focus: {0}", status);
+			spdlog::debug("Got focus: {0}", status);
 			window_instance->window_focus_callback(status);
 		}
 		else

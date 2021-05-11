@@ -36,6 +36,7 @@ private:
 
 	void make_cameras();
 
+	void add_light_bulb();
 	void transform_model(const parameters& parameters);
 
 private:

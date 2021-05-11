@@ -69,8 +69,9 @@ void preamble::run_loop()
 			process_input(delta_time);
 
 			m_main_loop->frame(delta_time, m_gui->model_parameters);
+			const auto scene_render_time = static_cast<float>(vr::glfw::get_time());
 
-			m_gui->frame();
+			m_gui->frame(scene_render_time - current_time);
 			
 			m_window.swap_buffers();
 		}

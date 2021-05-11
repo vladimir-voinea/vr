@@ -19,7 +19,7 @@ input_listener::input_listener(vr::glfw::window& window, vr::glfw::mouse& mouse,
 
 void input_listener::on_key_event(vr::glfw::key key, vr::glfw::key_action state, vr::glfw::modifiers mods)
 {
-	spdlog::info("Key event. Key: {0}, state: {1}, modifiers: {2}. Listener state: {3}", key, state, mods, m_state);
+	spdlog::debug("Key event. Key: {0}, state: {1}, modifiers: {2}. Listener state: {3}", key, state, mods, m_state);
 	auto& io = ImGui::GetIO();
 
 	const auto raw_key = vr::glfw::keyboard::convert_to_raw(key);
@@ -135,7 +135,7 @@ void input_listener::on_position_event(const vr::glfw::mouse_position& position)
 
 void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mouse_action action)
 {
-	spdlog::info("Mouse button event: Button {0}, action {1}", button, action);
+	spdlog::debug("Mouse button event: Button {0}, action {1}", button, action);
 
 	auto& io = ImGui::GetIO();
 
@@ -192,7 +192,7 @@ void input_listener::on_button_event(vr::glfw::mouse_button button, vr::glfw::mo
 
 void input_listener::on_scroll_event(const vr::glfw::mouse_scroll& scroll)
 {
-	spdlog::info("Mouse scroll event: x offset: {0}, y offset: {1}", scroll.xoffset, scroll.yoffset);
+	spdlog::debug("Mouse scroll event: x offset: {0}, y offset: {1}", scroll.xoffset, scroll.yoffset);
 	auto& io = ImGui::GetIO();
 
 	switch (m_state)
@@ -215,7 +215,7 @@ void input_listener::on_scroll_event(const vr::glfw::mouse_scroll& scroll)
 
 void input_listener::on_enter_event(bool entered)
 {
-	spdlog::info("Mouse inside the window: {0}", entered);
+	spdlog::debug("Mouse inside the window: {0}", entered);
 }
 
 void input_listener::update_state(state new_state)
@@ -284,7 +284,6 @@ void input_listener::imgui_forward_button_event(vr::glfw::mouse_button button, v
 
 void input_listener::object_move_towards(direction direction, float delta_time)
 {
-	spdlog::info("Moving!");
 	glm::vec3 direction_vector;
 
 	switch (direction)
