@@ -39,8 +39,13 @@ namespace vr::model
 			uniform float vr_shininess;
 
 			void main(){
+				vec4 position4 = vr_mvp * vec4(vr_vertex_position, 1);
+				position = vec3(position4.xyz);
+				gl_Position = position4;
 
-				gl_Position =  vr_mvp * vec4(vr_vertex_position, 1);
+				vec4 normal4 = vr_modelview * vec4(vr_vertex_normal, 0.f);
+				normal = normalize(vec3(normal4.xyz));
+				
 				uv = vr_vertex_uv;
 			}
 	)";
