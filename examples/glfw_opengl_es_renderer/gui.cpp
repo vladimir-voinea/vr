@@ -13,6 +13,7 @@ gui::gui(vr::glfw::window& window)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImGui::GetIO().IniFilename = "imgui.ini";
 	ImGui_ImplGlfw_InitForOpenGL(window.get_handle(), false);
 	ImGui_ImplOpenGL3_Init("#version 300 es");
 }
