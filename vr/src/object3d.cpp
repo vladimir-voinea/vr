@@ -77,6 +77,16 @@ namespace vr
 		}
 	}
 
+	const std::string& object3d::get_name() const
+	{
+		return m_name;
+	}
+
+	void object3d::set_name(const std::string& name)
+	{
+		m_name = name;
+	}
+
 	void object3d::set_before_render_callback(std::function<void(void)> callback)
 	{
 		m_before_render_callback = callback;

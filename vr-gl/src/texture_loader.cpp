@@ -14,6 +14,33 @@
 
 namespace vr::gl
 {
+	GLuint load_from_memory(const std::vector<uint8_t>& data)
+	{
+		int width = 0;
+		int height = 0;
+		int channels = 0;
+
+		stbi_set_flip_vertically_on_load(true);
+		auto stb_result = stbi_load_from_memory(data.data(), data.size(), &width, &height, &channels, STBI_rgb);
+
+		GLuint texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, stb_result);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(stb_result);
+		stbi_set_flip_vertically_on_load(false);
+
+		return texture;
+	}
+
 	GLuint load_from_memory(const std::vector<vr::texel>& texels, unsigned int width, unsigned int height)
 	{
 		GLuint texture;
@@ -37,29 +64,7 @@ namespace vr::gl
 		auto am = platform::get_platform_manager()->get_asset_manager();
 		const auto contents = am->read_file(am->get_asset_by_name(path));
 
-		int width = 0;
-		int height = 0;
-		int channels = 0;
-
-		stbi_set_flip_vertically_on_load(true);
-		auto stb_result = stbi_load_from_memory(contents.data(), contents.size(), &width, &height, &channels, STBI_rgb);
-
-		GLuint texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, stb_result);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-		
-		stbi_image_free(stb_result);
-		stbi_set_flip_vertically_on_load(false);
-
-		return texture;
+		return load_from_memory(contents);
 	}
 
 
@@ -122,11 +127,15 @@ namespace vr::gl
 
 	GLuint load_texture(const texture* texture)
 	{
-		if (texture->is_loaded_in_memory())
+		if (texture->texels_loaded_in_memory())
 		{
 			assert(texture->get_width() != 0);
 			assert(texture->get_height() != 0);
-			load_from_memory(texture->get_texels(), texture->get_width(), texture->get_height());
+			return load_from_memory(texture->get_texels(), texture->get_width(), texture->get_height());
+		}
+		else if (texture->bytes_loaded_in_memory())
+		{
+			return load_from_memory(texture->get_bytes());
 		}
 		else
 		{

@@ -28,9 +28,10 @@ namespace
 	constexpr auto builtin_projection_uniform_name = "vr_projection";
 	constexpr auto builtin_view_uniform_name = "vr_view";
 	constexpr auto builtin_model_uniform_name = "vr_model";
-	constexpr auto builtin_texture_sampler_uniform_name = "vr_texture_sampler";
 	constexpr auto builtin_modelview_uniform_name = "vr_modelview";
 	constexpr auto builtin_normal_uniform_name = "vr_normal";
+
+	constexpr auto builtin_have_shininess_uniform_name = "vr_material.have_shininess";
 
 	bool has_uniform(const vr::gl::shader_program& program, const std::string& name)
 	{
@@ -90,7 +91,7 @@ namespace
 			if (uniform.name != builtin_view_position_uniform_name &&
 				uniform.name != builtin_mvp_uniform_name && uniform.name != builtin_projection_uniform_name &&
 				uniform.name != builtin_view_uniform_name && uniform.name != builtin_model_uniform_name &&
-				uniform.name != builtin_normal_uniform_name && uniform.name != builtin_texture_sampler_uniform_name)
+				uniform.name != builtin_normal_uniform_name && uniform.name != builtin_have_shininess_uniform_name)
 			{
 				spdlog::debug("Uniform {0} not found in program {1}", uniform.name, program.get_id());
 			}
@@ -164,12 +165,6 @@ namespace
 			normal_uniform.value.mat4fv = normal_matrix;
 			load_uniform(shader->program, normal_uniform);
 		}
-
-		vr::gl::uniform texture_sampler_uniform;
-		texture_sampler_uniform.name = builtin_texture_sampler_uniform_name;
-		texture_sampler_uniform.type = vr::gl::uniform_type::vec1i;
-		texture_sampler_uniform.value.vec1i = 0;
-		load_uniform(shader->program, texture_sampler_uniform);
 	}
 
 	vr::gl::loaded_geometry load_geometry(const vr::geometry* geometry)
@@ -205,8 +200,6 @@ namespace
 			accumulated_offset += attribute.second.data.size();
 		}
 
-		spdlog::info("Loaded mesh with {} KB ({} MB)", accumulated_offset / 1024, static_cast<float>(accumulated_offset) / 1024.f / 1024.f);
-
 		glGenBuffers(1, &vao.indices.id);
 		glBindBuffer(GL_ARRAY_BUFFER, vao.indices.id);
 		glBufferData(GL_ARRAY_BUFFER, geometry->indices.size() * sizeof(decltype(geometry->indices)::value_type), geometry->indices.data(), GL_STATIC_DRAW);
@@ -218,7 +211,7 @@ namespace
 		const auto size_mb = static_cast<float>(size_kb) / 1024.f;
 		const auto n_triangles = geometry->indices.size() / 3;
 		const auto n_triangles_k = static_cast<float>(n_triangles) / 1000.f;
-		spdlog::info("Loaded mesh with {} KB ({} MB) with {} triangles ({}k)", size_kb,
+		spdlog::info("Loaded mesh of {} KB ({} MB) with {} triangles ({}k)", size_kb,
 			size_mb, n_triangles, n_triangles_k);
 
 		return loaded_geometry;
@@ -262,7 +255,6 @@ namespace
 
 		return result;
 	}
-
 }
 
 namespace vr::gl
@@ -333,23 +325,28 @@ namespace vr::gl
 		{
 			for (const auto mesh : object->get_meshes())
 			{
-
 				if (!m_cache->get(mesh->get_geometry()))
 				{
 					m_cache->set(mesh->get_geometry(), load_geometry(mesh->get_geometry()));
 				}
-				auto material = static_cast<const opengl_shader_material*>(mesh->get_material());
-				if (const auto opengl_shader = &material->get_shader(); !m_cache->get(opengl_shader))
-				{
-					m_cache->set(opengl_shader, load_shader(*opengl_shader));
 
-					const auto& textures = material->get_textures();
-					for (const auto* texture : textures)
+				auto material = static_cast<const opengl_shader_material*>(mesh->get_material());
+				if (const auto& opengl_shader = material->get_shader(); !m_cache->get(&opengl_shader))
+				{
+					m_cache->set(&opengl_shader, load_shader(opengl_shader));	
+				}
+
+				const auto& textures = material->get_textures();
+				for (const auto texture : textures)
+				{
+					if (!texture)
 					{
-						if (!m_cache->get(texture))
-						{
-							m_cache->set(texture, ::load_texture(texture));
-						}
+						spdlog::error("Attempting to load null texture");
+						assert(false);
+					}
+					if (!m_cache->get(texture))
+					{
+						m_cache->set(texture, ::load_texture(texture));
 					}
 				}
 			}
@@ -382,12 +379,9 @@ namespace vr::gl
 
 	void renderer::activate_texture(const loaded_texture* texture, unsigned int target)
 	{
-		if (texture->id != m_last_shader_id)
-		{
-			glActiveTexture(GL_TEXTURE0 + target);
-			glBindTexture(GL_TEXTURE_2D, texture->id);
-			m_last_texture_id = texture->id;
-		}
+		glActiveTexture(GL_TEXTURE0 + target);
+		glBindTexture(GL_TEXTURE_2D, texture->id);
+		m_last_texture_id = texture->id;
 	}
 
 	void renderer::activate_shader(const loaded_shader* shader)
@@ -450,10 +444,31 @@ namespace vr::gl
 				const auto material = static_cast<const opengl_shader_material*>(mesh->get_material());
 				const auto shader = m_cache->get(&material->get_shader());
 
-				for (auto i = 0u; i < material->get_textures().size(); ++i)
+				const auto n_textures = material->get_textures().size();
+				if (n_textures)
 				{
-					const auto texture = m_cache->get(material->get_textures()[i]);
-					activate_texture(texture, i);
+					spdlog::info("Activating textures per mesh. Mesh has {} textures", n_textures);
+					if (n_textures == 2)
+					{
+						spdlog::info("Found one with 2 textures");
+					}
+				}
+				for (auto i = 0u; i < n_textures; ++i)
+				{
+					if (const auto texture = m_cache->get(material->get_textures()[i]); texture)
+					{
+						spdlog::info("Activating texture unit {}/{}", i, n_textures - 1);
+						activate_texture(texture, i);
+					}
+					else
+					{
+						spdlog::error("Texture not in cache");
+					}
+
+				}
+				if (n_textures)
+				{
+					spdlog::info("Done activating mesh textures");
 				}
 				
 				activate_shader(shader);

@@ -72,19 +72,25 @@ namespace vr::gl
 {
 	void opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
+		// filter imgui errors
+		if (id == 1282 || id == 1280)
+		{
+			return;
+		}
+
 		std::string msg(message);
 
 		if (type == GL_DEBUG_TYPE_ERROR || type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR || severity == GL_DEBUG_SEVERITY_HIGH)
 		{
-			spdlog::debug("OGL: Source: {0}, Severity: {1}, Type: {2}, ID: {3}, Message: {4}", convert_source(source), convert_severity(severity), convert_type(type), id, msg);
+			spdlog::error("OGL: Source: {0}, Severity: {1}, Type: {2}, ID: {3}, Message: {4}", convert_source(source), convert_severity(severity), convert_type(type), id, msg);
 		}
 		else if (type == GL_DEBUG_TYPE_PERFORMANCE)
 		{
-			spdlog::debug("OGL: Source: {0}, Severity: {1}, Type: {2}, ID: {3}, Message: {4}", convert_source(source), convert_severity(severity), convert_type(type), id, msg);
+			spdlog::warn("OGL: Source: {0}, Severity: {1}, Type: {2}, ID: {3}, Message: {4}", convert_source(source), convert_severity(severity), convert_type(type), id, msg);
 		}
 		else
 		{
-			spdlog::debug("OGL: Source: {0}, Severity: {1}, Type: {2}, ID: {3}, Message: {4}", convert_source(source), convert_severity(severity), convert_type(type), id, msg);
+			spdlog::warn("OGL: Source: {0}, Severity: {1}, Type: {2}, ID: {3}, Message: {4}", convert_source(source), convert_severity(severity), convert_type(type), id, msg);
 		}
 	}
 }

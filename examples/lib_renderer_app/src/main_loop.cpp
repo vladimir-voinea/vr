@@ -208,6 +208,7 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 				m_scene_model = it->second.first.get();
 			}
 			m_scene.add(m_scene_model);
+			m_scene_model->set_name("Model root");
 		}
 	}
 	transform_model(parameters);

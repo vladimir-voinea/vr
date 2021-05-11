@@ -13,12 +13,11 @@ namespace vr::model
 {
 	struct model_data
 	{
-		std::list<vr::geometry> geometries;
 		std::unique_ptr<vr::gl::opengl_shader> shader;
-		std::vector<std::unique_ptr<vr::gl::opengl_shader_material>> materials;
 
-		std::vector<vr::texture> textures;
-		std::list<std::vector<const texture*>> textures_per_material;
+		std::list<vr::geometry> geometries;
+		std::list<vr::texture> textures;
+		std::vector<std::unique_ptr<vr::gl::opengl_shader_material>> materials;
 
 		std::vector<vr::mesh> meshes;
 	};

@@ -35,6 +35,9 @@ namespace vr
 
 		virtual glm::mat4 get_transformation_matrix() const override;
 
+		const std::string& get_name() const;
+		void set_name(const std::string& name);
+
 		void set_before_render_callback(std::function<void(void)> callback);
 		void on_before_render();
 
@@ -49,6 +52,8 @@ namespace vr
 		std::vector<mesh*> m_meshes;
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;
+
+		std::string m_name;
 
 		std::function<void(void)> m_before_render_callback;
 	};
