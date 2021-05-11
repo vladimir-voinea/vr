@@ -11,6 +11,7 @@ class gui
 {
 public:
 	gui(vr::glfw::window& window);
+	~gui();
 
 	void frame();
 
