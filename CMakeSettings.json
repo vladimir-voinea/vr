@@ -17,7 +17,7 @@
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /W2 /O2 /GR /EHsc\"",
+      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /W4 /O2 /GR /EHsc\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ]

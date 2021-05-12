@@ -1,5 +1,7 @@
 #include "cube_texture_material.hpp"
 
+#include <spdlog/spdlog.h>
+
 namespace
 {
 	constexpr auto vshader = R"(
@@ -36,13 +38,21 @@ namespace
 			color = texture(sampler, cube_texcoords);
 		}
 		)";
+
+	vr::gl::opengl_shader& get_cube_shader()
+	{
+		static vr::gl::opengl_shader shader{ vshader, fshader };
+		return shader;
+	}
 }
 
 namespace vr::gl
 {
 	cube_texture_material::cube_texture_material()
-		: opengl_shader_material(m_shader, m_uniforms)
-		, m_shader(vshader, fshader)
+		: opengl_shader_material(get_cube_shader())
 	{
+		spdlog::info("Created cube texture material");
 	}
+
+	cube_texture_material::~cube_texture_material() = default;
 }

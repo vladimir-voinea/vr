@@ -62,8 +62,14 @@ private:
 	std::string m_scene_model_path;
 	vr::object3d* m_scene_model = nullptr;
 
-	std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data> m_light_bulb_model;
-	vr::object3d* m_light_bulb = nullptr;
+	std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data> m_directional_light_model;
+	vr::object3d* m_directional_light = nullptr;
+
+	std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data> m_point_light_model;
+	vr::object3d* m_point_light = nullptr;
+
+	std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data> m_spot_light_model;
+	vr::object3d* m_spot_light = nullptr;
 
 	int total_frames = 0;
 };

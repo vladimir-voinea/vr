@@ -10,9 +10,8 @@ namespace vr::gl
 	{
 	public:
 		cube_texture_material();
+		~cube_texture_material() override;
 
 	private:
-		vr::gl::opengl_shader m_shader;
-		std::vector<uniform> m_uniforms;
 	};
 }

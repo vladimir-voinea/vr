@@ -148,13 +148,16 @@ namespace vr::glfw
 	{
 		const auto glfw_key = enum_to_glfw_key(key);
 		const auto state = glfwGetKey(m_window.get_handle(), glfw_key);
-		if (state == GLFW_PRESS)
+		switch (state)
 		{
+		case GLFW_PRESS:
 			return key_action::press;
-		}
-		if (state == GLFW_RELEASE)
-		{
+		case GLFW_RELEASE:
 			return key_action::release;
+		case GLFW_REPEAT:
+			return key_action::repeat;
+		default:
+			return key_action::repeat;
 		}
 	}
 

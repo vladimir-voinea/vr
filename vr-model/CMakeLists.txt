@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 
 set(LIB_NAME "vr-model")
 
-set(SOURCES "src/model_loading.cpp")
+set(SOURCES "src/model_loading.cpp" "src/shader_repository.cpp")
 			
 add_library (${LIB_NAME} STATIC ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)

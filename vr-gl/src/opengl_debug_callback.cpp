@@ -64,6 +64,8 @@ namespace
 			return "Low";
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
 			return "Notification";
+		default:
+			return "";
 		}
 	}
 }

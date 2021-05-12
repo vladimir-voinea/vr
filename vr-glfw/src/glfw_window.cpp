@@ -1,5 +1,5 @@
-#include "glfw_window.hpp";
-#include "glfw_initialization.hpp";
+#include "glfw_window.hpp"
+#include "glfw_initialization.hpp"
 #include "glfw_user_pointer.hpp"
 
 #include <GLFW/glfw3.h>

@@ -1,4 +1,5 @@
 #include "model_loading.hpp"
+#include "shader_repository.hpp"
 
 #include <platform_manager_factory.hpp>
 
@@ -14,145 +15,6 @@
 
 namespace vr::model
 {
-	constexpr auto vshader = R"(
-			#version 300 es
-
-			in vec3 vr_vertex_position;
-			in vec3 vr_vertex_normal;
-			in vec4 vr_vertex_color;
-			in vec2 vr_vertex_uv;
-
-			out vec2 uv;
-			out vec3 normal;
-			out vec3 position;
-
-			uniform vec3 vr_view_position;
-			uniform mat4 vr_mvp;
-			uniform mat4 vr_projection;
-			uniform mat4 vr_view;
-			uniform mat4 vr_model;
-			uniform mat4 vr_modelview;
-			uniform mat3 vr_normal;
-
-			void main()
-			{
-				vec4 position4 = vr_model * vec4(vr_vertex_position, 1.f);
-				position = position4.xyz;
-				gl_Position = vr_projection * vr_view * position4;
-
-				normal = vr_normal * vr_vertex_normal;
-				
-				uv = vr_vertex_uv;
-			}
-	)";
-
-	constexpr auto fshader = R"(
-#version 300 es
-
-struct vr_material_t
-{
-	highp int have_ambient_color;
-	highp vec3 ambient_color;
-	highp int have_ambient_texture;
-	sampler2D ambient_texture;
-				
-	highp int have_diffuse_color;
-	highp vec3 diffuse_color;
-	highp int have_diffuse_texture;
-	sampler2D diffuse_texture;
-
-	highp int have_specular_color;
-	highp vec3 specular_color;
-	highp int have_specular_texture;
-	sampler2D specular_texture;
-
-	highp int have_shininess;
-	highp float shininess;
-};
-
-struct vr_light_t
-{
-	highp vec3 position;
-	highp vec3 ambient;
-	highp vec3 diffuse;
-	highp vec3 specular;
-};
-
-in highp vec2 uv;
-in highp vec3 normal;
-in highp vec3 position;
-out highp vec4 out_color4;
-
-uniform highp vec3 vr_view_position;
-uniform vr_material_t vr_material;
-uniform vr_light_t vr_light;
-
-#define DEFAULT_COLOR vec3(1.f, 1.f, 1.f)
-
-highp float get_ambient_coefficient()
-{
-	highp float coefficient = 1.f;
-	return coefficient;
-}
-
-highp vec3 get_ambient_color_contribution()
-{
-	return vr_material.have_ambient_color == 1 ? vr_material.ambient_color : DEFAULT_COLOR;
-}
-
-highp vec3 get_ambient_texture_contribution()
-{
-	return texture(vr_material.ambient_texture, uv).rgb;
-}
-
-highp float get_diffuse_coefficient(highp vec3 normalized_normal, highp vec3 light_direction)
-{
-	highp float diff = max(dot(normalized_normal, light_direction), 0.f);
-	return diff;
-}
-
-highp vec3 get_diffuse_color_contribution()
-{
-	return vr_material.have_diffuse_color == 1 ? vr_material.diffuse_color : DEFAULT_COLOR;
-}
-
-highp vec3 get_diffuse_texture_contribution()
-{
-	return texture(vr_material.diffuse_texture, uv).rgb;
-}
-
-highp float get_specular_coefficient(highp vec3 normalized_normal, highp vec3 light_direction)
-{
-	highp vec3 view_direction = normalize(vr_view_position - position);
-	highp vec3 reflect_direction = reflect(-light_direction, normalized_normal);
-	highp float spec = pow(max(dot(view_direction, reflect_direction), 0.f), vr_material.shininess);
-	return spec;
-}
-
-highp vec3 get_specular_color_contribution()
-{
-	return vr_material.have_specular_color == 1 ? vr_material.specular_color : DEFAULT_COLOR;
-}
-
-highp vec3 get_specular_texture_contribution()
-{
-	return texture(vr_material.specular_texture, uv).rgb;
-}
-
-void main()
-{
-	highp vec3 normalized_normal = normalize(normal);
-	highp vec3 light_direction = normalize(vr_light.position - position);
-
-	highp vec3 ambient = vr_light.ambient * get_ambient_coefficient() * get_ambient_texture_contribution() * get_ambient_color_contribution();
-	highp vec3 diffuse = vr_light.diffuse * get_diffuse_coefficient(normalized_normal, light_direction) * get_diffuse_texture_contribution() * get_diffuse_color_contribution();
-	highp vec3 specular = vr_light.specular * get_specular_coefficient(normalized_normal, light_direction) * get_specular_texture_contribution() * get_specular_color_contribution();
-
-	highp vec3 result = ambient + diffuse + specular;
-	out_color4 = vec4(result, 1.f);
-}
-	)";
-
 	void load_node(model_data& data, std::unique_ptr<object3d>& node, const aiScene* scene, const aiNode* assimp_node, object3d* parent, const aiMatrix4x4& accumulated_transformation)
 	{
 		object3d* current_node = nullptr;
@@ -432,13 +294,7 @@ std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)),
 		if (scene)
 		{
 			std::pair<std::unique_ptr<object3d>, model_data> result;
-			result.second.shader = std::make_unique<vr::gl::opengl_shader>(vshader, fshader);
-
-			//const auto n_textures = scene->mNumTextures;
-			//for (auto i = 0u; i < n_textures; ++i)
-			//{
-			//	load_texture(result.second, scene->mTextures[i]);
-			//}
+			result.second.shader = std::make_unique<vr::gl::opengl_shader>(vr::model::get_phong_vshader(), vr::model::get_phong_fshader());
 
 			const auto n_materials = scene->mNumMaterials;
 			for (auto i = 0u; i < n_materials; ++i)

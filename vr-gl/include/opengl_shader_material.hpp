@@ -41,7 +41,8 @@ namespace vr::gl
 	public:
 		opengl_shader_material(const opengl_shader& shader, std::vector<uniform> uniforms, std::vector<const texture*> textures);
 		opengl_shader_material(const opengl_shader& shader, std::vector<uniform> uniforms);
-		~opengl_shader_material() override;
+		opengl_shader_material(const opengl_shader& shader);
+		virtual ~opengl_shader_material() override;
 
 		const opengl_shader& get_shader() const;
 		const std::vector<uniform>& get_uniforms() const;

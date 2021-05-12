@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <glm/glm.hpp>
 
 struct translation
@@ -17,12 +18,41 @@ struct scale
 	glm::vec3 value = { 1.f, 1.f, 1.f };
 };
 
-struct light
+struct light_components
 {
-	glm::vec3 position;
 	glm::vec3 ambient = { 1.f, 1.f, 1.f };
 	glm::vec3 diffuse = { 1.f, 1.f, 1.f };
 	glm::vec3 specular = { 1.f, 1.f, 1.f };
+};
+
+struct light_attenuation
+{
+	float constant = 1.f;
+	float linear = 0.09f;
+	float quadratic = 0.32f;
+};
+
+struct directional_light
+{
+	glm::vec3 position = { 0.f, 10.f, 0.f };
+	light_components components;
+};
+
+
+struct point_light
+{
+	glm::vec3 position = { 2.f, 3.f, 2.f };
+	light_components components;
+	light_attenuation attenuation;
+};
+
+struct spot_light
+{
+	glm::vec3 position = { -3.f, 5.f, 2.f };
+	light_components components;
+	light_attenuation attenuation;
+	float cutoff_angle = 12.f;
+	float outer_cutoff_angle = 15.f;
 };
 
 struct parameters
@@ -32,5 +62,9 @@ struct parameters
 	rotation rotation;
 	scale scale;
 
-	light light;
+	directional_light directional_light;
+	point_light point_light;
+	spot_light spot_light;
+
+	parameters();
 };

@@ -6,13 +6,17 @@ namespace vr::gl
 {
 	opengl_shader_material::opengl_shader_material(const opengl_shader& shader, std::vector<uniform> uniforms, std::vector<const texture*> textures)
 		: m_shader(shader)
-		, m_uniforms(uniforms)
+		, m_uniforms(std::move(uniforms))
 		, m_textures(textures)
 	{}
 
 	opengl_shader_material::opengl_shader_material(const opengl_shader& shader, std::vector<uniform> uniforms)
 		: m_shader(shader)
-		, m_uniforms(uniforms)
+		, m_uniforms(std::move(uniforms))
+	{}
+
+	opengl_shader_material::opengl_shader_material(const opengl_shader & shader)
+		: m_shader(shader)
 	{}
 
 	opengl_shader_material::~opengl_shader_material() = default;

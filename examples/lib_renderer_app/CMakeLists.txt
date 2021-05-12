@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 
 set(LIB_NAME "lib_renderer_app")
 
-set(SOURCES "src/main_loop.cpp" "src/shader_loader.cpp")
+set(SOURCES "src/main_loop.cpp" "src/shader_loader.cpp" "src/paramters.cpp")
 
 add_library (${LIB_NAME} STATIC ${SOURCES})
 target_compile_features(${LIB_NAME} PRIVATE cxx_std_17)
