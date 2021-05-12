@@ -109,31 +109,43 @@ namespace
 		const auto model_matrix = object->get_transformation_matrix();
 		const auto view_matrix = camera.get_view_matrix();
 		const auto projection_matrix = camera.get_projection_matrix();
-		const auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
 
-		vr::gl::uniform mvp_uniform;
-		mvp_uniform.name = builtin_mvp_uniform_name;
-		mvp_uniform.type = vr::gl::uniform_type::mat4fv;
-		mvp_uniform.value.mat4fv = mvp_matrix;
-		load_uniform(shader->program, mvp_uniform);
+		if (has_uniform(shader->program, builtin_mvp_uniform_name))
+		{
+			const auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
+			vr::gl::uniform mvp_uniform;
+			mvp_uniform.name = builtin_mvp_uniform_name;
+			mvp_uniform.type = vr::gl::uniform_type::mat4fv;
+			mvp_uniform.value.mat4fv = mvp_matrix;
+			load_uniform(shader->program, mvp_uniform);
+		}
 
-		vr::gl::uniform projection_uniform;
-		projection_uniform.name = builtin_projection_uniform_name;
-		projection_uniform.type = vr::gl::uniform_type::mat4fv;
-		projection_uniform.value.mat4fv = projection_matrix;
-		load_uniform(shader->program, projection_uniform);
+		if (has_uniform(shader->program, builtin_projection_uniform_name))
+		{
+			vr::gl::uniform projection_uniform;
+			projection_uniform.name = builtin_projection_uniform_name;
+			projection_uniform.type = vr::gl::uniform_type::mat4fv;
+			projection_uniform.value.mat4fv = projection_matrix;
+			load_uniform(shader->program, projection_uniform);
+		}
 
-		vr::gl::uniform view_uniform;
-		view_uniform.name = builtin_view_uniform_name;
-		view_uniform.type = vr::gl::uniform_type::mat4fv;
-		view_uniform.value.mat4fv = view_matrix;
-		load_uniform(shader->program, view_uniform);
+		if (has_uniform(shader->program, builtin_view_uniform_name))
+		{
+			vr::gl::uniform view_uniform;
+			view_uniform.name = builtin_view_uniform_name;
+			view_uniform.type = vr::gl::uniform_type::mat4fv;
+			view_uniform.value.mat4fv = view_matrix;
+			load_uniform(shader->program, view_uniform);
+		}
 
-		vr::gl::uniform model_uniform;
-		model_uniform.name = builtin_model_uniform_name;
-		model_uniform.type = vr::gl::uniform_type::mat4fv;
-		model_uniform.value.mat4fv = model_matrix;
-		load_uniform(shader->program, model_uniform);
+		if (has_uniform(shader->program, builtin_model_uniform_name))
+		{
+			vr::gl::uniform model_uniform;
+			model_uniform.name = builtin_model_uniform_name;
+			model_uniform.type = vr::gl::uniform_type::mat4fv;
+			model_uniform.value.mat4fv = model_matrix;
+			load_uniform(shader->program, model_uniform);
+		}
 
 		if (has_uniform(shader->program, builtin_view_position_uniform_name))
 		{
@@ -148,7 +160,6 @@ namespace
 			glm::vec3 skew;
 			glm::vec4 perspective;
 			glm::decompose(view_matrix_inverse, scale, orientation, translation, skew, perspective);
-			spdlog::info("Camera position world {}, {}, {}", translation.x, translation.y, translation.z);
 			view_position_uniform.value.vec3f = translation;
 			load_uniform(shader->program, view_position_uniform);
 		}
