@@ -36,8 +36,9 @@ namespace vr::model
 
 			void main()
 			{
-				position = vec3(vr_model * vec4(vr_vertex_position, 1.f));
-				gl_Position = vr_projection * vr_view * vec4(position, 1.f);
+				vec4 position4 = vr_model * vec4(vr_vertex_position, 1.f);
+				position = position4.xyz;
+				gl_Position = vr_projection * vr_view * position4;
 
 				normal = vr_normal * vr_vertex_normal;
 				
