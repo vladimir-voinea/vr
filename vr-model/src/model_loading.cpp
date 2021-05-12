@@ -150,7 +150,7 @@ void main()
 	highp vec3 specular = vr_light.specular * get_specular_coefficient(normalized_normal, light_direction) * get_specular_texture_contribution() * get_specular_color_contribution();
 
 	highp vec3 result = ambient + diffuse + specular;
-	out_color4 = vec4(result, 1.f/2.f);
+	out_color4 = vec4(result, 1.f);
 }
 	)";
 
