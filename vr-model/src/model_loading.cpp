@@ -88,7 +88,6 @@ uniform vr_material_t vr_material;
 uniform vr_light_t vr_light;
 
 #define DEFAULT_COLOR vec3(1.f, 1.f, 1.f)
-//const highp vec3 default_color(1.f, 1.f, 1.f);
 
 highp float get_ambient_coefficient()
 {
