@@ -20,9 +20,9 @@ struct scale
 struct light
 {
 	glm::vec3 position;
-	glm::vec3 ambient = { 0.1f, 0.1f, 0.1f };
-	glm::vec3 diffuse = { 0.1f, 0.1f, 0.1f };
-	glm::vec3 specular = { 0.1f, 0.1f, 0.1f };
+	glm::vec3 ambient = { 1.f, 1.f, 1.f };
+	glm::vec3 diffuse = { 1.f, 1.f, 1.f };
+	glm::vec3 specular = { 1.f, 1.f, 1.f };
 };
 
 struct parameters

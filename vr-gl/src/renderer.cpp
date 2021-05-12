@@ -57,6 +57,12 @@ namespace
 				glUniformMatrix4fv(location, 1, GL_FALSE, &uniform.value.mat4fv[0][0]);
 				break;
 			}
+			case ut::mat3fv:
+			{
+				loaded_type = "mat3fv";
+				glUniformMatrix3fv(location, 1, GL_FALSE, &uniform.value.mat3fv[0][0]);
+				break;
+			}
 			case ut::vec4f:
 			{
 				loaded_type = "4f";
@@ -102,7 +108,6 @@ namespace
 	{
 		const auto model_matrix = object->get_transformation_matrix();
 		const auto view_matrix = camera.get_view_matrix();
-		const auto view_matrix_inverse = glm::inverse(view_matrix);
 		const auto projection_matrix = camera.get_projection_matrix();
 		const auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
 
@@ -132,6 +137,8 @@ namespace
 
 		if (has_uniform(shader->program, builtin_view_position_uniform_name))
 		{
+			const auto view_matrix_inverse = glm::inverse(view_matrix);
+
 			vr::gl::uniform view_position_uniform;
 			view_position_uniform.name = builtin_view_position_uniform_name;
 			view_position_uniform.type = vr::gl::uniform_type::vec3f;
@@ -141,6 +148,7 @@ namespace
 			glm::vec3 skew;
 			glm::vec4 perspective;
 			glm::decompose(view_matrix_inverse, scale, orientation, translation, skew, perspective);
+			spdlog::info("Camera position world {}, {}, {}", translation.x, translation.y, translation.z);
 			view_position_uniform.value.vec3f = translation;
 			load_uniform(shader->program, view_position_uniform);
 		}
@@ -157,12 +165,11 @@ namespace
 
 		if (has_uniform(shader->program, builtin_normal_uniform_name))
 		{
-			const auto modelview_matrix = view_matrix * model_matrix;
-			const auto normal_matrix = glm::transpose(view_matrix_inverse);
+			const auto normal_matrix = glm::transpose(glm::inverse(model_matrix));
 			vr::gl::uniform normal_uniform;
 			normal_uniform.name = builtin_normal_uniform_name;
-			normal_uniform.type = vr::gl::uniform_type::mat4fv;
-			normal_uniform.value.mat4fv = normal_matrix;
+			normal_uniform.type = vr::gl::uniform_type::mat3fv;
+			normal_uniform.value.mat3fv = normal_matrix;
 			load_uniform(shader->program, normal_uniform);
 		}
 	}
@@ -447,17 +454,17 @@ namespace vr::gl
 				const auto n_textures = material->get_textures().size();
 				if (n_textures)
 				{
-					spdlog::info("Activating textures per mesh. Mesh has {} textures", n_textures);
+					spdlog::debug("Activating textures per mesh. Mesh has {} textures", n_textures);
 					if (n_textures == 2)
 					{
-						spdlog::info("Found one with 2 textures");
+						spdlog::debug("Found one with 2 textures");
 					}
 				}
 				for (auto i = 0u; i < n_textures; ++i)
 				{
 					if (const auto texture = m_cache->get(material->get_textures()[i]); texture)
 					{
-						spdlog::info("Activating texture unit {}/{}", i, n_textures - 1);
+						spdlog::debug("Activating texture unit {}/{}", i, n_textures - 1);
 						activate_texture(texture, i);
 					}
 					else
@@ -468,7 +475,7 @@ namespace vr::gl
 				}
 				if (n_textures)
 				{
-					spdlog::info("Done activating mesh textures");
+					spdlog::debug("Done activating mesh textures");
 				}
 				
 				activate_shader(shader);
