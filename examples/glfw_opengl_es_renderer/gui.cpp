@@ -14,6 +14,7 @@
 #include <iomanip>
 
 constexpr auto max_translation = 5.f;
+constexpr auto max_light_translation = 20.f;
 constexpr auto max_scale = 2.f;
 
 gui::gui(vr::glfw::window& window)
@@ -114,9 +115,9 @@ void gui::render_model_options(float delta_time)
 	ImGui::ColorEdit3("Light specular##l", glm::value_ptr(model_parameters.light.specular), ImGuiColorEditFlags_DisplayRGB);
 
 	ImGui::Text("Translation");
-	ImGui::SliderFloat("X##l", &model_parameters.light.position.x, -max_translation, max_translation);
-	ImGui::SliderFloat("Y##l", &model_parameters.light.position.y, -max_translation, max_translation);
-	ImGui::SliderFloat("Z##l", &model_parameters.light.position.z, -max_translation, max_translation);
+	ImGui::SliderFloat("X##l", &model_parameters.light.position.x, -max_light_translation, max_light_translation);
+	ImGui::SliderFloat("Y##l", &model_parameters.light.position.y, -max_light_translation, max_light_translation);
+	ImGui::SliderFloat("Z##l", &model_parameters.light.position.z, -max_light_translation, max_light_translation);
 
 	ImGui::EndGroup();
 

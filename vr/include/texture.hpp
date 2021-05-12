@@ -9,6 +9,30 @@ namespace vr
 {
 	using texel = glm::u8vec3;
 
+	enum class wrap_mode
+	{
+		repeat,
+		mirrored_repeat,
+		clamp_to_edge,
+		clamp_to_border
+	};
+
+	enum class operation
+	{
+		/** T = T1 + T2 */
+		add,
+		/** T = T1 * T2 */
+		multiply,
+		/** T = T1 - T2 */
+		subtract,
+		/** T = T1 / T2 */
+		divide,
+		/** T = (T1 + T2) - (T1 * T2) */
+		smooth_add,
+		/** T = T1 + (T2-0.5) */
+		signed_add,
+	};
+
 	class texture
 	{
 	public:

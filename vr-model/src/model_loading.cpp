@@ -86,7 +86,7 @@ uniform highp vec3 vr_view_position;
 uniform vr_material_t vr_material;
 uniform vr_light_t vr_light;
 
-#define DEFAULT_COLOR vec3(0.f, 0.f, 0.f)
+#define DEFAULT_COLOR vec3(1.f, 1.f, 1.f)
 //const highp vec3 default_color(1.f, 1.f, 1.f);
 
 highp float get_ambient_coefficient()
@@ -148,12 +148,8 @@ void main()
 	highp vec3 diffuse = vr_light.diffuse * get_diffuse_coefficient(normalized_normal, light_direction) * get_diffuse_texture_contribution() * get_diffuse_color_contribution();
 	highp vec3 specular = vr_light.specular * get_specular_coefficient(normalized_normal, light_direction) * get_specular_texture_contribution() * get_specular_color_contribution();
 
-	//highp vec3 ambient = get_ambient_texture_contribution() * get_ambient_color_contribution();
-	//highp vec3 diffuse = get_diffuse_texture_contribution() * get_diffuse_color_contribution();
-	//highp vec3 specular = get_specular_texture_contribution() * get_specular_color_contribution();
-
 	highp vec3 result = ambient + diffuse + specular;
-	out_color4 = vec4(result, 1.f);
+	out_color4 = vec4(result, 1.f/2.f);
 }
 	)";
 
@@ -334,9 +330,14 @@ std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)),
 		auto get_texture = [&assimp_material, &scene, &data](aiTextureType type, unsigned int index) -> vr::texture*
 		{
 			aiString path;
-			unsigned int uv_index;
-			if (assimp_material->GetTexture(type, index, &path, nullptr, &uv_index) == aiReturn_SUCCESS)
+			aiTextureMapping mapping;
+			unsigned int uv_index = 0;
+			ai_real blend;
+			aiTextureOp operation;
+			aiTextureMapMode map_mode;
+			if (assimp_material->GetTexture(type, index, &path, &mapping, &uv_index, &blend, &operation, &map_mode) == aiReturn_SUCCESS)
 			{
+				assert(mapping == aiTextureMapping_UV);
 				assert(uv_index == 0);
 				if (auto texture = scene->GetEmbeddedTexture(path.C_Str()); texture)
 				{

@@ -22,6 +22,14 @@ namespace vr::gl
 
 		stbi_set_flip_vertically_on_load(true);
 		auto stb_result = stbi_load_from_memory(data.data(), data.size(), &width, &height, &channels, STBI_rgb);
+		if (!stb_result)
+		{
+			throw std::runtime_error{ "stbimage could not parse in-memory texture" };
+		}
+		else
+		{
+			spdlog::info("Image parsed succesfully. Size: {} x {}", width, height);
+		}
 
 		GLuint texture;
 		glGenTextures(1, &texture);
@@ -30,8 +38,8 @@ namespace vr::gl
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, stb_result);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
