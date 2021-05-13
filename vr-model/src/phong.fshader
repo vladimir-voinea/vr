@@ -98,7 +98,7 @@ highp vec3 get_ambient_color_contribution()
 
 highp vec3 get_ambient_texture_contribution(highp vec2 uv)
 {
-	return texture(vr_material.ambient_texture, uv).rgb;
+	return vr_material.have_ambient_texture == 1 ? texture(vr_material.ambient_texture, uv).rgb : DEFAULT_COLOR;
 }
 
 highp float get_diffuse_coefficient(highp vec3 normalized_normal, highp vec3 light_direction)
@@ -114,7 +114,7 @@ highp vec3 get_diffuse_color_contribution()
 
 highp vec3 get_diffuse_texture_contribution(highp vec2 uv)
 {
-	return texture(vr_material.diffuse_texture, uv).rgb;
+	return vr_material.have_diffuse_texture == 1? texture(vr_material.diffuse_texture, uv).rgb : DEFAULT_COLOR;
 }
 
 highp float get_specular_coefficient(highp vec3 normalized_normal, highp vec3 light_direction, highp vec3 view_direction)
@@ -131,7 +131,7 @@ highp vec3 get_specular_color_contribution()
 
 highp vec3 get_specular_texture_contribution(highp vec2 uv)
 {
-	return texture(vr_material.specular_texture, uv).rgb;
+	return vr_material.have_specular_texture == 1 ? texture(vr_material.specular_texture, uv).rgb : DEFAULT_COLOR;
 }
 
 highp vec3 calculate_directional_light(vr_directional_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 view_direction)
@@ -196,9 +196,23 @@ void main()
 
 	if(1 > 0)
 	{	
-		highp vec3 ambient = get_ambient_texture_contribution(v_uv) * get_ambient_color_contribution();
-		highp vec3 diffuse = get_diffuse_texture_contribution(v_uv) * get_diffuse_color_contribution();
-		highp vec3 specular = get_specular_texture_contribution(v_uv) * get_specular_color_contribution();
+		highp vec3 ambient = vec3(0.f, 0.f, 0.f);
+		if(vr_material.have_ambient_texture == 1 || vr_material.have_ambient_color == 1)
+		{
+			ambient = get_ambient_texture_contribution(v_uv) * get_ambient_color_contribution();
+		}
+
+		highp vec3 diffuse = vec3(0.f, 0.f, 0.f);
+		if(vr_material.have_diffuse_texture == 1 || vr_material.have_diffuse_color == 1)
+		{
+			diffuse = get_diffuse_texture_contribution(v_uv) * get_diffuse_color_contribution();
+		}
+
+		highp vec3 specular = vec3(0.f, 0.f, 0.f);
+		if(vr_material.have_specular_texture == 1 || vr_material.have_specular_color == 1)
+		{
+			specular = get_specular_texture_contribution(v_uv) * get_specular_color_contribution();
+		}
 
 		accumulator = ambient + diffuse + specular;
 	}
@@ -215,6 +229,6 @@ void main()
 	}
 	
 	highp vec3 clamped = clamp(accumulator, vec3(0.f, 0.f, 0.f), vec3(1.f, 1.f, 1.f));
-	out_color4 = vec4(clamped, 1.f);
+	out_color4 = vec4(accumulator, 1.f);
 }
 )"

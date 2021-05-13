@@ -502,7 +502,7 @@ namespace vr::gl
 
 				for (auto i = 0u; i < n_textures; ++i)
 				{
-					deactivate_texture(i);
+					//deactivate_texture(i);
 				}
 			}
 		}

@@ -207,7 +207,7 @@ namespace vr::model
 			aiString path;
 			aiTextureMapping mapping;
 			unsigned int uv_index = 0;
-			ai_real blend;
+			ai_real blend = 0.f;
 			aiTextureOp operation;
 			aiTextureMapMode map_mode;
 			if (assimp_material->GetTexture(type, index, &path, &mapping, &uv_index, &blend, &operation, &map_mode) == aiReturn_SUCCESS)
@@ -306,6 +306,7 @@ namespace vr::model
 			| aiPostProcessSteps::aiProcess_EmbedTextures
 			| aiPostProcessSteps::aiProcess_FlipUVs
 			| aiPostProcessSteps::aiProcess_CalcTangentSpace
+			| aiPostProcessSteps::aiProcess_GenSmoothNormals
 		);
 		if (scene)
 		{
