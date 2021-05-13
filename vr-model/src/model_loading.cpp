@@ -92,7 +92,7 @@ namespace vr::model
 			loaded_geometry.attributes["vr_vertex_normal"].components = 3;
 			loaded_geometry.attributes["vr_vertex_normal"].type = vr::attribute::data_type::t_float;
 			const auto begin = reinterpret_cast<const uint8_t*>(mesh->mNormals);
-std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)), std::back_inserter(loaded_geometry.attributes["vr_vertex_normal"].data));
+			std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)), std::back_inserter(loaded_geometry.attributes["vr_vertex_normal"].data));
 		}
 
 		if (mesh->HasVertexColors(0))
@@ -274,7 +274,7 @@ std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)),
 		add_if_found(aiTextureType_AMBIENT, 0, "vr_material.ambient_texture", "vr_material.have_ambient_texture");
 		add_if_found(aiTextureType_DIFFUSE, 0, "vr_material.diffuse_texture", "vr_material.have_diffuse_texture");
 		add_if_found(aiTextureType_SPECULAR, 0, "vr_material.specular_texture", "vr_material.have_specular_texture");
-		add_if_found(aiTextureType_HEIGHT, 0, "vr_material.normal_texture", "vr_material.have_normal_texture");
+		add_if_found(aiTextureType_NORMALS, 0, "vr_material.normal_texture", "vr_material.have_normal_texture");
 
 		auto material = std::make_unique<vr::gl::opengl_shader_material>(*data.shader, uniforms, textures);
 

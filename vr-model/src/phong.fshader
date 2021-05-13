@@ -68,6 +68,12 @@ in highp vec3 t_view_position;
 // light position are calculated here in fshader
 in highp mat3 vr_tbn;
 
+
+in highp vec3 d_d;
+in highp vec3 p_p;
+in highp vec3 s_p;
+in highp vec3 s_d;
+
 out highp vec4 out_color4;
 
 uniform highp vec3 vr_view_position;
@@ -77,7 +83,7 @@ uniform vr_directional_light_t vr_directional_light;
 uniform vr_point_light_t vr_point_light;
 uniform vr_spot_light_t vr_spot_light;
 
-#define DEFAULT_COLOR vec3(0.f, 0.f, 0.f)
+#define DEFAULT_COLOR vec3(1.f, 1.f, 1.f)
 
 highp float get_ambient_coefficient()
 {
@@ -130,7 +136,7 @@ highp vec3 get_specular_texture_contribution(highp vec2 uv)
 
 highp vec3 calculate_directional_light(vr_directional_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 view_direction)
 {
-	highp vec3 t_light_direction = vr_tbn * light.direction;
+	highp vec3 t_light_direction = d_d;
 
 	highp vec3 light_direction = normalize(-t_light_direction);
 
@@ -150,7 +156,7 @@ highp float calculate_attenuation(vr_light_attenuation_t attenuation_data, highp
 
 highp vec3 calculate_point_light(vr_point_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
 {
-	highp vec3 t_light_position = vr_tbn * light.position;
+	highp vec3 t_light_position = p_p;
 	highp vec3 unnormalized_light_direction = t_light_position - fragment_position;
 	highp vec3 light_direction = normalize(unnormalized_light_direction);
 	highp float distance = length(unnormalized_light_direction);
@@ -165,8 +171,8 @@ highp vec3 calculate_point_light(vr_point_light_t light, highp vec2 uv, highp ve
 
 highp vec3 calculate_spot_light(vr_spot_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
 {
-	highp vec3 t_light_position = vr_tbn * light.position;
-	highp vec3 t_light_direction = vr_tbn * light.direction;
+	highp vec3 t_light_position = s_p;
+	highp vec3 t_light_direction = s_d;
 
 	highp vec3 unnormalized_light_direction = t_light_position - fragment_position;
 	highp vec3 light_direction = normalize(unnormalized_light_direction);
@@ -186,25 +192,29 @@ highp vec3 calculate_spot_light(vr_spot_light_t light, highp vec2 uv, highp vec3
 
 void main()
 {
-	if(1 < 0)
-	{
-	highp vec3 normal_texel = texture(vr_material.normal_texture, v_uv).rgb;
-		out_color4 = vec4(normal_texel, 1.f);
+	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
+
+	if(1 > 0)
+	{	
+		highp vec3 ambient = get_ambient_texture_contribution(v_uv) * get_ambient_color_contribution();
+		highp vec3 diffuse = get_diffuse_texture_contribution(v_uv) * get_diffuse_color_contribution();
+		highp vec3 specular = get_specular_texture_contribution(v_uv) * get_specular_color_contribution();
+
+		accumulator = ambient + diffuse + specular;
 	}
 	else
 	{
-	highp vec3 normal_texel = texture(vr_material.normal_texture, v_uv).rgb;
-	highp vec3 normalized_normal = normalize(normal_texel);
-	highp vec3 view_direction = normalize(t_view_position - t_position);
+		highp vec3 normal_texel = texture(vr_material.normal_texture, v_uv).rgb;
+		highp vec3 normalized_normal = normalize(normal_texel * 2.0 - 1.0);
+		highp vec3 view_direction = normalize(t_view_position - t_position);
 
-	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
 	
-	accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
-	accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, t_position, view_direction);
-	accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, t_position, view_direction);
-
-	highp vec4 clamped = clamp(vec4(accumulator, 1.f), vec4(0.f, 0.f, 0.f, 1.f), vec4(1.f, 1.f, 1.f, 1.f));
-	out_color4 = clamped;
+		accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
+		accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, t_position, view_direction);
+		accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, t_position, view_direction);
 	}
+	
+	highp vec3 clamped = clamp(accumulator, vec3(0.f, 0.f, 0.f), vec3(1.f, 1.f, 1.f));
+	out_color4 = vec4(clamped, 1.f);
 }
 )"

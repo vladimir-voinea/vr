@@ -399,7 +399,12 @@ namespace vr::gl
 	{
 		glActiveTexture(GL_TEXTURE0 + target);
 		glBindTexture(GL_TEXTURE_2D, texture->id);
-		m_last_texture_id = texture->id;
+	}
+
+	void renderer::deactivate_texture(unsigned int target)
+	{
+		glActiveTexture(GL_TEXTURE0 + target);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void renderer::activate_shader(const loaded_shader* shader)
@@ -494,6 +499,11 @@ namespace vr::gl
 				load_shader_uniforms(static_cast<const opengl_shader_material*>(mesh->get_material()), shader);
 
 				render_geometry(mesh->get_geometry(), shader);
+
+				for (auto i = 0u; i < n_textures; ++i)
+				{
+					deactivate_texture(i);
+				}
 			}
 		}
 
