@@ -18,7 +18,7 @@ constexpr auto max_light_translation = 20.f;
 constexpr auto max_scale = 2.f;
 
 gui::gui(vr::glfw::window& window)
-	: m_model_files_regex("^.*\.(dae|obj|OBJ|fbx|glb)$")
+	: m_model_files_regex("^.*\.(dae|obj|OBJ|fbx|glb|gltf)$")
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

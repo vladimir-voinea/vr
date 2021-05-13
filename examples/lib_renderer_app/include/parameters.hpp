@@ -34,7 +34,7 @@ struct light_attenuation
 
 struct directional_light
 {
-	glm::vec3 position = { 0.f, 10.f, 0.f };
+	glm::vec3 position = { -30.f, 30.f, 30.f };
 	light_components components;
 };
 

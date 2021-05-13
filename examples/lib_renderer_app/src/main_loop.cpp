@@ -272,14 +272,14 @@ void create_or_update(std::vector<vr::gl::uniform>& uniforms, const std::string&
 	}
 }
 
-void set_light_parameters(vr::object3d* object, const parameters& parameters, glm::vec3 target, glm::vec3 source)
+void set_light_parameters(vr::object3d* object, const parameters& parameters, glm::vec3 target)
 {
 	for (auto& mesh : object->get_meshes())
 	{
 
 		vr::gl::opengl_shader_material* material = static_cast<vr::gl::opengl_shader_material*>(mesh->get_material());
 		auto& uniforms = material->get_uniforms();
-		create_or_update(uniforms, "vr_directional_light.direction", glm::vec3{ -30.f, -30.f, -30.f } - parameters.directional_light.position);
+		create_or_update(uniforms, "vr_directional_light.direction", glm::vec3{ 0.f, 0.f, 0.f } - parameters.directional_light.position);
 		create_or_update(uniforms, "vr_directional_light.components.ambient", parameters.directional_light.components.ambient);
 		create_or_update(uniforms, "vr_directional_light.components.diffuse", parameters.directional_light.components.diffuse);
 		create_or_update(uniforms, "vr_directional_light.components.specular", parameters.directional_light.components.specular);
@@ -292,8 +292,8 @@ void set_light_parameters(vr::object3d* object, const parameters& parameters, gl
 		create_or_update(uniforms, "vr_point_light.attenuation.linear", parameters.point_light.attenuation.linear);
 		create_or_update(uniforms, "vr_point_light.attenuation.quadratic", parameters.point_light.attenuation.quadratic);
 
-		create_or_update(uniforms, "vr_spot_light.position", source);
-		create_or_update(uniforms, "vr_spot_light.direction", target - source);
+		create_or_update(uniforms, "vr_spot_light.position", parameters.spot_light.position);
+		create_or_update(uniforms, "vr_spot_light.direction", target - parameters.spot_light.position);
 		create_or_update(uniforms, "vr_spot_light.cutoff_cosine", glm::cos(glm::radians(parameters.spot_light.cutoff_angle)));
 		create_or_update(uniforms, "vr_spot_light.outer_cutoff_cosine", glm::cos(glm::radians(parameters.spot_light.outer_cutoff_angle)));
 		create_or_update(uniforms, "vr_spot_light.components.ambient", parameters.spot_light.components.ambient);
@@ -332,7 +332,7 @@ void main_loop::transform_model(const parameters& parameters)
 
 		m_scene_model->traverse([&, this](vr::object3d* obj)
 			{
-				set_light_parameters(obj, parameters, get_camera().front(), get_world_position(&get_camera()));
+				set_light_parameters(obj, parameters, object_position_world);
 			});
 
 		m_scene_model->set_translation(parameters.translation.vec);
