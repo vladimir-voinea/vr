@@ -84,9 +84,9 @@ highp vec3 get_ambient_color_contribution()
 	return vr_material.have_ambient_color == 1 ? vr_material.ambient_color : DEFAULT_COLOR;
 }
 
-highp vec3 get_ambient_texture_contribution()
+highp vec3 get_ambient_texture_contribution(highp vec2 uv)
 {
-	return texture(vr_material.ambient_texture, v_uv).rgb;
+	return texture(vr_material.ambient_texture, uv).rgb;
 }
 
 highp float get_diffuse_coefficient(highp vec3 normalized_normal, highp vec3 light_direction)
@@ -100,9 +100,9 @@ highp vec3 get_diffuse_color_contribution()
 	return vr_material.have_diffuse_color == 1 ? vr_material.diffuse_color : DEFAULT_COLOR;
 }
 
-highp vec3 get_diffuse_texture_contribution()
+highp vec3 get_diffuse_texture_contribution(highp vec2 uv)
 {
-	return texture(vr_material.diffuse_texture, v_uv).rgb;
+	return texture(vr_material.diffuse_texture, uv).rgb;
 }
 
 highp float get_specular_coefficient(highp vec3 normalized_normal, highp vec3 light_direction, highp vec3 view_direction)
@@ -117,18 +117,18 @@ highp vec3 get_specular_color_contribution()
 	return vr_material.have_specular_color == 1 ? vr_material.specular_color : DEFAULT_COLOR;
 }
 
-highp vec3 get_specular_texture_contribution()
+highp vec3 get_specular_texture_contribution(highp vec2 uv)
 {
-	return texture(vr_material.specular_texture, v_uv).rgb;
+	return texture(vr_material.specular_texture, uv).rgb;
 }
 
-highp vec3 calculate_directional_light(vr_directional_light_t light, highp vec3 normal, highp vec3 view_direction)
+highp vec3 calculate_directional_light(vr_directional_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 view_direction)
 {
 	highp vec3 light_direction = normalize(-light.direction);
 
-	highp vec3 ambient = light.components.ambient * get_ambient_coefficient() * get_ambient_texture_contribution() * get_ambient_color_contribution();
-	highp vec3 diffuse = light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * get_diffuse_texture_contribution() * get_diffuse_color_contribution();
-	highp vec3 specular = light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * get_specular_texture_contribution() * get_specular_color_contribution();
+	highp vec3 ambient = light.components.ambient * get_ambient_coefficient() * get_ambient_texture_contribution(uv) * get_ambient_color_contribution();
+	highp vec3 diffuse = light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * get_diffuse_texture_contribution(uv) * get_diffuse_color_contribution();
+	highp vec3 specular = light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * get_specular_texture_contribution(uv) * get_specular_color_contribution();
 
 	return (ambient + diffuse + specular);
 }
@@ -140,21 +140,21 @@ highp float calculate_attenuation(vr_light_attenuation_t attenuation_data, highp
 	return attenuation;
 }
 
-highp vec3 calculate_point_light(vr_point_light_t light, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
+highp vec3 calculate_point_light(vr_point_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
 {
 	highp vec3 unnormalized_light_direction = light.position - fragment_position;
 	highp vec3 light_direction = normalize(unnormalized_light_direction);
 	highp float distance = length(unnormalized_light_direction);
 	highp float attenuation = calculate_attenuation(light.attenuation, distance);
 
-	highp vec3 ambient = attenuation * light.components.ambient * get_ambient_coefficient() * get_ambient_texture_contribution() * get_ambient_color_contribution();
-	highp vec3 diffuse = attenuation * light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * get_diffuse_texture_contribution() * get_diffuse_color_contribution();
-	highp vec3 specular = attenuation * light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * get_specular_texture_contribution() * get_specular_color_contribution();
+	highp vec3 ambient = attenuation * light.components.ambient * get_ambient_coefficient() * get_ambient_texture_contribution(uv) * get_ambient_color_contribution();
+	highp vec3 diffuse = attenuation * light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * get_diffuse_texture_contribution(uv) * get_diffuse_color_contribution();
+	highp vec3 specular = attenuation * light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * get_specular_texture_contribution(uv) * get_specular_color_contribution();
 
 	return (ambient + diffuse + specular);
 }
 
-highp vec3 calculate_spot_light(vr_spot_light_t light, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
+highp vec3 calculate_spot_light(vr_spot_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
 {
 	highp vec3 unnormalized_light_direction = light.position - fragment_position;
 	highp vec3 light_direction = normalize(unnormalized_light_direction);
@@ -165,9 +165,9 @@ highp vec3 calculate_spot_light(vr_spot_light_t light, highp vec3 normal, highp 
 	highp float epsilon = light.cutoff_cosine - light.outer_cutoff_cosine;
 	highp float intensity = clamp((theta - light.outer_cutoff_cosine) / epsilon, 0.f, 1.f);
 
-	highp vec3 ambient = intensity * attenuation * light.components.ambient * get_ambient_coefficient() * get_ambient_texture_contribution() * get_ambient_color_contribution();
-	highp vec3 diffuse = intensity * attenuation * light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * get_diffuse_texture_contribution() * get_diffuse_color_contribution();
-	highp vec3 specular = intensity * attenuation * light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * get_specular_texture_contribution() * get_specular_color_contribution();
+	highp vec3 ambient = intensity * attenuation * light.components.ambient * get_ambient_coefficient() * get_ambient_texture_contribution(uv) * get_ambient_color_contribution();
+	highp vec3 diffuse = intensity * attenuation * light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * get_diffuse_texture_contribution(uv) * get_diffuse_color_contribution();
+	highp vec3 specular = intensity * attenuation * light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * get_specular_texture_contribution(uv) * get_specular_color_contribution();
 
 	return (ambient + diffuse + specular);
 }
@@ -179,9 +179,9 @@ void main()
 
 	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
 	
-	accumulator += calculate_directional_light(vr_directional_light, normalized_normal, view_direction);
-	accumulator += calculate_point_light(vr_point_light, normalized_normal, v_position, view_direction);
-	accumulator += calculate_spot_light(vr_spot_light, normalized_normal, v_position, view_direction);
+	accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
+	accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, v_position, view_direction);
+	accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, v_position, view_direction);
 
 	out_color4 = vec4(accumulator, 1.f);
 }
