@@ -74,6 +74,19 @@ namespace vr::model
 			loaded_geometry.indices.push_back(mesh->mFaces[i].mIndices[2]);
 		}
 
+		if (mesh->HasTangentsAndBitangents())
+		{
+			loaded_geometry.attributes["vr_vertex_tangent"].components = 3;
+			loaded_geometry.attributes["vr_vertex_tangent"].type = vr::attribute::data_type::t_float;
+			const auto t_begin = reinterpret_cast<const uint8_t*>(mesh->mTangents);
+			std::copy(t_begin, t_begin + mesh->mNumVertices * sizeof(decltype(*mesh->mTangents)), std::back_inserter(loaded_geometry.attributes["vr_vertex_tangent"].data));
+
+			loaded_geometry.attributes["vr_vertex_bitangent"].components = 3;
+			loaded_geometry.attributes["vr_vertex_bitangent"].type = vr::attribute::data_type::t_float;
+			const auto b_begin = reinterpret_cast<const uint8_t*>(mesh->mBitangents);
+			std::copy(b_begin, b_begin + mesh->mNumVertices * sizeof(decltype(*mesh->mBitangents)), std::back_inserter(loaded_geometry.attributes["vr_vertex_bitangent"].data));
+		}
+
 		if (mesh->HasNormals())
 		{
 			loaded_geometry.attributes["vr_vertex_normal"].components = 3;
@@ -261,6 +274,7 @@ std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)),
 		add_if_found(aiTextureType_AMBIENT, 0, "vr_material.ambient_texture", "vr_material.have_ambient_texture");
 		add_if_found(aiTextureType_DIFFUSE, 0, "vr_material.diffuse_texture", "vr_material.have_diffuse_texture");
 		add_if_found(aiTextureType_SPECULAR, 0, "vr_material.specular_texture", "vr_material.have_specular_texture");
+		add_if_found(aiTextureType_HEIGHT, 0, "vr_material.normal_texture", "vr_material.have_normal_texture");
 
 		auto material = std::make_unique<vr::gl::opengl_shader_material>(*data.shader, uniforms, textures);
 
@@ -290,6 +304,8 @@ std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)),
 			| aiPostProcessSteps::aiProcess_JoinIdenticalVertices 
 			| aiPostProcessSteps::aiProcess_Triangulate
 			| aiPostProcessSteps::aiProcess_EmbedTextures
+			| aiPostProcessSteps::aiProcess_FlipUVs
+			| aiPostProcessSteps::aiProcess_CalcTangentSpace
 		);
 		if (scene)
 		{

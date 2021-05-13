@@ -147,7 +147,8 @@ void main_loop::init()
 	});
 	m_skybox_material = std::make_unique<vr::gl::cube_texture_material>();
 
-	m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
+	//m_renderer_settings.skybox = std::make_unique<vr::skybox>(m_skybox_material.get(), m_cube_texture.get());
+	m_renderer_settings.clear_color = std::make_unique<glm::vec3>(1, 1, 1);
 
 	m_renderer_settings.cull_faces = true;
 	m_renderer_settings.wireframe_mode = false;

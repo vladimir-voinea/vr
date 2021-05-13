@@ -20,6 +20,9 @@ struct vr_material_t
 
 	highp int have_shininess;
 	highp float shininess;
+
+	highp int have_normal_texture;
+	sampler2D normal_texture;
 };
 
 struct vr_light_components_t
@@ -60,8 +63,11 @@ struct vr_spot_light_t
 };
 
 in highp vec2 v_uv;
-in highp vec3 v_normal;
-in highp vec3 v_position;
+in highp vec3 t_position;
+in highp vec3 t_view_position;
+// light position are calculated here in fshader
+in highp mat3 vr_tbn;
+
 out highp vec4 out_color4;
 
 uniform highp vec3 vr_view_position;
@@ -124,7 +130,9 @@ highp vec3 get_specular_texture_contribution(highp vec2 uv)
 
 highp vec3 calculate_directional_light(vr_directional_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 view_direction)
 {
-	highp vec3 light_direction = normalize(-light.direction);
+	highp vec3 t_light_direction = vr_tbn * light.direction;
+
+	highp vec3 light_direction = normalize(-t_light_direction);
 
 	highp vec3 ambient = light.components.ambient * get_ambient_coefficient() * get_ambient_texture_contribution(uv) * get_ambient_color_contribution();
 	highp vec3 diffuse = light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * get_diffuse_texture_contribution(uv) * get_diffuse_color_contribution();
@@ -142,7 +150,8 @@ highp float calculate_attenuation(vr_light_attenuation_t attenuation_data, highp
 
 highp vec3 calculate_point_light(vr_point_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
 {
-	highp vec3 unnormalized_light_direction = light.position - fragment_position;
+	highp vec3 t_light_position = vr_tbn * light.position;
+	highp vec3 unnormalized_light_direction = t_light_position - fragment_position;
 	highp vec3 light_direction = normalize(unnormalized_light_direction);
 	highp float distance = length(unnormalized_light_direction);
 	highp float attenuation = calculate_attenuation(light.attenuation, distance);
@@ -156,12 +165,15 @@ highp vec3 calculate_point_light(vr_point_light_t light, highp vec2 uv, highp ve
 
 highp vec3 calculate_spot_light(vr_spot_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
 {
-	highp vec3 unnormalized_light_direction = light.position - fragment_position;
+	highp vec3 t_light_position = vr_tbn * light.position;
+	highp vec3 t_light_direction = vr_tbn * light.direction;
+
+	highp vec3 unnormalized_light_direction = t_light_position - fragment_position;
 	highp vec3 light_direction = normalize(unnormalized_light_direction);
 	highp float distance = length(unnormalized_light_direction);
 	highp float attenuation = calculate_attenuation(light.attenuation, distance);
 
-	highp float theta = dot(light_direction, normalize(-light.direction));
+	highp float theta = dot(light_direction, normalize(-t_light_direction));
 	highp float epsilon = light.cutoff_cosine - light.outer_cutoff_cosine;
 	highp float intensity = clamp((theta - light.outer_cutoff_cosine) / epsilon, 0.f, 1.f);
 
@@ -174,15 +186,25 @@ highp vec3 calculate_spot_light(vr_spot_light_t light, highp vec2 uv, highp vec3
 
 void main()
 {
-	highp vec3 normalized_normal = normalize(v_normal);
-	highp vec3 view_direction = normalize(vr_view_position - v_position);
+	if(1 < 0)
+	{
+	highp vec3 normal_texel = texture(vr_material.normal_texture, v_uv).rgb;
+		out_color4 = vec4(normal_texel, 1.f);
+	}
+	else
+	{
+	highp vec3 normal_texel = texture(vr_material.normal_texture, v_uv).rgb;
+	highp vec3 normalized_normal = normalize(normal_texel);
+	highp vec3 view_direction = normalize(t_view_position - t_position);
 
 	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
 	
 	accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
-	accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, v_position, view_direction);
-	accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, v_position, view_direction);
+	accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, t_position, view_direction);
+	accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, t_position, view_direction);
 
-	out_color4 = vec4(accumulator, 1.f);
+	highp vec4 clamped = clamp(vec4(accumulator, 1.f), vec4(0.f, 0.f, 0.f, 1.f), vec4(1.f, 1.f, 1.f, 1.f));
+	out_color4 = clamped;
+	}
 }
 )"
