@@ -110,65 +110,73 @@ void gui::render_model_options(float delta_time)
 	ImGui::EndGroup();
 
 	ImGui::BeginGroup();
-	ImGui::Text("Ambient light");
-	ImGui::Checkbox("Enable##al", &model_parameters.have_ambient_light);
-	ImGui::ColorEdit3("Color##al", glm::value_ptr(model_parameters.ambient_light.color), ImGuiColorEditFlags_DisplayRGB);
+	if (ImGui::CollapsingHeader("Ambient light"))
+	{
+		ImGui::Checkbox("Enable##al", &model_parameters.have_ambient_light);
+		ImGui::ColorEdit3("Color##al", glm::value_ptr(model_parameters.ambient_light.color), ImGuiColorEditFlags_DisplayRGB);
 
-	ImGui::Text("Intensity");
-	ImGui::SliderFloat("X##dl", &model_parameters.ambient_light.intensity, 0.f, 1.f);
+		ImGui::Text("Intensity");
+		ImGui::SliderFloat("X##dl", &model_parameters.ambient_light.intensity, 0.f, 1.f);
+	}
 	ImGui::EndGroup();
 
 	ImGui::BeginGroup();
-	ImGui::Text("Directional light");
-	ImGui::Checkbox("Enable##dl", &model_parameters.have_directional_light);
-	ImGui::ColorEdit3("Light ambient##dl", glm::value_ptr(model_parameters.directional_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
-	ImGui::ColorEdit3("Light diffuse##dl", glm::value_ptr(model_parameters.directional_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
-	ImGui::ColorEdit3("Light specular##dl", glm::value_ptr(model_parameters.directional_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
+	if (ImGui::CollapsingHeader("Directional light"))
+	{
+		ImGui::Checkbox("Enable##dl", &model_parameters.have_directional_light);
+		ImGui::ColorEdit3("Light ambient##dl", glm::value_ptr(model_parameters.directional_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
+		ImGui::ColorEdit3("Light diffuse##dl", glm::value_ptr(model_parameters.directional_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
+		ImGui::ColorEdit3("Light specular##dl", glm::value_ptr(model_parameters.directional_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
 
-	ImGui::Text("Translation");
-	ImGui::SliderFloat("X##dl", &model_parameters.directional_light.position.x, -max_light_translation, max_light_translation);
-	ImGui::SliderFloat("Y##dl", &model_parameters.directional_light.position.y, -max_light_translation, max_light_translation);
-	ImGui::SliderFloat("Z##dl", &model_parameters.directional_light.position.z, -max_light_translation, max_light_translation);
+		ImGui::Text("Translation");
+		ImGui::SliderFloat("X##dl", &model_parameters.directional_light.position.x, -max_light_translation, max_light_translation);
+		ImGui::SliderFloat("Y##dl", &model_parameters.directional_light.position.y, -max_light_translation, max_light_translation);
+		ImGui::SliderFloat("Z##dl", &model_parameters.directional_light.position.z, -max_light_translation, max_light_translation);
+	}
 	ImGui::EndGroup();
 
 	ImGui::BeginGroup();
-	ImGui::Text("Point light");
-	ImGui::Checkbox("Enable##pl", &model_parameters.have_point_light);
-	ImGui::ColorEdit3("Light ambient##pl", glm::value_ptr(model_parameters.point_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
-	ImGui::ColorEdit3("Light diffuse##pl", glm::value_ptr(model_parameters.point_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
-	ImGui::ColorEdit3("Light specular##pl", glm::value_ptr(model_parameters.point_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
+	if (ImGui::CollapsingHeader("Point light"))
+	{
+		ImGui::Checkbox("Enable##pl", &model_parameters.have_point_light);
+		ImGui::ColorEdit3("Light ambient##pl", glm::value_ptr(model_parameters.point_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
+		ImGui::ColorEdit3("Light diffuse##pl", glm::value_ptr(model_parameters.point_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
+		ImGui::ColorEdit3("Light specular##pl", glm::value_ptr(model_parameters.point_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
 
-	ImGui::Text("Attenuation");
-	ImGui::SliderFloat("Constant##pl", &model_parameters.point_light.attenuation.constant, 0.f, 1.f);
-	ImGui::SliderFloat("Linear##pl", &model_parameters.point_light.attenuation.linear, 0.0014, 0.07);
-	ImGui::SliderFloat("Quadratic##pl", &model_parameters.point_light.attenuation.quadratic, 0.000007, 2.f);
+		ImGui::Text("Attenuation");
+		ImGui::SliderFloat("Constant##pl", &model_parameters.point_light.attenuation.constant, 0.f, 1.f);
+		ImGui::SliderFloat("Linear##pl", &model_parameters.point_light.attenuation.linear, 0.0014, 0.07);
+		ImGui::SliderFloat("Quadratic##pl", &model_parameters.point_light.attenuation.quadratic, 0.000007, 2.f);
 
-	ImGui::Text("Translation");
-	ImGui::SliderFloat("X##pl", &model_parameters.point_light.position.x, -max_light_translation, max_light_translation);
-	ImGui::SliderFloat("Y##pl", &model_parameters.point_light.position.y, -max_light_translation, max_light_translation);
-	ImGui::SliderFloat("Z##pl", &model_parameters.point_light.position.z, -max_light_translation, max_light_translation);
+		ImGui::Text("Translation");
+		ImGui::SliderFloat("X##pl", &model_parameters.point_light.position.x, -max_light_translation, max_light_translation);
+		ImGui::SliderFloat("Y##pl", &model_parameters.point_light.position.y, -max_light_translation, max_light_translation);
+		ImGui::SliderFloat("Z##pl", &model_parameters.point_light.position.z, -max_light_translation, max_light_translation);
+	}
 	ImGui::EndGroup();
 
 	ImGui::BeginGroup();
-	ImGui::Text("Spot light");
-	ImGui::Checkbox("Enable##sl", &model_parameters.have_spot_light);
-	ImGui::ColorEdit3("Light ambient##sl", glm::value_ptr(model_parameters.spot_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
-	ImGui::ColorEdit3("Light diffuse##sl", glm::value_ptr(model_parameters.spot_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
-	ImGui::ColorEdit3("Light specular##sl", glm::value_ptr(model_parameters.spot_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
+	if (ImGui::CollapsingHeader("Spot light"))
+	{
+		ImGui::Checkbox("Enable##sl", &model_parameters.have_spot_light);
+		ImGui::ColorEdit3("Light ambient##sl", glm::value_ptr(model_parameters.spot_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
+		ImGui::ColorEdit3("Light diffuse##sl", glm::value_ptr(model_parameters.spot_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
+		ImGui::ColorEdit3("Light specular##sl", glm::value_ptr(model_parameters.spot_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
 
-	ImGui::Text("Attenuation");
-	ImGui::SliderFloat("Constant##sl", &model_parameters.spot_light.attenuation.constant, 0.f, 1.f);
-	ImGui::SliderFloat("Linear##sl", &model_parameters.spot_light.attenuation.linear, 0.0014, 0.07);
-	ImGui::SliderFloat("Quadratic##sl", &model_parameters.spot_light.attenuation.quadratic, 0.000007, 2.f);
+		ImGui::Text("Attenuation");
+		ImGui::SliderFloat("Constant##sl", &model_parameters.spot_light.attenuation.constant, 0.f, 1.f);
+		ImGui::SliderFloat("Linear##sl", &model_parameters.spot_light.attenuation.linear, 0.0014, 0.07);
+		ImGui::SliderFloat("Quadratic##sl", &model_parameters.spot_light.attenuation.quadratic, 0.000007, 2.f);
 
-	ImGui::Text("Cutoff");
-	ImGui::SliderFloat("Inner##sl", &model_parameters.spot_light.cutoff_angle, 0.f, 360.f);
-	ImGui::SliderFloat("Outer##sl", &model_parameters.spot_light.outer_cutoff_angle, 0.f, 360.f);
+		ImGui::Text("Cutoff");
+		ImGui::SliderFloat("Inner##sl", &model_parameters.spot_light.cutoff_angle, 0.f, 360.f);
+		ImGui::SliderFloat("Outer##sl", &model_parameters.spot_light.outer_cutoff_angle, 0.f, 360.f);
 
-	ImGui::Text("Translation");
-	ImGui::SliderFloat("X##sl", &model_parameters.spot_light.position.x, -max_light_translation, max_light_translation);
-	ImGui::SliderFloat("Y##sl", &model_parameters.spot_light.position.y, -max_light_translation, max_light_translation);
-	ImGui::SliderFloat("Z##sl", &model_parameters.spot_light.position.z, -max_light_translation, max_light_translation);
+		ImGui::Text("Translation");
+		ImGui::SliderFloat("X##sl", &model_parameters.spot_light.position.x, -max_light_translation, max_light_translation);
+		ImGui::SliderFloat("Y##sl", &model_parameters.spot_light.position.y, -max_light_translation, max_light_translation);
+		ImGui::SliderFloat("Z##sl", &model_parameters.spot_light.position.z, -max_light_translation, max_light_translation);
+	}
 	ImGui::EndGroup();
 
 
