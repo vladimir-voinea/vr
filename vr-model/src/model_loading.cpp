@@ -80,11 +80,6 @@ namespace vr::model
 			loaded_geometry.attributes["vr_vertex_tangent"].type = vr::attribute::data_type::t_float;
 			const auto t_begin = reinterpret_cast<const uint8_t*>(mesh->mTangents);
 			std::copy(t_begin, t_begin + mesh->mNumVertices * sizeof(decltype(*mesh->mTangents)), std::back_inserter(loaded_geometry.attributes["vr_vertex_tangent"].data));
-
-			loaded_geometry.attributes["vr_vertex_bitangent"].components = 3;
-			loaded_geometry.attributes["vr_vertex_bitangent"].type = vr::attribute::data_type::t_float;
-			const auto b_begin = reinterpret_cast<const uint8_t*>(mesh->mBitangents);
-			std::copy(b_begin, b_begin + mesh->mNumVertices * sizeof(decltype(*mesh->mBitangents)), std::back_inserter(loaded_geometry.attributes["vr_vertex_bitangent"].data));
 		}
 
 		if (mesh->HasNormals())
@@ -266,6 +261,15 @@ namespace vr::model
 			uniforms.push_back(have_texture_sampler_uniform);
 		};
 
+		if (aiShadingMode shading_mode = aiShadingMode_Flat; assimp_material->Get(AI_MATKEY_SHADING_MODEL, shading_mode))
+		{
+			const std::vector<aiShadingMode> supportedShadingModes = { aiShadingMode_NoShading, aiShadingMode_Flat, aiShadingMode_Phong };
+			if(std::find(supportedShadingModes.begin(), supportedShadingModes.end(), shading_mode) == supportedShadingModes.end())
+			{
+				throw std::runtime_error{ "Unsupported shading mode: " + std::to_string(shading_mode) };
+			}
+		}
+
 		add_color_if_found("vr_material.ambient_color", "vr_material.have_ambient_color", AI_MATKEY_COLOR_AMBIENT);
 		add_color_if_found("vr_material.diffuse_color", "vr_material.have_diffuse_color", AI_MATKEY_COLOR_DIFFUSE);
 		add_color_if_found("vr_material.specular_color", "vr_material.have_specular_color", AI_MATKEY_COLOR_SPECULAR);
@@ -304,7 +308,6 @@ namespace vr::model
 			| aiPostProcessSteps::aiProcess_JoinIdenticalVertices 
 			| aiPostProcessSteps::aiProcess_Triangulate
 			| aiPostProcessSteps::aiProcess_EmbedTextures
-			| aiPostProcessSteps::aiProcess_FlipUVs
 			| aiPostProcessSteps::aiProcess_CalcTangentSpace
 			| aiPostProcessSteps::aiProcess_GenSmoothNormals
 			| aiPostProcessSteps::aiProcess_FixInfacingNormals
