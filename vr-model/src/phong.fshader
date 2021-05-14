@@ -243,8 +243,8 @@ void main()
 	
 	highp vec3 view_direction = normalize(vr_view_position - v_position);
 
-	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
 	vr_color_components_t color = get_color(v_uv);
+	highp vec3 accumulator = color.diffuse;
 	
 	if(vr_have_ambient_light)
 	{
