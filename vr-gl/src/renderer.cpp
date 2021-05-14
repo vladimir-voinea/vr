@@ -320,6 +320,11 @@ namespace vr::gl
 			glClearColor(clear_color.r, clear_color.g, clear_color.b, 0.0f);
 		}
 
+		if (m_settings.skybox)
+		{
+			load_skybox(m_settings.skybox.get());
+		}
+
 		for (auto object : scene.get_objects())
 		{
 			load_object(object);
@@ -332,7 +337,6 @@ namespace vr::gl
 
 		if (m_settings.skybox)
 		{
-			load_skybox(m_settings.skybox.get());
 			render_skybox(m_settings.skybox.get(), camera);
 		}
 	}
@@ -395,15 +399,15 @@ namespace vr::gl
 		}
 	}
 
-	void renderer::activate_texture(const loaded_texture* texture, unsigned int target)
+	void renderer::activate_texture(const loaded_texture* texture, unsigned int unit)
 	{
-		glActiveTexture(GL_TEXTURE0 + target);
+		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture(GL_TEXTURE_2D, texture->id);
 	}
 
-	void renderer::deactivate_texture(unsigned int target)
+	void renderer::deactivate_texture_unit(unsigned int unit)
 	{
-		glActiveTexture(GL_TEXTURE0 + target);
+		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -468,30 +472,13 @@ namespace vr::gl
 				const auto shader = m_cache->get(&material->get_shader());
 
 				const auto n_textures = material->get_textures().size();
-				if (n_textures)
-				{
-					spdlog::debug("Activating textures per mesh. Mesh has {} textures", n_textures);
-					if (n_textures == 2)
-					{
-						spdlog::debug("Found one with 2 textures");
-					}
-				}
 				for (auto i = 0u; i < n_textures; ++i)
 				{
 					if (const auto texture = m_cache->get(material->get_textures()[i]); texture)
 					{
-						spdlog::debug("Activating texture unit {}/{}", i, n_textures - 1);
 						activate_texture(texture, i);
 					}
-					else
-					{
-						spdlog::error("Texture not in cache");
-					}
 
-				}
-				if (n_textures)
-				{
-					spdlog::debug("Done activating mesh textures");
 				}
 				
 				activate_shader(shader);
@@ -502,7 +489,7 @@ namespace vr::gl
 
 				for (auto i = 0u; i < n_textures; ++i)
 				{
-					//deactivate_texture(i);
+					deactivate_texture_unit(i);
 				}
 			}
 		}

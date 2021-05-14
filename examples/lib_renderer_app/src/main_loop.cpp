@@ -212,7 +212,11 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 	{
 		if (std::filesystem::exists(parameters.path))
 		{
-			m_scene.remove(m_scene_model);
+			if (m_scene_model)
+			{
+				m_scene.remove(m_scene_model);
+			}
+
 			if (auto it = m_loaded_models.find(parameters.path); it == m_loaded_models.end())
 			{
 				auto insert = m_loaded_models.insert(std::make_pair(parameters.path, vr::model::load_model(parameters.path)));
@@ -222,6 +226,7 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 			{
 				m_scene_model = it->second.first.get();
 			}
+
 			m_scene.add(m_scene_model);
 			m_scene_model->set_name("Model root");
 		}
@@ -280,11 +285,19 @@ void set_light_parameters(vr::object3d* object, const parameters& parameters, gl
 
 		vr::gl::opengl_shader_material* material = static_cast<vr::gl::opengl_shader_material*>(mesh->get_material());
 		auto& uniforms = material->get_uniforms();
+
+
+		create_or_update(uniforms, "vr_have_ambient_light", parameters.have_ambient_light);
+		create_or_update(uniforms, "vr_ambient_light.color", parameters.ambient_light.color);
+		create_or_update(uniforms, "vr_ambient_light.intensity", parameters.ambient_light.intensity);
+
+		create_or_update(uniforms, "vr_have_directional_light", parameters.have_directional_light);
 		create_or_update(uniforms, "vr_directional_light.direction", glm::vec3{ 0.f, 0.f, 0.f } - parameters.directional_light.position);
 		create_or_update(uniforms, "vr_directional_light.components.ambient", parameters.directional_light.components.ambient);
 		create_or_update(uniforms, "vr_directional_light.components.diffuse", parameters.directional_light.components.diffuse);
 		create_or_update(uniforms, "vr_directional_light.components.specular", parameters.directional_light.components.specular);
 
+		create_or_update(uniforms, "vr_have_point_light", parameters.have_point_light);
 		create_or_update(uniforms, "vr_point_light.position", parameters.point_light.position);
 		create_or_update(uniforms, "vr_point_light.components.ambient", parameters.point_light.components.ambient);
 		create_or_update(uniforms, "vr_point_light.components.diffuse", parameters.point_light.components.diffuse);
@@ -293,6 +306,7 @@ void set_light_parameters(vr::object3d* object, const parameters& parameters, gl
 		create_or_update(uniforms, "vr_point_light.attenuation.linear", parameters.point_light.attenuation.linear);
 		create_or_update(uniforms, "vr_point_light.attenuation.quadratic", parameters.point_light.attenuation.quadratic);
 
+		create_or_update(uniforms, "vr_have_spot_light", parameters.have_spot_light);
 		create_or_update(uniforms, "vr_spot_light.position", parameters.spot_light.position);
 		create_or_update(uniforms, "vr_spot_light.direction", target - parameters.spot_light.position);
 		create_or_update(uniforms, "vr_spot_light.cutoff_cosine", glm::cos(glm::radians(parameters.spot_light.cutoff_angle)));
@@ -329,10 +343,9 @@ void main_loop::transform_model(const parameters& parameters)
 			return translation;
 		};
 
-		const auto object_position_world = get_world_position(m_scene_model);
-
 		m_scene_model->traverse([&, this](vr::object3d* obj)
 			{
+				const auto object_position_world = get_world_position(m_scene_model);
 				set_light_parameters(obj, parameters, object_position_world);
 			});
 

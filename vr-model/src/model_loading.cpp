@@ -307,6 +307,9 @@ namespace vr::model
 			| aiPostProcessSteps::aiProcess_FlipUVs
 			| aiPostProcessSteps::aiProcess_CalcTangentSpace
 			| aiPostProcessSteps::aiProcess_GenSmoothNormals
+			| aiPostProcessSteps::aiProcess_FixInfacingNormals
+			| aiPostProcessSteps::aiProcess_GenSmoothNormals
+			| aiPostProcessSteps::aiProcess_CalcTangentSpace
 		);
 		if (scene)
 		{

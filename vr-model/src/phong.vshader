@@ -3,6 +3,8 @@ R"(
 
 in vec3 vr_vertex_position;
 in vec3 vr_vertex_normal;
+in vec3 vr_vertex_tangent;
+in vec3 vr_vertex_bitangent;
 in vec4 vr_vertex_color;
 in vec2 vr_vertex_uv;
 in vec3 vr_vertex_tangent;
@@ -65,6 +67,9 @@ out vec3 s_p;
 out vec3 s_d;
 
 
+out vec3 v_normal;
+out vec3 v_position;
+out mat3 tbn;
 
 uniform vec3 vr_view_position;
 uniform mat4 vr_mvp;
@@ -96,5 +101,10 @@ void main()
 	p_p = vr_tbn * vr_point_light.position;
 	s_p = vr_tbn * vr_spot_light.position;
 	s_d = vr_tbn * vr_spot_light.direction;
+
+	vec3 n = normalize((vr_model * vec4(vr_vertex_normal, 0.f)).xyz);
+	vec3 t = normalize((vr_model * vec4(vr_vertex_tangent, 0.f)).xyz);
+	vec3 b = normalize((vr_model * vec4(vr_vertex_bitangent, 0.f)).xyz);
+	tbn = mat3(t, b, n);
 }
 )"
