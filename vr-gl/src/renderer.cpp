@@ -325,15 +325,11 @@ namespace vr::gl
 			load_skybox(m_settings.skybox.get());
 		}
 
-		for (auto& object : scene.get_children())
-		{
-			load_object(object.get());
-		}
-
-		for (auto& object : scene.get_children())
-		{
-			render_object(object.get(), camera);
-		}
+		scene.traverse([this, &camera](vr::object3d* node)
+			{
+				load_object(node);
+				render_object(node, camera);
+			});
 
 		if (m_settings.skybox)
 		{
