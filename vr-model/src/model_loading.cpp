@@ -149,7 +149,7 @@ namespace vr::model
 
 	void load_material(model_data& data, const aiMaterial* assimp_material, const aiScene* scene)
 	{
-		std::vector<vr::gl::uniform> uniforms;
+		std::vector<vr::uniform> uniforms;
 
 		auto add_color_if_found = [&uniforms, &assimp_material](const std::string& uniform_name, const std::string& color_check_uniform_name, auto&& ...key)
 		{
@@ -158,9 +158,9 @@ namespace vr::model
 			if (assimp_material->Get(key..., color) == aiReturn_SUCCESS)
 			{
 				have_color = 1;
-				vr::gl::uniform color_uniform;
+				vr::uniform color_uniform;
 				color_uniform.name = uniform_name;
-				color_uniform.type = vr::gl::uniform_type::vec3f;
+				color_uniform.type = vr::uniform_type::vec3f;
 				color_uniform.value.vec3f = glm::vec3{ color.r, color.g, color.b };
 				uniforms.push_back(color_uniform);
 			}
@@ -169,9 +169,9 @@ namespace vr::model
 				spdlog::info("No color");
 			}
 
-			vr::gl::uniform have_color_uniform;
+			vr::uniform have_color_uniform;
 			have_color_uniform.name = color_check_uniform_name;
-			have_color_uniform.type = vr::gl::uniform_type::vec1i;
+			have_color_uniform.type = vr::uniform_type::vec1i;
 			have_color_uniform.value.vec1i = have_color;
 			uniforms.push_back(have_color_uniform);
 		};
@@ -183,16 +183,16 @@ namespace vr::model
 			if (assimp_material->Get(key..., item) == aiReturn_SUCCESS)
 			{
 				have_item = 1;
-				vr::gl::uniform item_uniform;
+				vr::uniform item_uniform;
 				item_uniform.name = uniform_name;
-				item_uniform.type = vr::gl::uniform_type::vec3f;
+				item_uniform.type = vr::uniform_type::vec3f;
 				item_uniform.value.vec1f = item;
 				uniforms.push_back(item_uniform);
 			}
 
-			vr::gl::uniform have_item_uniform;
+			vr::uniform have_item_uniform;
 			have_item_uniform.name = item_check_uniform_name;
-			have_item_uniform.type = vr::gl::uniform_type::vec1i;
+			have_item_uniform.type = vr::uniform_type::vec1i;
 			have_item_uniform.value.vec1i = have_item;
 			uniforms.push_back(have_item_uniform);
 		};
@@ -247,16 +247,16 @@ namespace vr::model
 				have_texture = 1;
 				textures.push_back(texture);
 
-				vr::gl::uniform texture_sampler_uniform;
+				vr::uniform texture_sampler_uniform;
 				texture_sampler_uniform.name = uniform_name;
-				texture_sampler_uniform.type = vr::gl::uniform_type::vec1i;
+				texture_sampler_uniform.type = vr::uniform_type::vec1i;
 				texture_sampler_uniform.value.vec1i = textures.size() - 1;
 				uniforms.push_back(texture_sampler_uniform);
 			}
 
-			vr::gl::uniform have_texture_sampler_uniform;
+			vr::uniform have_texture_sampler_uniform;
 			have_texture_sampler_uniform.name = sampler_check_uniform_name;
-			have_texture_sampler_uniform.type = vr::gl::uniform_type::vec1i;
+			have_texture_sampler_uniform.type = vr::uniform_type::vec1i;
 			have_texture_sampler_uniform.value.vec1i = have_texture;
 			uniforms.push_back(have_texture_sampler_uniform);
 		};

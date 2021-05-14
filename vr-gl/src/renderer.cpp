@@ -38,7 +38,7 @@ namespace
 		return std::find(program.get_uniform_names().begin(), program.get_uniform_names().end(), name) != program.get_uniform_names().end();
 	}
 
-	void load_uniform(const vr::gl::shader_program& program, const vr::gl::uniform& uniform)
+	void load_uniform(const vr::gl::shader_program& program, const vr::uniform& uniform)
 	{
 		const auto& uniforms = program.get_uniform_names();
 		if (has_uniform(program, uniform.name))
@@ -48,7 +48,7 @@ namespace
 			spdlog::debug("Got location {}", location);
 
 			std::string loaded_type = "NONE";
-			using ut = vr::gl::uniform_type;
+			using ut = vr::uniform_type;
 			switch (uniform.type)
 			{
 			case ut::mat4fv:
@@ -113,36 +113,36 @@ namespace
 		if (has_uniform(shader->program, builtin_mvp_uniform_name))
 		{
 			const auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
-			vr::gl::uniform mvp_uniform;
+			vr::uniform mvp_uniform;
 			mvp_uniform.name = builtin_mvp_uniform_name;
-			mvp_uniform.type = vr::gl::uniform_type::mat4fv;
+			mvp_uniform.type = vr::uniform_type::mat4fv;
 			mvp_uniform.value.mat4fv = mvp_matrix;
 			load_uniform(shader->program, mvp_uniform);
 		}
 
 		if (has_uniform(shader->program, builtin_projection_uniform_name))
 		{
-			vr::gl::uniform projection_uniform;
+			vr::uniform projection_uniform;
 			projection_uniform.name = builtin_projection_uniform_name;
-			projection_uniform.type = vr::gl::uniform_type::mat4fv;
+			projection_uniform.type = vr::uniform_type::mat4fv;
 			projection_uniform.value.mat4fv = projection_matrix;
 			load_uniform(shader->program, projection_uniform);
 		}
 
 		if (has_uniform(shader->program, builtin_view_uniform_name))
 		{
-			vr::gl::uniform view_uniform;
+			vr::uniform view_uniform;
 			view_uniform.name = builtin_view_uniform_name;
-			view_uniform.type = vr::gl::uniform_type::mat4fv;
+			view_uniform.type = vr::uniform_type::mat4fv;
 			view_uniform.value.mat4fv = view_matrix;
 			load_uniform(shader->program, view_uniform);
 		}
 
 		if (has_uniform(shader->program, builtin_model_uniform_name))
 		{
-			vr::gl::uniform model_uniform;
+			vr::uniform model_uniform;
 			model_uniform.name = builtin_model_uniform_name;
-			model_uniform.type = vr::gl::uniform_type::mat4fv;
+			model_uniform.type = vr::uniform_type::mat4fv;
 			model_uniform.value.mat4fv = model_matrix;
 			load_uniform(shader->program, model_uniform);
 		}
@@ -151,9 +151,9 @@ namespace
 		{
 			const auto view_matrix_inverse = glm::inverse(view_matrix);
 
-			vr::gl::uniform view_position_uniform;
+			vr::uniform view_position_uniform;
 			view_position_uniform.name = builtin_view_position_uniform_name;
-			view_position_uniform.type = vr::gl::uniform_type::vec3f;
+			view_position_uniform.type = vr::uniform_type::vec3f;
 			glm::vec3 scale;
 			glm::quat orientation;
 			glm::vec3 translation;
@@ -167,9 +167,9 @@ namespace
 		if (has_uniform(shader->program, builtin_modelview_uniform_name))
 		{
 			const auto modelview_matrix = view_matrix * model_matrix;
-			vr::gl::uniform modelview_uniform;
+			vr::uniform modelview_uniform;
 			modelview_uniform.name = builtin_modelview_uniform_name;
-			modelview_uniform.type = vr::gl::uniform_type::mat4fv;
+			modelview_uniform.type = vr::uniform_type::mat4fv;
 			modelview_uniform.value.mat4fv = modelview_matrix;
 			load_uniform(shader->program, modelview_uniform);
 		}
@@ -177,9 +177,9 @@ namespace
 		if (has_uniform(shader->program, builtin_normal_uniform_name))
 		{
 			const auto normal_matrix = glm::transpose(glm::inverse(model_matrix));
-			vr::gl::uniform normal_uniform;
+			vr::uniform normal_uniform;
 			normal_uniform.name = builtin_normal_uniform_name;
-			normal_uniform.type = vr::gl::uniform_type::mat3fv;
+			normal_uniform.type = vr::uniform_type::mat3fv;
 			normal_uniform.value.mat3fv = normal_matrix;
 			load_uniform(shader->program, normal_uniform);
 		}
@@ -511,15 +511,15 @@ namespace vr::gl
 		const auto shader = m_cache->get(&static_cast<const opengl_shader_material*>(skybox->get_material())->get_shader());
 		activate_shader(shader);
 
-		vr::gl::uniform projection_uniform;
+		vr::uniform projection_uniform;
 		projection_uniform.name = builtin_projection_uniform_name;
-		projection_uniform.type = vr::gl::uniform_type::mat4fv;
+		projection_uniform.type = vr::uniform_type::mat4fv;
 		projection_uniform.value.mat4fv = camera.get_projection_matrix();
 		load_uniform(shader->program, projection_uniform);
 
-		vr::gl::uniform view_uniform;
+		vr::uniform view_uniform;
 		view_uniform.name = builtin_view_uniform_name;
-		view_uniform.type = vr::gl::uniform_type::mat4fv;
+		view_uniform.type = vr::uniform_type::mat4fv;
 		view_uniform.value.mat4fv = glm::mat4(glm::mat3(camera.get_view_matrix()));
 		load_uniform(shader->program, view_uniform);
 

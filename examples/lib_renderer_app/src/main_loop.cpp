@@ -235,18 +235,18 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 	m_renderer->render(m_scene, get_camera());
 }
 
-void create_or_update(std::vector<vr::gl::uniform>& uniforms, const std::string& name, const float& value)
+void create_or_update(std::vector<vr::uniform>& uniforms, const std::string& name, const float& value)
 {
-	auto uniform_it = std::find_if(uniforms.begin(), uniforms.end(), [&name](const vr::gl::uniform& uniform)
+	auto uniform_it = std::find_if(uniforms.begin(), uniforms.end(), [&name](const vr::uniform& uniform)
 		{
 			return uniform.name == name;
 		});
 
 	if (uniform_it == uniforms.end())
 	{
-		vr::gl::uniform uniform;
+		vr::uniform uniform;
 		uniform.name = name;
-		uniform.type = vr::gl::uniform_type::vec1f;
+		uniform.type = vr::uniform_type::vec1f;
 		uniform.value.vec1f = value;
 		uniforms.push_back(uniform);
 	}
@@ -256,18 +256,18 @@ void create_or_update(std::vector<vr::gl::uniform>& uniforms, const std::string&
 	}
 }
 
-void create_or_update(std::vector<vr::gl::uniform>& uniforms, const std::string& name, const glm::vec3& value)
+void create_or_update(std::vector<vr::uniform>& uniforms, const std::string& name, const glm::vec3& value)
 {
-	auto uniform_it = std::find_if(uniforms.begin(), uniforms.end(), [&name](const vr::gl::uniform& uniform)
+	auto uniform_it = std::find_if(uniforms.begin(), uniforms.end(), [&name](const vr::uniform& uniform)
 		{
 			return uniform.name == name;
 		});
 
 	if (uniform_it == uniforms.end())
 	{
-		vr::gl::uniform uniform;
+		vr::uniform uniform;
 		uniform.name = name;
-		uniform.type = vr::gl::uniform_type::vec3f;
+		uniform.type = vr::uniform_type::vec3f;
 		uniform.value.vec3f = value;
 		uniforms.push_back(uniform);
 	}
