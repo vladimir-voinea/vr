@@ -20,6 +20,9 @@ struct vr_material_t
 
 	highp bool have_shininess;
 	highp float shininess;
+
+	highp bool have_normal_texture;
+	sampler2D normal_texture;
 };
 
 struct vr_light_components_t
