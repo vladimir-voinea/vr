@@ -94,8 +94,8 @@ namespace vr::model
 		{
 			loaded_geometry.attributes["vr_vertex_color"].components = 4;
 			loaded_geometry.attributes["vr_vertex_color"].type = vr::attribute::data_type::t_float;
-			const auto begin = reinterpret_cast<const uint8_t*>(mesh->mColors);
-			std::copy(begin, begin + mesh->mNumVertices + sizeof(decltype(*mesh->mColors)), std::back_inserter(loaded_geometry.attributes["vr_vertex_color"].data));
+			const auto begin = reinterpret_cast<const uint8_t*>(mesh->mColors[0]);
+			std::copy(begin, begin + mesh->mNumVertices + sizeof(decltype(*mesh->mColors[0])), std::back_inserter(loaded_geometry.attributes["vr_vertex_color"].data));
 		}
 
 		if (mesh->HasTextureCoords(0))
@@ -304,7 +304,8 @@ namespace vr::model
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFileFromMemory(file.data(), file.size(),
 #endif
-			aiPostProcessSteps::aiProcess_ValidateDataStructure
+			0
+			//| aiPostProcessSteps::aiProcess_ValidateDataStructure
 			| aiPostProcessSteps::aiProcess_JoinIdenticalVertices 
 			| aiPostProcessSteps::aiProcess_Triangulate
 			| aiPostProcessSteps::aiProcess_EmbedTextures
@@ -314,6 +315,7 @@ namespace vr::model
 			| aiPostProcessSteps::aiProcess_GenSmoothNormals
 			| aiPostProcessSteps::aiProcess_CalcTangentSpace
 		);
+
 		if (scene)
 		{
 			std::pair<std::unique_ptr<object3d>, model_data> result;
