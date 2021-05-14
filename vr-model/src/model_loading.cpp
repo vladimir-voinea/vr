@@ -74,12 +74,25 @@ namespace vr::model
 			loaded_geometry.indices.push_back(mesh->mFaces[i].mIndices[2]);
 		}
 
+		if (mesh->HasTangentsAndBitangents())
+		{
+			loaded_geometry.attributes["vr_vertex_tangent"].components = 3;
+			loaded_geometry.attributes["vr_vertex_tangent"].type = vr::attribute::data_type::t_float;
+			const auto t_begin = reinterpret_cast<const uint8_t*>(mesh->mTangents);
+			std::copy(t_begin, t_begin + mesh->mNumVertices * sizeof(decltype(*mesh->mTangents)), std::back_inserter(loaded_geometry.attributes["vr_vertex_tangent"].data));
+
+			loaded_geometry.attributes["vr_vertex_bitangent"].components = 3;
+			loaded_geometry.attributes["vr_vertex_bitangent"].type = vr::attribute::data_type::t_float;
+			const auto b_begin = reinterpret_cast<const uint8_t*>(mesh->mBitangents);
+			std::copy(b_begin, b_begin + mesh->mNumVertices * sizeof(decltype(*mesh->mBitangents)), std::back_inserter(loaded_geometry.attributes["vr_vertex_bitangent"].data));
+		}
+
 		if (mesh->HasNormals())
 		{
 			loaded_geometry.attributes["vr_vertex_normal"].components = 3;
 			loaded_geometry.attributes["vr_vertex_normal"].type = vr::attribute::data_type::t_float;
 			const auto begin = reinterpret_cast<const uint8_t*>(mesh->mNormals);
-std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)), std::back_inserter(loaded_geometry.attributes["vr_vertex_normal"].data));
+			std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)), std::back_inserter(loaded_geometry.attributes["vr_vertex_normal"].data));
 		}
 
 		if (mesh->HasVertexColors(0))
@@ -290,6 +303,9 @@ std::copy(begin, begin + mesh->mNumVertices * sizeof(decltype(*mesh->mNormals)),
 			| aiPostProcessSteps::aiProcess_JoinIdenticalVertices 
 			| aiPostProcessSteps::aiProcess_Triangulate
 			| aiPostProcessSteps::aiProcess_EmbedTextures
+			| aiPostProcessSteps::aiProcess_GenSmoothNormals
+			| aiPostProcessSteps::aiProcess_CalcTangentSpace
+			| aiPostProcessSteps::aiProcess_FlipUVs
 		);
 		if (scene)
 		{
