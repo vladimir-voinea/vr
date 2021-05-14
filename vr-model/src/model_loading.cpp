@@ -304,9 +304,9 @@ namespace vr::model
 			| aiPostProcessSteps::aiProcess_JoinIdenticalVertices 
 			| aiPostProcessSteps::aiProcess_Triangulate
 			| aiPostProcessSteps::aiProcess_EmbedTextures
+			| aiPostProcessSteps::aiProcess_FixInfacingNormals
 			| aiPostProcessSteps::aiProcess_GenSmoothNormals
 			| aiPostProcessSteps::aiProcess_CalcTangentSpace
-			| aiPostProcessSteps::aiProcess_FlipUVs
 		);
 		if (scene)
 		{

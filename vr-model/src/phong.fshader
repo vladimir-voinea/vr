@@ -71,6 +71,7 @@ struct vr_spot_light_t
 in highp vec2 v_uv;
 in highp vec3 v_normal;
 in highp vec3 v_position;
+in highp mat3 tbn;
 out highp vec4 out_color4;
 
 uniform highp vec3 vr_view_position;
@@ -230,7 +231,16 @@ highp vec3 add_spot_light(vr_spot_light_t light, vr_color_components_t color, hi
 
 void main()
 {
-	highp vec3 normalized_normal = normalize(v_normal);
+	highp vec3 normalized_normal = vec3(0.f, 0.f, 0.f);
+	if(vr_material.have_normal_texture)
+	{
+		normalized_normal = tbn * normalize(texture2D(vr_material.normal_texture, v_uv).xyz * 2.f - 1.f);
+	}
+	else
+	{
+		normalized_normal = normalize(v_normal);
+	}
+	
 	highp vec3 view_direction = normalize(vr_view_position - v_position);
 
 	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
