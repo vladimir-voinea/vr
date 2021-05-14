@@ -32,6 +32,12 @@ struct light_attenuation
 	float quadratic = 0.32f;
 };
 
+struct ambient_light
+{
+	glm::vec3 color = { 1.f, 1.f, 1.f };
+	float intensity = 1.f;
+};
+
 struct directional_light
 {
 	glm::vec3 position = { -30.f, 30.f, 30.f };
@@ -62,6 +68,7 @@ struct parameters
 	rotation rotation;
 	scale scale;
 
+	ambient_light ambient_light;
 	directional_light directional_light;
 	point_light point_light;
 	spot_light spot_light;

@@ -279,6 +279,10 @@ void set_light_parameters(vr::object3d* object, const parameters& parameters, gl
 
 		vr::gl::opengl_shader_material* material = static_cast<vr::gl::opengl_shader_material*>(mesh->get_material());
 		auto& uniforms = material->get_uniforms();
+
+		create_or_update(uniforms, "vr_ambient_light.color", parameters.ambient_light.color);
+		create_or_update(uniforms, "vr_ambient_light.intensity", parameters.ambient_light.intensity);
+
 		create_or_update(uniforms, "vr_directional_light.direction", glm::vec3{ 0.f, 0.f, 0.f } - parameters.directional_light.position);
 		create_or_update(uniforms, "vr_directional_light.components.ambient", parameters.directional_light.components.ambient);
 		create_or_update(uniforms, "vr_directional_light.components.diffuse", parameters.directional_light.components.diffuse);

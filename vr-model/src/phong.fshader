@@ -36,6 +36,12 @@ struct vr_light_attenuation_t
 	highp float quadratic;
 };
 
+struct vr_ambient_light_t
+{
+	highp vec3 color;
+	highp float intensity;
+};
+
 struct vr_directional_light_t
 {
 	highp vec3 direction;
@@ -67,6 +73,7 @@ out highp vec4 out_color4;
 uniform highp vec3 vr_view_position;
 uniform vr_material_t vr_material;
 
+uniform vr_ambient_light_t vr_ambient_light;
 uniform vr_directional_light_t vr_directional_light;
 uniform vr_point_light_t vr_point_light;
 uniform vr_spot_light_t vr_spot_light;
@@ -120,6 +127,13 @@ highp vec3 get_specular_color_contribution()
 highp vec3 get_specular_texture_contribution(highp vec2 uv)
 {
 	return texture(vr_material.specular_texture, uv).rgb;
+}
+
+highp vec3 calculate_ambient_light(vr_ambient_light_t light, highp vec2 uv)
+{
+	highp vec3 ambient = light.color * light.intensity * get_diffuse_texture_contribution(uv) * get_diffuse_color_contribution();
+
+	return ambient;
 }
 
 highp vec3 calculate_directional_light(vr_directional_light_t light, highp vec2 uv, highp vec3 normal, highp vec3 view_direction)
@@ -179,9 +193,10 @@ void main()
 
 	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
 	
-	accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
-	accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, v_position, view_direction);
-	accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, v_position, view_direction);
+	accumulator += calculate_ambient_light(vr_ambient_light, v_uv);
+	//accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
+	//accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, v_position, view_direction);
+	//accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, v_position, view_direction);
 
 	out_color4 = vec4(accumulator, 1.f);
 }

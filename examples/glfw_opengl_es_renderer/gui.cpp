@@ -110,6 +110,14 @@ void gui::render_model_options(float delta_time)
 	ImGui::EndGroup();
 
 	ImGui::BeginGroup();
+	ImGui::Text("Ambient light");
+	ImGui::ColorEdit3("Color##al", glm::value_ptr(model_parameters.ambient_light.color), ImGuiColorEditFlags_DisplayRGB);
+
+	ImGui::Text("Intensity");
+	ImGui::SliderFloat("X##dl", &model_parameters.ambient_light.intensity, 0.f, 1.f);
+	ImGui::EndGroup();
+
+	ImGui::BeginGroup();
 	ImGui::Text("Directional light");
 	ImGui::ColorEdit3("Light ambient##dl", glm::value_ptr(model_parameters.directional_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
 	ImGui::ColorEdit3("Light diffuse##dl", glm::value_ptr(model_parameters.directional_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
