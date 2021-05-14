@@ -31,7 +31,9 @@ namespace vr::gl
 		void load_skybox(const skybox* skybox);
 
 	private:
-		void activate_texture(const loaded_texture* texture, unsigned int target);
+		void activate_texture(const loaded_texture* texture, unsigned int unit);
+		void deactivate_texture_unit(unsigned int unit);
+
 		void activate_shader(const loaded_shader* shader);
 		void load_shader_uniforms(const opengl_shader_material* material, const loaded_shader* shader);
 		void render_geometry(const vr::geometry* geometry, const loaded_shader* shader);
@@ -42,6 +44,5 @@ namespace vr::gl
 		const renderer_settings& m_settings;
 		std::unique_ptr<renderer_cache> m_cache;
 		GLuint m_last_shader_id = 0;
-		GLuint m_last_texture_id = 0;
 	};
 }
