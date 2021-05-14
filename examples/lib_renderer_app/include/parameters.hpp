@@ -68,9 +68,16 @@ struct parameters
 	rotation rotation;
 	scale scale;
 
+	bool have_ambient_light = true;
 	ambient_light ambient_light;
+
+	bool have_directional_light = false;
 	directional_light directional_light;
+
+	bool have_point_light = false;
 	point_light point_light;
+
+	bool have_spot_light = false;
 	spot_light spot_light;
 
 	parameters();

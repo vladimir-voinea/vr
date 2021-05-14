@@ -111,6 +111,7 @@ void gui::render_model_options(float delta_time)
 
 	ImGui::BeginGroup();
 	ImGui::Text("Ambient light");
+	ImGui::Checkbox("Enable##al", &model_parameters.have_ambient_light);
 	ImGui::ColorEdit3("Color##al", glm::value_ptr(model_parameters.ambient_light.color), ImGuiColorEditFlags_DisplayRGB);
 
 	ImGui::Text("Intensity");
@@ -119,6 +120,7 @@ void gui::render_model_options(float delta_time)
 
 	ImGui::BeginGroup();
 	ImGui::Text("Directional light");
+	ImGui::Checkbox("Enable##dl", &model_parameters.have_directional_light);
 	ImGui::ColorEdit3("Light ambient##dl", glm::value_ptr(model_parameters.directional_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
 	ImGui::ColorEdit3("Light diffuse##dl", glm::value_ptr(model_parameters.directional_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
 	ImGui::ColorEdit3("Light specular##dl", glm::value_ptr(model_parameters.directional_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
@@ -131,6 +133,7 @@ void gui::render_model_options(float delta_time)
 
 	ImGui::BeginGroup();
 	ImGui::Text("Point light");
+	ImGui::Checkbox("Enable##pl", &model_parameters.have_point_light);
 	ImGui::ColorEdit3("Light ambient##pl", glm::value_ptr(model_parameters.point_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
 	ImGui::ColorEdit3("Light diffuse##pl", glm::value_ptr(model_parameters.point_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
 	ImGui::ColorEdit3("Light specular##pl", glm::value_ptr(model_parameters.point_light.components.specular), ImGuiColorEditFlags_DisplayRGB);
@@ -148,6 +151,7 @@ void gui::render_model_options(float delta_time)
 
 	ImGui::BeginGroup();
 	ImGui::Text("Spot light");
+	ImGui::Checkbox("Enable##sl", &model_parameters.have_spot_light);
 	ImGui::ColorEdit3("Light ambient##sl", glm::value_ptr(model_parameters.spot_light.components.ambient), ImGuiColorEditFlags_DisplayRGB);
 	ImGui::ColorEdit3("Light diffuse##sl", glm::value_ptr(model_parameters.spot_light.components.diffuse), ImGuiColorEditFlags_DisplayRGB);
 	ImGui::ColorEdit3("Light specular##sl", glm::value_ptr(model_parameters.spot_light.components.specular), ImGuiColorEditFlags_DisplayRGB);

@@ -3,22 +3,22 @@ R"(
 
 struct vr_material_t
 {
-	highp int have_ambient_color;
+	highp bool have_ambient_color;
 	highp vec3 ambient_color;
-	highp int have_ambient_texture;
+	highp bool have_ambient_texture;
 	sampler2D ambient_texture;
 				
-	highp int have_diffuse_color;
+	highp bool have_diffuse_color;
 	highp vec3 diffuse_color;
-	highp int have_diffuse_texture;
+	highp bool have_diffuse_texture;
 	sampler2D diffuse_texture;
 
-	highp int have_specular_color;
+	highp bool have_specular_color;
 	highp vec3 specular_color;
-	highp int have_specular_texture;
+	highp bool have_specular_texture;
 	sampler2D specular_texture;
 
-	highp int have_shininess;
+	highp bool have_shininess;
 	highp float shininess;
 };
 
@@ -73,10 +73,19 @@ out highp vec4 out_color4;
 uniform highp vec3 vr_view_position;
 uniform vr_material_t vr_material;
 
+uniform bool vr_have_ambient_light;
 uniform vr_ambient_light_t vr_ambient_light;
+
+uniform bool vr_have_directional_light;
 uniform vr_directional_light_t vr_directional_light;
+
+uniform bool vr_have_point_light;
 uniform vr_point_light_t vr_point_light;
+
+uniform bool vr_have_spot_light;
 uniform vr_spot_light_t vr_spot_light;
+
+
 
 #define DEFAULT_COLOR vec3(0.f, 0.f, 0.f)
 
@@ -88,7 +97,7 @@ highp float get_ambient_coefficient()
 
 highp vec3 get_ambient_color_contribution()
 {
-	return vr_material.have_ambient_color == 1 ? vr_material.ambient_color : DEFAULT_COLOR;
+	return vr_material.have_ambient_color ? vr_material.ambient_color : DEFAULT_COLOR;
 }
 
 highp vec3 get_ambient_texture_contribution(highp vec2 uv)
@@ -104,7 +113,7 @@ highp float get_diffuse_coefficient(highp vec3 normalized_normal, highp vec3 lig
 
 highp vec3 get_diffuse_color_contribution()
 {
-	return vr_material.have_diffuse_color == 1 ? vr_material.diffuse_color : DEFAULT_COLOR;
+	return vr_material.have_diffuse_color ? vr_material.diffuse_color : DEFAULT_COLOR;
 }
 
 highp vec3 get_diffuse_texture_contribution(highp vec2 uv)
@@ -121,7 +130,7 @@ highp float get_specular_coefficient(highp vec3 normalized_normal, highp vec3 li
 
 highp vec3 get_specular_color_contribution()
 {
-	return vr_material.have_specular_color == 1 ? vr_material.specular_color : DEFAULT_COLOR;
+	return vr_material.have_specular_color ? vr_material.specular_color : DEFAULT_COLOR;
 }
 
 highp vec3 get_specular_texture_contribution(highp vec2 uv)
@@ -193,10 +202,24 @@ void main()
 
 	highp vec3 accumulator = vec3(0.f, 0.f, 0.f);
 	
-	accumulator += calculate_ambient_light(vr_ambient_light, v_uv);
-	//accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
-	//accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, v_position, view_direction);
-	//accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, v_position, view_direction);
+	if(vr_have_ambient_light)
+	{
+		accumulator += calculate_ambient_light(vr_ambient_light, v_uv);
+	}
+	if(vr_have_directional_light)
+	{
+		accumulator += calculate_directional_light(vr_directional_light, v_uv, normalized_normal, view_direction);
+	}
+
+	if(vr_have_point_light)
+	{
+		accumulator += calculate_point_light(vr_point_light, v_uv, normalized_normal, v_position, view_direction);
+	}
+	
+	if(vr_have_spot_light)
+	{
+		accumulator += calculate_spot_light(vr_spot_light, v_uv, normalized_normal, v_position, view_direction);
+	}
 
 	out_color4 = vec4(accumulator, 1.f);
 }
