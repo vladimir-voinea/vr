@@ -17,6 +17,7 @@ namespace vr
 	{
 	public:
 		object3d();
+		object3d(const glm::vec3& position);
 		~object3d() override = default;
 
 		object3d* get_parent();

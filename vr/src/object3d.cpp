@@ -11,6 +11,11 @@ namespace vr
 {
 	object3d::object3d() = default;
 
+	object3d::object3d(const glm::vec3& position)
+	{
+		translate(position);
+	}
+
 	object3d* object3d::get_parent()
 	{
 		return m_parent;
