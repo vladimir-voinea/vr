@@ -24,7 +24,7 @@ namespace vr
 
 		const std::vector<std::unique_ptr<object3d>>& get_children() const;
 		void add_child(std::unique_ptr<object3d>);
-		void remove_child(object3d*);
+		std::unique_ptr<object3d> remove_child(object3d*);
 
 		const std::vector<mesh*>& get_meshes() const;
 		std::vector<mesh*>& get_meshes();

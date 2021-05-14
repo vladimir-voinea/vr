@@ -4,16 +4,12 @@
 
 namespace vr
 {
-	class scene
+	class scene : public object3d
 	{
 	public:
-		void add(object3d* object); 
-		void remove(object3d* object);
-
-		const std::vector<object3d*>& get_objects() const;
-		std::vector<object3d*>& get_objects();
+		scene();
+		~scene() override;
 
 	private:
-		std::vector<object3d*> m_objects;
 	};
 }

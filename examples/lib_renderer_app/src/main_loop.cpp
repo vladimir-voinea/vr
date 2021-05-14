@@ -171,17 +171,17 @@ void main_loop::add_light_bulb()
 	m_directional_light_model = vr::model::load_model("data/models/uv_sphere.obj");
 	m_directional_light = m_directional_light_model.first.get();
 	//m_directional_light->scale(scale_factor);
-	m_scene.add(m_directional_light);
+	m_scene.add_child(std::move(m_directional_light_model.first));
 
 	m_point_light_model = vr::model::load_model("data/models/torus.obj");
 	m_point_light = m_point_light_model.first.get();
 	//m_point_light->scale(scale_factor);
-	m_scene.add(m_point_light);
+	m_scene.add_child(std::move(m_point_light_model.first));
 
 	m_spot_light_model = vr::model::load_model("data/models/cone.obj");
 	m_spot_light = m_spot_light_model.first.get();
 	//m_spot_light->scale(scale_factor);
-	m_scene.add(m_spot_light);
+	m_scene.add_child(std::move(m_spot_light_model.first));
 }
 
 void main_loop::resize(int width, int height)
@@ -213,21 +213,21 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 		{
 			if (m_scene_model)
 			{
-				m_scene.remove(m_scene_model);
+				m_loaded_models[m_scene_model_path].first = std::move(m_scene.remove_child(m_scene_model));
 			}
 
-			if (auto it = m_loaded_models.find(parameters.path); it == m_loaded_models.end())
+			auto it = m_loaded_models.find(parameters.path);
+			if (it == m_loaded_models.end())
 			{
 				auto insert = m_loaded_models.insert(std::make_pair(parameters.path, vr::model::load_model(parameters.path)));
-				m_scene_model = insert.first->second.first.get();
-			}
-			else
-			{
-				m_scene_model = it->second.first.get();
+				it = insert.first;
 			}
 
-			m_scene.add(m_scene_model);
+			m_scene_model = it->second.first.get();
 			m_scene_model->set_name("Model root");
+			m_scene.add_child(std::move(it->second.first));
+
+			m_scene_model_path = parameters.path;
 		}
 	}
 	transform_model(parameters);

@@ -5,6 +5,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include <spdlog/spdlog.h>
+
 namespace vr
 {
 	object3d::object3d() = default;
@@ -34,10 +36,15 @@ namespace vr
 		m_children.emplace_back(std::move(child))->set_parent(this);
 	}
 
-	void object3d::remove_child(object3d* child)
+	std::unique_ptr<object3d> object3d::remove_child(object3d* child)
 	{
-		m_children.erase(std::remove_if(m_children.begin(), m_children.end(), [child](const auto& child_ptr) { return child_ptr.get() == child; }), m_children.end());
-		child->set_parent(nullptr);
+		auto remove_it = std::remove_if(m_children.begin(), m_children.end(), [child](const auto& child_ptr) { return child_ptr.get() == child; });
+
+		std::unique_ptr<object3d> released = std::move(*remove_it);
+		m_children.erase(remove_it, m_children.end());
+		released->set_parent(nullptr);
+
+		return released;
 	}
 
 	const std::vector<mesh*>& object3d::get_meshes() const
