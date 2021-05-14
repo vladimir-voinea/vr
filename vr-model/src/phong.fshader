@@ -269,9 +269,6 @@ void main()
 		accumulator += with_spot_light;
 	}
 
-	highp vec3 min = vec3(0.f, 0.f, 0.f);
-	highp vec3 max = vec3(1.f, 1.f, 1.f);
-
-	out_color4 = vec4(clamp(accumulator, min, max), 1.f);
+	out_color4 = vec4(accumulator, 1.f);
 }
 )"
