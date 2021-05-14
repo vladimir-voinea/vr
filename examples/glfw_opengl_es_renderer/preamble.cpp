@@ -1,8 +1,7 @@
 #include "preamble.hpp"
+
 #include <glfw_util.hpp>
-
 #include <spdlog/spdlog.h>
-
 
 #include <stdexcept>
 

@@ -211,7 +211,11 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 	{
 		if (std::filesystem::exists(parameters.path))
 		{
-			m_scene.remove(m_scene_model);
+			if (m_scene_model)
+			{
+				m_scene.remove(m_scene_model);
+			}
+
 			if (auto it = m_loaded_models.find(parameters.path); it == m_loaded_models.end())
 			{
 				auto insert = m_loaded_models.insert(std::make_pair(parameters.path, vr::model::load_model(parameters.path)));
@@ -221,6 +225,7 @@ void main_loop::frame(float delta_time, const parameters& parameters)
 			{
 				m_scene_model = it->second.first.get();
 			}
+
 			m_scene.add(m_scene_model);
 			m_scene_model->set_name("Model root");
 		}
@@ -337,10 +342,9 @@ void main_loop::transform_model(const parameters& parameters)
 			return translation;
 		};
 
-		const auto object_position_world = get_world_position(m_scene_model);
-
 		m_scene_model->traverse([&, this](vr::object3d* obj)
 			{
+				const auto object_position_world = get_world_position(m_scene_model);
 				set_light_parameters(obj, parameters, object_position_world);
 			});
 

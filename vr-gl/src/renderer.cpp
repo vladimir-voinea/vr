@@ -320,6 +320,11 @@ namespace vr::gl
 			glClearColor(clear_color.r, clear_color.g, clear_color.b, 0.0f);
 		}
 
+		if (m_settings.skybox)
+		{
+			load_skybox(m_settings.skybox.get());
+		}
+
 		for (auto object : scene.get_objects())
 		{
 			load_object(object);
@@ -332,7 +337,6 @@ namespace vr::gl
 
 		if (m_settings.skybox)
 		{
-			load_skybox(m_settings.skybox.get());
 			render_skybox(m_settings.skybox.get(), camera);
 		}
 	}
