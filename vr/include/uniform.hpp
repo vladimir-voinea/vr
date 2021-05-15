@@ -30,4 +30,12 @@ namespace vr
 			float vec1f;
 		} value;
 	};
+
+	uniform make_uniform(const std::string& name, const glm::mat4& value);
+	uniform make_uniform(const std::string& name, const glm::mat3& value);
+	uniform make_uniform(const std::string& name, const glm::vec3& value);
+	uniform make_uniform(const std::string& name, const glm::vec4& value);
+	uniform make_uniform(const std::string& name, const int& value);
+	uniform make_uniform(const std::string& name, const float& value);
+	uniform make_uniform(const std::string& name, const bool& value);
 }

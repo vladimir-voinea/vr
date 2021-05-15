@@ -23,4 +23,10 @@ namespace vr
 	{
 		m_color = color;
 	}
+
+	void ambient_light::load_uniforms(const uniform_loader_base& loader, unsigned int light_index)
+	{
+		loader.load_uniform(make_uniform("vr_ambient_light.color", get_color()));
+		loader.load_uniform(make_uniform("vr_ambient_light.intensity", get_intensity()));
+	}
 }

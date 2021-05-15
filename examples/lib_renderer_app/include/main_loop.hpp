@@ -37,6 +37,7 @@ private:
 	void make_cameras();
 
 	void add_light_bulb();
+	void setup_lights(const parameters& parameters);
 	void transform_model(const parameters& parameters);
 
 private:
@@ -62,14 +63,19 @@ private:
 	std::string m_scene_model_path;
 	vr::object3d* m_scene_model = nullptr;
 
+	vr::ambient_light* m_ambient_light = nullptr;
+
 	std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data> m_directional_light_model;
-	vr::object3d* m_directional_light = nullptr;
+	vr::object3d* m_directional_light_object = nullptr;
+	vr::directional_light* m_directional_light = nullptr;
 
 	std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data> m_point_light_model;
-	vr::object3d* m_point_light = nullptr;
+	vr::object3d* m_point_light_object = nullptr;
+	vr::point_light* m_point_light = nullptr;
 
 	std::pair<std::unique_ptr<vr::object3d>, vr::model::model_data> m_spot_light_model;
-	vr::object3d* m_spot_light = nullptr;
+	vr::object3d* m_spot_light_object = nullptr;
+	vr::spot_light* m_spot_light = nullptr;
 
 	int total_frames = 0;
 };

@@ -12,3 +12,7 @@
 #include "texture.hpp"
 #include "vertex.hpp"
 #include "cube_texture.hpp"
+#include "ambient_light.hpp"
+#include "directional_light.hpp"
+#include "point_light.hpp"
+#include "spot_light.hpp"

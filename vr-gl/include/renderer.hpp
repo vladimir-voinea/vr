@@ -37,7 +37,7 @@ namespace vr::gl
 		void activate_shader(const loaded_shader* shader);
 		void load_shader_uniforms(const opengl_shader_material* material, const loaded_shader* shader);
 		void render_geometry(const vr::geometry* geometry, const loaded_shader* shader);
-		void render_object(object3d* object, const camera& camera);
+		void render_object(object3d& object, const camera& camera, light_container* lights);
 		void render_skybox(const skybox* skybox, const camera& camera);
 
 	private:

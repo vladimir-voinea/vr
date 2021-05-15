@@ -44,6 +44,8 @@ namespace vr
 
 		void traverse(std::function<void(object3d*)> func);
 
+		glm::vec3 get_world_position() const;
+
 	private:
 		void set_parent(object3d*);
 

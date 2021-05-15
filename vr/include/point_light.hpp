@@ -12,6 +12,8 @@ namespace vr
 		point_light(const light_components& components, const light_attenuation& attenuation, float intensity = 1.f);
 		virtual ~point_light() override;
 
+		void load_uniforms(const uniform_loader_base& loader, unsigned int light_index) override;
+
 	private:
 	};
 }

@@ -16,6 +16,8 @@ namespace vr
 		float get_outer_cutoff_angle() const;
 		void set_outer_cutoff_angle(float angle);
 
+		void load_uniforms(const uniform_loader_base& loader, unsigned int light_index) override;
+
 	private:
 		float m_inner_cutoff_angle;
 		float m_outer_cutoff_angle;

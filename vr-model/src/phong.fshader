@@ -49,6 +49,7 @@ struct vr_directional_light_t
 {
 	highp vec3 direction;
 	vr_light_components_t components;
+	highp float intensity;
 };
 
 struct vr_point_light_t
@@ -56,16 +57,18 @@ struct vr_point_light_t
 	highp vec3 position;
 	vr_light_attenuation_t attenuation;
 	vr_light_components_t components;
+	highp float intensity;
 };
 
 struct vr_spot_light_t
 {
 	highp vec3 position;
 	highp vec3 direction;
-	highp float cutoff_cosine;
-	highp float outer_cutoff_cosine;
 	vr_light_attenuation_t attenuation;
 	vr_light_components_t components;
+	highp float cutoff_cosine;
+	highp float outer_cutoff_cosine;
+	highp float intensity;
 };
 
 in highp vec2 v_uv;
@@ -83,8 +86,9 @@ uniform vr_ambient_light_t vr_ambient_light;
 uniform bool vr_have_directional_light;
 uniform vr_directional_light_t vr_directional_light;
 
-uniform bool vr_have_point_light;
-uniform vr_point_light_t vr_point_light;
+#define MAX_POINT_LIGHTS 10
+uniform highp int vr_n_point_lights;
+uniform vr_point_light_t vr_point_lights[MAX_POINT_LIGHTS];
 
 uniform bool vr_have_spot_light;
 uniform vr_spot_light_t vr_spot_light;
@@ -187,7 +191,7 @@ highp vec3 add_directional_light(vr_directional_light_t light, vr_color_componen
 	highp vec3 diffuse = light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * color.diffuse;
 	highp vec3 specular = light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * color.specular;
 
-	return (ambient + diffuse + specular);
+	return (ambient + diffuse + specular) * light.intensity;
 }
 
 highp float calculate_attenuation(vr_light_attenuation_t attenuation_data, highp float distance)
@@ -208,7 +212,7 @@ highp vec3 add_point_light(vr_point_light_t light, vr_color_components_t color, 
 	highp vec3 diffuse = attenuation * light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * color.diffuse;
 	highp vec3 specular = attenuation * light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * color.specular;
 
-	return (ambient + diffuse + specular);
+	return (ambient + diffuse + specular) * light.intensity;
 }
 
 highp vec3 add_spot_light(vr_spot_light_t light, vr_color_components_t color, highp vec3 normal, highp vec3 fragment_position, highp vec3 view_direction)
@@ -226,7 +230,7 @@ highp vec3 add_spot_light(vr_spot_light_t light, vr_color_components_t color, hi
 	highp vec3 diffuse = intensity * attenuation * light.components.diffuse * get_diffuse_coefficient(normal, light_direction) * color.diffuse;
 	highp vec3 specular = intensity * attenuation * light.components.specular * get_specular_coefficient(normal, light_direction, view_direction) * color.specular;
 
-	return (ambient + diffuse + specular);
+	return (ambient + diffuse + specular) * light.intensity;
 }
 
 void main()
@@ -257,9 +261,9 @@ void main()
 		accumulator += with_directional_light;
 	}
 
-	if(vr_have_point_light)
+	for(highp int i = 0; i < vr_n_point_lights; i++)
 	{
-		highp vec3 with_point_light = add_point_light(vr_point_light, color, normalized_normal, v_position, view_direction);
+		highp vec3 with_point_light = add_point_light(vr_point_lights[i], color, normalized_normal, v_position, view_direction);
 		accumulator += with_point_light;
 	}
 	

@@ -90,12 +90,14 @@ struct directional_light
 {
 	glm::vec3 position = { -30.f, 30.f, 30.f };
 	light_components components;
+	float intensity = 1.f;
 
 	template<typename Archive>
 	void serialize(Archive& ar)
 	{
 		ar(position);
 		ar(components);
+		ar(intensity);
 	}
 };
 
@@ -105,6 +107,7 @@ struct point_light
 	glm::vec3 position = { 2.f, 3.f, 2.f };
 	light_components components;
 	light_attenuation attenuation;
+	float intensity = 1.f;
 
 	template<typename Archive>
 	void serialize(Archive& ar)
@@ -112,6 +115,7 @@ struct point_light
 		ar(position);
 		ar(components);
 		ar(attenuation);
+		ar(intensity);
 	}
 };
 
@@ -122,6 +126,7 @@ struct spot_light
 	light_attenuation attenuation;
 	float cutoff_angle = 12.f;
 	float outer_cutoff_angle = 15.f;
+	float intensity = 1.f;
 
 	template<typename Archive>
 	void serialize(Archive& ar)
@@ -130,6 +135,7 @@ struct spot_light
 		ar(components);
 		ar(attenuation);
 		ar(cutoff_angle, outer_cutoff_angle);
+		ar(intensity);
 	}
 };
 
@@ -140,7 +146,7 @@ struct parameters
 	rotation rotation;
 	scale scale;
 
-	bool have_ambient_light = true;
+	bool have_ambient_light = false;
 	ambient_light ambient_light;
 
 	bool have_directional_light = false;

@@ -4,7 +4,7 @@
 
 namespace vr
 {
-	class ambient_light : light
+	class ambient_light : public light
 	{
 	public:
 		ambient_light(const glm::vec3& color, float intensity = 1.f);
@@ -14,6 +14,8 @@ namespace vr
 		glm::vec3& get_color();
 
 		void set_color(const glm::vec3& color);
+
+		virtual void load_uniforms(const uniform_loader_base& loader, unsigned int light_index) override;
 
 	private:
 		glm::vec3 m_color;

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "uniform.hpp"
 
 namespace vr

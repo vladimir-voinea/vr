@@ -104,7 +104,7 @@ void gui::render_model_options(float delta_time)
 
 	ImGui::BeginGroup();
 	ImGui::Text("Scale");
-	ImGui::Checkbox("Uniform##s", &m_scale_uniformly);
+	ImGui::Checkbox("Uniform scaling##s", &m_scale_uniformly);
 	if (m_scale_uniformly)
 	{
 		ImGui::SliderFloat("Value##s", &model_parameters.scale.value.x, 0.0f, max_scale);
@@ -126,7 +126,7 @@ void gui::render_model_options(float delta_time)
 		ImGui::ColorEdit3("Color##al", glm::value_ptr(model_parameters.ambient_light.color), ImGuiColorEditFlags_DisplayRGB);
 
 		ImGui::Text("Intensity");
-		ImGui::SliderFloat("X##dl", &model_parameters.ambient_light.intensity, 0.f, 1.f);
+		ImGui::SliderFloat("I##al", &model_parameters.ambient_light.intensity, 0.f, 1.f);
 	}
 	ImGui::EndGroup();
 
@@ -142,6 +142,9 @@ void gui::render_model_options(float delta_time)
 		ImGui::SliderFloat("X##dl", &model_parameters.directional_light.position.x, -max_light_translation, max_light_translation);
 		ImGui::SliderFloat("Y##dl", &model_parameters.directional_light.position.y, -max_light_translation, max_light_translation);
 		ImGui::SliderFloat("Z##dl", &model_parameters.directional_light.position.z, -max_light_translation, max_light_translation);
+
+		ImGui::Text("Intensity");
+		ImGui::SliderFloat("I##dl", &model_parameters.directional_light.intensity, 0.f, 1.f);
 	}
 	ImGui::EndGroup();
 
@@ -162,6 +165,9 @@ void gui::render_model_options(float delta_time)
 		ImGui::SliderFloat("X##pl", &model_parameters.point_light.position.x, -max_light_translation, max_light_translation);
 		ImGui::SliderFloat("Y##pl", &model_parameters.point_light.position.y, -max_light_translation, max_light_translation);
 		ImGui::SliderFloat("Z##pl", &model_parameters.point_light.position.z, -max_light_translation, max_light_translation);
+
+		ImGui::Text("Intensity");
+		ImGui::SliderFloat("I##pl", &model_parameters.point_light.intensity, 0.f, 1.f);
 	}
 	ImGui::EndGroup();
 
@@ -186,6 +192,9 @@ void gui::render_model_options(float delta_time)
 		ImGui::SliderFloat("X##sl", &model_parameters.spot_light.position.x, -max_light_translation, max_light_translation);
 		ImGui::SliderFloat("Y##sl", &model_parameters.spot_light.position.y, -max_light_translation, max_light_translation);
 		ImGui::SliderFloat("Z##sl", &model_parameters.spot_light.position.z, -max_light_translation, max_light_translation);
+
+		ImGui::Text("Intensity");
+		ImGui::SliderFloat("I##sl", &model_parameters.spot_light.intensity, 0.f, 1.f);
 	}
 	ImGui::EndGroup();
 

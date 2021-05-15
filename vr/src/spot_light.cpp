@@ -29,4 +29,23 @@ namespace vr
 	{
 		m_outer_cutoff_angle = angle;
 	}
+
+	void spot_light::load_uniforms(const uniform_loader_base& loader, unsigned int light_index)
+	{
+		loader.load_uniform(make_uniform("vr_spot_light.position", get_world_position()));
+		loader.load_uniform(make_uniform("vr_spot_light.direction", front() - get_world_position()));
+
+		loader.load_uniform(make_uniform("vr_spot_light.components.ambient", get_components().ambient));
+		loader.load_uniform(make_uniform("vr_spot_light.components.diffuse", get_components().diffuse));
+		loader.load_uniform(make_uniform("vr_spot_light.components.specular", get_components().specular));
+
+		loader.load_uniform(make_uniform("vr_spot_light.attenuation.constant", get_attenuation().constant));
+		loader.load_uniform(make_uniform("vr_spot_light.attenuation.linear", get_attenuation().linear));
+		loader.load_uniform(make_uniform("vr_spot_light.attenuation.quadratic", get_attenuation().quadratic));
+
+		loader.load_uniform(make_uniform("vr_spot_light.cutoff_cosine", std::cos(glm::radians(get_inner_cutoff_angle()))));
+		loader.load_uniform(make_uniform("vr_spot_light.outer_cutoff_cosine", std::cos(glm::radians(get_outer_cutoff_angle()))));
+
+		loader.load_uniform(make_uniform("vr_spot_light.intensity", get_intensity()));
+	}
 }

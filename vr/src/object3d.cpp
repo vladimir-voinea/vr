@@ -1,9 +1,11 @@
 #include "object3d.hpp"
+#include "util.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -120,5 +122,12 @@ namespace vr
 		{
 			child->traverse(func);
 		}
+	}
+
+	glm::vec3 object3d::get_world_position() const
+	{
+		const auto decomp = decompose(get_transformation_matrix());
+
+		return decomp.translation;
 	}
 }

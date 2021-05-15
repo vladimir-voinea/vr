@@ -5,4 +5,6 @@ namespace vr
 	light::light(float intensity)
 		: detail::has_intensity(intensity)
 	{}
+
+	light::~light() = default;
 }

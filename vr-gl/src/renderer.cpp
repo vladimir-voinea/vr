@@ -20,11 +20,11 @@
 
 namespace
 {
-	void load_builtin_uniforms(const vr::gl::loaded_shader* shader, const vr::object3d* object, const vr::camera& camera)
+	void load_builtin_uniforms(const vr::gl::loaded_shader* shader, const vr::object3d& object, const vr::camera& camera, vr::light_container* lights)
 	{
 		using namespace vr::gl;
 
-		const auto model_matrix = object->get_transformation_matrix();
+		const auto model_matrix = object.get_transformation_matrix();
 		const auto view_matrix = camera.get_view_matrix();
 		const auto projection_matrix = camera.get_projection_matrix();
 
@@ -102,6 +102,11 @@ namespace
 			normal_uniform.type = vr::uniform_type::mat3fv;
 			normal_uniform.value.mat3fv = normal_matrix;
 			loader.load_uniform(normal_uniform);
+		}
+
+		if (lights)
+		{
+			lights->load_uniforms(loader);
 		}
 	}
 
@@ -245,10 +250,10 @@ namespace vr::gl
 			load_skybox(m_settings.skybox.get());
 		}
 
-		scene.traverse([this, &camera](vr::object3d* node)
+		scene.traverse([this, &camera, &scene](vr::object3d* node)
 			{
 				load_object(node);
-				render_object(node, camera);
+				render_object(*node, camera, &scene.get_lights());
 			});
 
 		if (m_settings.skybox)
@@ -378,13 +383,13 @@ namespace vr::gl
 		}
 	}
 
-	void renderer::render_object(object3d* object, const vr::camera& camera)
+	void renderer::render_object(object3d& object, const vr::camera& camera, light_container* lights)
 	{
-		object->on_before_render();
+		object.on_before_render();
 
-		if (object->has_geometry())
+		if (object.has_geometry())
 		{
-			for (auto* mesh : object->get_meshes())
+			for (auto* mesh : object.get_meshes())
 			{
 				const auto material = static_cast<const opengl_shader_material*>(mesh->get_material());
 				const auto shader = m_cache->get(&material->get_shader());
@@ -400,7 +405,7 @@ namespace vr::gl
 				}
 				
 				activate_shader(shader);
-				load_builtin_uniforms(shader, object, camera);
+				load_builtin_uniforms(shader, object, camera, lights);
 				load_shader_uniforms(static_cast<const opengl_shader_material*>(mesh->get_material()), shader);
 
 				render_geometry(mesh->get_geometry(), shader);
@@ -410,11 +415,6 @@ namespace vr::gl
 					deactivate_texture_unit(i);
 				}
 			}
-		}
-
-		for (auto& child : object->get_children())
-		{
-			render_object(child.get(), camera);
 		}
 	}
 
