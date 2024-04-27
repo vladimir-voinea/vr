@@ -185,7 +185,7 @@ namespace vr::model
 				have_item = 1;
 				vr::gl::uniform item_uniform;
 				item_uniform.name = uniform_name;
-				item_uniform.type = vr::gl::uniform_type::vec3f;
+				item_uniform.type = vr::gl::uniform_type::vec1f;
 				item_uniform.value.vec1f = item;
 				uniforms.push_back(item_uniform);
 			}

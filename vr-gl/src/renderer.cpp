@@ -402,7 +402,7 @@ namespace vr::gl
 	void renderer::activate_texture(const loaded_texture* texture, unsigned int unit)
 	{
 		glActiveTexture(GL_TEXTURE0 + unit);
-		glBindTexture(GL_TEXTURE_2D, texture->id);
+		glBindTexture(texture->target, texture->id);
 	}
 
 	void renderer::deactivate_texture_unit(unsigned int unit)
