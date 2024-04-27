@@ -22,8 +22,8 @@ endif()
 add_subdirectory ("assimp")
 
 if(NOT DEFINED ANDROID)
-	add_subdirectory ("cereal")
+#	add_subdirectory ("cereal")
 endif()
 
-add_subdirectory ("imgui")
+#add_subdirectory ("imgui")
 add_subdirectory ("spdlog")

@@ -36,7 +36,7 @@ endif()
 if(NOT DEFINED ANDROID)
 	# CMake modules
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-add_subdirectory ("vr-vk")
+#add_subdirectory ("vr-vk")
 endif()
 
 add_subdirectory ("examples")
