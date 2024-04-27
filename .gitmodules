@@ -20,9 +20,9 @@
 	branch = v2.x
 [submodule "imgui"]
 	path = dependencies/imgui
-	url = https://github.com/vladimir-voinea/imgui.git
-	branch = branch-v1.82
+	url = https://github.com/ocornut/imgui.git
+	branch = v1.82
 [submodule "cereal"]
 	path = dependencies/cereal
-	url = https://github.com/vladimir-voinea/cereal.git
+	url = https://github.com/USCiLab/cereal.git
 	branch = v1.3.30
