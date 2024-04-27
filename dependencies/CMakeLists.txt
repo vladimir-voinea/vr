@@ -7,7 +7,8 @@ endif()
 
 add_subdirectory ("glm")
 
-if(NOT DEFINED ANDROID)
+
+if(WIN32)
 	add_subdirectory ("glew")
 endif()
 
