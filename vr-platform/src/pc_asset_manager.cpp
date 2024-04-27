@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iterator>
 #include <filesystem>
+#include <algorithm>
 
 namespace vr::platform
 {

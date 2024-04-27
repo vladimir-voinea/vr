@@ -8,8 +8,8 @@ namespace vr::glfw
 
 	struct user_pointer
 	{
-		window* window;
-		keyboard* keyboard;
-		mouse* mouse;
+		window* window_ptr;
+		keyboard* keyboard_ptr;
+		mouse* mouse_ptr;
 	};
 }

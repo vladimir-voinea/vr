@@ -12,7 +12,7 @@ namespace cereal
 	}
 }
 
-struct translation
+struct translation_t
 {
 	glm::vec3 vec;
 
@@ -23,7 +23,7 @@ struct translation
 	}
 };
 
-struct rotation
+struct rotation_t
 {
 	glm::vec3 euler_angles;
 
@@ -34,7 +34,7 @@ struct rotation
 	}
 };
 
-struct scale
+struct scale_t
 {
 	glm::vec3 value = { 1.f, 1.f, 1.f };
 
@@ -45,7 +45,7 @@ struct scale
 	}
 };
 
-struct light_components
+struct light_components_t
 {
 	glm::vec3 ambient = { 1.f, 1.f, 1.f };
 	glm::vec3 diffuse = { 1.f, 1.f, 1.f };
@@ -60,7 +60,7 @@ struct light_components
 	}
 };
 
-struct light_attenuation
+struct light_attenuation_t
 {
 	float constant = 1.f;
 	float linear = 0.09f;
@@ -73,7 +73,7 @@ struct light_attenuation
 	}
 };
 
-struct ambient_light
+struct ambient_light_t
 {
 	glm::vec3 color = { 1.f, 1.f, 1.f };
 	float intensity = 1.f;
@@ -86,10 +86,10 @@ struct ambient_light
 	}
 };
 
-struct directional_light
+struct directional_light_t
 {
 	glm::vec3 position = { -30.f, 30.f, 30.f };
-	light_components components;
+	light_components_t components;
 
 	template<typename Archive>
 	void serialize(Archive& ar)
@@ -100,11 +100,11 @@ struct directional_light
 };
 
 
-struct point_light
+struct point_light_t
 {
 	glm::vec3 position = { 2.f, 3.f, 2.f };
-	light_components components;
-	light_attenuation attenuation;
+	light_components_t components;
+	light_attenuation_t attenuation;
 
 	template<typename Archive>
 	void serialize(Archive& ar)
@@ -115,11 +115,11 @@ struct point_light
 	}
 };
 
-struct spot_light
+struct spot_light_t
 {
 	glm::vec3 position = { -3.f, 5.f, 2.f };
-	light_components components;
-	light_attenuation attenuation;
+	light_components_t components;
+	light_attenuation_t attenuation;
 	float cutoff_angle = 12.f;
 	float outer_cutoff_angle = 15.f;
 
@@ -136,21 +136,21 @@ struct spot_light
 struct parameters
 {
 	std::string path;
-	translation translation;
-	rotation rotation;
-	scale scale;
+	translation_t translation;
+	rotation_t rotation;
+	scale_t scale;
 
 	bool have_ambient_light = true;
-	ambient_light ambient_light;
+	ambient_light_t ambient_light;
 
 	bool have_directional_light = false;
-	directional_light directional_light;
+	directional_light_t directional_light;
 
 	bool have_point_light = false;
-	point_light point_light;
+	point_light_t point_light;
 
 	bool have_spot_light = false;
-	spot_light spot_light;
+	spot_light_t spot_light;
 
 	parameters();
 

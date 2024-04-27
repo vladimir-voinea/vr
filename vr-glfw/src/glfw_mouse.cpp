@@ -5,10 +5,16 @@
 
 namespace vr::glfw
 {
+	void glfw_cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+	void glfw_button_callback(GLFWwindow* window, int button, int action, int mods);
+	void glfw_button_callback(GLFWwindow* window, int button, int action, int mods);
+	void glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+	void glfw_cursor_enter_callback(GLFWwindow* window, int entered);
+
 	mouse::mouse(window& window)
 		: m_window(window)
 	{
-		static_cast<user_pointer*>(glfwGetWindowUserPointer(window.get_handle()))->mouse = this;
+		static_cast<user_pointer*>(glfwGetWindowUserPointer(window.get_handle()))->mouse_ptr = this;
 		glfwSetCursorPosCallback(window.get_handle(), glfw_cursor_position_callback);
 		glfwSetMouseButtonCallback(window.get_handle(), glfw_button_callback);
 		glfwSetScrollCallback(window.get_handle(), glfw_scroll_callback);
@@ -83,7 +89,7 @@ namespace vr::glfw
 	void glfw_cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	{
 		auto user_ptr = static_cast<user_pointer*>(glfwGetWindowUserPointer(window));
-		auto m = static_cast<mouse*>(user_ptr->mouse);
+		auto m = static_cast<mouse*>(user_ptr->mouse_ptr);
 		m->cursor_position_callback(xpos, ypos);
 	}
 
@@ -138,7 +144,7 @@ namespace vr::glfw
 	void glfw_button_callback(GLFWwindow* window, int button, int action, int mods)
 	{
 		auto user_ptr = static_cast<user_pointer*>(glfwGetWindowUserPointer(window));
-		auto m = static_cast<mouse*>(user_ptr->mouse);
+		auto m = static_cast<mouse*>(user_ptr->mouse_ptr);
 		m->button_callback(button, action, mods);
 	}
 
@@ -153,7 +159,7 @@ namespace vr::glfw
 	void glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
 		auto user_ptr = static_cast<user_pointer*>(glfwGetWindowUserPointer(window));
-		auto m = static_cast<mouse*>(user_ptr->mouse);
+		auto m = static_cast<mouse*>(user_ptr->mouse_ptr);
 		m->scroll_callback(xoffset, yoffset);
 	}
 
@@ -168,7 +174,7 @@ namespace vr::glfw
 	void glfw_cursor_enter_callback(GLFWwindow* window, int entered)
 	{
 		auto user_ptr = static_cast<user_pointer*>(glfwGetWindowUserPointer(window));
-		auto m = static_cast<mouse*>(user_ptr->mouse);
+		auto m = static_cast<mouse*>(user_ptr->mouse_ptr);
 		m->cursor_enter_callback(entered);
 	}
 }

@@ -3,6 +3,7 @@
 #include "glfw_window_settings.hpp"
 #include <functional>
 #include <string>
+#include <memory>
 
 struct GLFWwindow;
 

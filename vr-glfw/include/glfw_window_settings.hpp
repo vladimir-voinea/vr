@@ -2,6 +2,7 @@
 
 #include <string>
 #include <optional>
+#include <cstdint>
 
 namespace vr::glfw
 {
@@ -37,7 +38,7 @@ namespace vr::glfw
 		int height = 600;
 		bool full_screen = false;
 		std::string name = "Unnamed window";
-		std::optional<opengl_context> opengl_context = {};
+		std::optional<opengl_context> gl_context = {};
 		bool resizable = false;
 		std::optional<uint8_t> msaa_samples;
 	};

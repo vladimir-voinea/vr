@@ -380,7 +380,7 @@ namespace vr::gl
 		}
 	}
 
-	void renderer::load_skybox(const skybox* skybox)
+	void renderer::load_skybox(const skybox_t* skybox)
 	{
 		loaded_texture* texture = nullptr;
 		loaded_geometry* geometry = nullptr;
@@ -500,7 +500,7 @@ namespace vr::gl
 		}
 	}
 
-	void renderer::render_skybox(const skybox* skybox, const camera& camera)
+	void renderer::render_skybox(const skybox_t* skybox, const camera& camera)
 	{
 		glDepthFunc(GL_LEQUAL);
 

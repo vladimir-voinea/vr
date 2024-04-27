@@ -1,8 +1,8 @@
 #pragma once
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__linux__)
 	#define GLEW_STATIC
-	#include <gl/glew.h>
+	#include <GL/glew.h>
 #elif __ANDROID__
 	#if __ANDROID_API__ >= 24
 	#include <GLES3/gl32.h>

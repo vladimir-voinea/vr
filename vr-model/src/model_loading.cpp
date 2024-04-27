@@ -287,7 +287,7 @@ namespace vr::model
 
 	std::pair<std::unique_ptr<object3d>, model_data> load_model(const std::string& path)
 	{
-#ifdef WIN32
+#if defined(WIN32) || defined(__linux__)
 		const auto name = path;
 		if (!std::filesystem::exists(path))
 		{

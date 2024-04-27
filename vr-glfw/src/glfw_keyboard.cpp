@@ -126,10 +126,13 @@ namespace
 
 namespace vr::glfw
 {
+	void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	void glfw_char_callback(GLFWwindow* window, unsigned int codepoint);
+
 	keyboard::keyboard(window& window)
 		: m_window(window)
 	{
-		static_cast<user_pointer*>(glfwGetWindowUserPointer(window.get_handle()))->keyboard = this;
+		static_cast<user_pointer*>(glfwGetWindowUserPointer(window.get_handle()))->keyboard_ptr = this;
 		glfwSetKeyCallback(window.get_handle(), glfw_key_callback);
 		glfwSetCharCallback(window.get_handle(), glfw_char_callback);
 	}
@@ -241,13 +244,13 @@ namespace vr::glfw
 
 	void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard;
+		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard_ptr;
 		kb->key_callback(key, scancode, action, mods);
 	}
 
 	void glfw_char_callback(GLFWwindow* window, unsigned int codepoint)
 	{
-		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard;
+		keyboard* kb = static_cast<user_pointer*>(glfwGetWindowUserPointer(window))->keyboard_ptr;
 		kb->char_callback(codepoint);
 	}
 }

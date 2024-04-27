@@ -8,7 +8,7 @@
 
 namespace vr::gl
 {
-	struct viewport
+	struct viewport_t
 	{
 		int x0;
 		int y0;
@@ -38,10 +38,10 @@ namespace vr::gl
 
 	struct renderer_settings
 	{
-		viewport viewport;
+		viewport_t viewport;
 
 		std::unique_ptr<glm::vec3> clear_color;
-		std::unique_ptr<skybox> skybox;
+		std::unique_ptr<skybox_t> skybox;
 
 		bool wireframe_mode = false;
 		bool cull_faces = true;

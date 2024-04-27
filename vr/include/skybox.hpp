@@ -9,10 +9,10 @@
 
 namespace vr
 {
-	class skybox
+	class skybox_t
 	{
 	public:
-		skybox(const shader_material* material, const cube_texture* texture);
+		skybox_t(const shader_material* material, const cube_texture* texture);
 
 		const cube_texture* get_texture() const;
 		const geometry* get_geometry() const;

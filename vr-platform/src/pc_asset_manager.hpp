@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asset_manager.hpp"
+#include <cstdint>
 
 namespace vr::platform
 {

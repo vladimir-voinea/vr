@@ -57,12 +57,16 @@ namespace
 
 namespace vr::glfw
 {
+
+	void glfw_window_focus_callback(GLFWwindow* window, int focused);
+	void glfw_framebuffer_resize_callback(GLFWwindow* window, int width, int height);
+
 	window::window(window_settings settings)
 		: m_settings(settings)
 		, m_has_focus(false)
 		, m_user_pointer(std::make_unique<user_pointer>())
 	{
-		m_user_pointer->window = this;
+		m_user_pointer->window_ptr = this;
 	}
 
 	window::~window()
@@ -79,13 +83,13 @@ namespace vr::glfw
 
 		glfwSetErrorCallback(::glfw_error_callback);
 
-		if (m_settings.opengl_context)
+		if (m_settings.gl_context)
 		{
-			glfwWindowHint(GLFW_CLIENT_API, convert_opengl_api(m_settings.opengl_context->api));
-			glfwWindowHint(GLFW_OPENGL_PROFILE, convert_opengl_profile(m_settings.opengl_context->profile));
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_settings.opengl_context->context_version.major);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_settings.opengl_context->context_version.minor);
-			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, m_settings.opengl_context->foward_compatible ? GL_TRUE : GL_FALSE);
+			glfwWindowHint(GLFW_CLIENT_API, convert_opengl_api(m_settings.gl_context->api));
+			glfwWindowHint(GLFW_OPENGL_PROFILE, convert_opengl_profile(m_settings.gl_context->profile));
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_settings.gl_context->context_version.major);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_settings.gl_context->context_version.minor);
+			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, m_settings.gl_context->foward_compatible ? GL_TRUE : GL_FALSE);
 		}
 		else
 		{
@@ -179,7 +183,7 @@ namespace vr::glfw
 	void glfw_window_focus_callback(GLFWwindow* window, int focused)
 	{
 		void* window_user_ptr = glfwGetWindowUserPointer(window);
-		auto window_instance = static_cast<vr::glfw::window*>(static_cast<user_pointer*>(window_user_ptr)->window);
+		auto window_instance = static_cast<vr::glfw::window*>(static_cast<user_pointer*>(window_user_ptr)->window_ptr);
 		if (window_instance != nullptr)
 		{
 			const bool status = focused;
@@ -195,7 +199,7 @@ namespace vr::glfw
 	void glfw_framebuffer_resize_callback(GLFWwindow* window, int width, int height)
 	{
 		void* window_user_ptr = glfwGetWindowUserPointer(window);
-		auto window_instance = static_cast<vr::glfw::window*>(static_cast<user_pointer*>(window_user_ptr)->window);
+		auto window_instance = static_cast<vr::glfw::window*>(static_cast<user_pointer*>(window_user_ptr)->window_ptr);
 		if (window_instance != nullptr)
 		{
 			window_instance->window_framebuffer_callback(width, height);

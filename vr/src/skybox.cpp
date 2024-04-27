@@ -56,23 +56,23 @@ namespace
 
 namespace vr
 {
-	skybox::skybox(const shader_material* material, const cube_texture* texture)
+	skybox_t::skybox_t(const shader_material* material, const cube_texture* texture)
 		: m_texture(texture)
 		, m_geometry(generate_cube_geometry())
 		, m_material(material)
 	{}
 
-	const cube_texture* skybox::get_texture() const
+	const cube_texture* skybox_t::get_texture() const
 	{
 		return m_texture;
 	}
 
-	const geometry* skybox::get_geometry() const
+	const geometry* skybox_t::get_geometry() const
 	{
 		return m_geometry.get();
 	}
 
-	const shader_material* skybox::get_material() const
+	const shader_material* skybox_t::get_material() const
 	{
 		return m_material;
 	}
